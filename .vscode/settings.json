@@ -1,0 +1,27 @@
+{
+  "github.issues.queries": [
+    {
+      "label": "Current Sprint",
+      "query": "is:open is:issue milestone:\"MVP Foundation\" assignee:@me"
+    },
+    {
+      "label": "Backlog",
+      "query": "is:open is:issue no:milestone"
+    },
+    {
+      "label": "In Review",
+      "query": "is:open is:issue label:\"in-review\""
+    }
+  ],
+  "github.remoteName": "origin",
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "files.associations": {
+    "*.dart": "dart"
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": true
+  }
+}

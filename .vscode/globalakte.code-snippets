@@ -1,0 +1,40 @@
+{
+    "Feature Issue": {
+        "prefix": "issue-feature",
+        "body": [
+            "## 📋 Beschreibung",
+            "$1",
+            "",
+            "## ✅ Acceptance Criteria",
+            "- [ ] $2",
+            "- [ ] $3",
+            "- [ ] $4",
+            "",
+            "## 🔧 Technical Notes",
+            "$5",
+            "",
+            "## ⏱️ Time Estimate",
+            "$6"
+        ],
+        "description": "Feature Issue Template"
+    },
+    "Bug Issue": {
+        "prefix": "issue-bug",
+        "body": [
+            "## 🐛 Bug Beschreibung",
+            "$1",
+            "",
+            "## 🔄 Schritte zur Reproduktion",
+            "1. $2",
+            "2. $3",
+            "3. $4",
+            "",
+            "## 📱 Erwartetes Verhalten",
+            "$5",
+            "",
+            "## 📱 Aktuelles Verhalten",
+            "$6"
+        ],
+        "description": "Bug Issue Template"
+    }
+} 

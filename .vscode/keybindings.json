@@ -1,0 +1,17 @@
+[
+  {
+    "key": "ctrl+shift+i",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Create Issue"
+  },
+  {
+    "key": "ctrl+shift+s",
+    "command": "workbench.action.tasks.runTask",
+    "args": "View Current Sprint"
+  },
+  {
+    "key": "ctrl+shift+p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Create Pull Request"
+  }
+]

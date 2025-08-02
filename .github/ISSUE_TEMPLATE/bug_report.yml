@@ -1,0 +1,55 @@
+name: 🐛 Bug Report
+description: Einen Fehler in GlobalAkte melden
+title: "[BUG] "
+labels: ["bug", "priority-high"]
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorität
+      options:
+        - priority-critical
+        - priority-high
+        - priority-medium
+        - priority-low
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: Bug Beschreibung
+      description: Was ist das Problem?
+      placeholder: "Klare Beschreibung des Fehlers..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Schritte zur Reproduktion
+      description: Wie kann der Fehler nachgestellt werden?
+      placeholder: |
+        1. Schritt 1
+        2. Schritt 2
+        3. Fehler tritt auf
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Erwartetes Verhalten
+      description: Was sollte stattdessen passieren?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Umgebung
+      description: Device, OS, App Version
+      placeholder: |
+        - Device: iPhone 14
+        - OS: iOS 17.2
+        - App Version: 1.0.0 
