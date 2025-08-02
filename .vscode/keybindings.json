@@ -10,8 +10,18 @@
     "args": "View Current Sprint"
   },
   {
-    "key": "ctrl+shift+p",
+    "key": "ctrl+shift+r",
     "command": "workbench.action.tasks.runTask",
     "args": "Create Pull Request"
+  },
+  {
+    "key": "ctrl+shift+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Setup GitHub"
+  },
+  {
+    "key": "ctrl+shift+n",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Create Sprint Issues"
   }
 ]
