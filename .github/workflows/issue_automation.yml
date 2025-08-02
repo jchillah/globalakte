@@ -1,0 +1,22 @@
+name: 🧠 Auto-Zuweisung nach Label
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  assign_by_label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set assignee based on label
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SPRINT1_ASSIGNEE: ${{ secrets.SPRINT1_ASSIGNEE }}
+        run: |
+          if [[ "${{ github.event.label.name }}" == "sprint:1" ]]; then
+            gh issue edit "${{ github.event.issue.number }}" \
+              --add-assignee "$SPRINT1_ASSIGNEE"
+          fi
