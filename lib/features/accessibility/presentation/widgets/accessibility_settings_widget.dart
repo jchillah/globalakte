@@ -54,7 +54,7 @@ class _AccessibilitySettingsWidgetState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+                        Row(
               children: [
                 Icon(
                   Icons.settings,
@@ -62,13 +62,14 @@ class _AccessibilitySettingsWidgetState
                   size: 24,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  'Accessibility-Einstellungen',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                Expanded(
+                  child: Text(
+                    'Accessibility-Einstellungen',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-                const Spacer(),
                 TextButton.icon(
                   onPressed: widget.isLoading ? null : widget.onResetSettings,
                   icon: const Icon(Icons.refresh),

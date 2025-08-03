@@ -1,28 +1,29 @@
 // features/accessibility/presentation/screens/accessibility_demo_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../data/repositories/accessibility_repository_impl.dart';
 import '../../domain/entities/accessibility_settings.dart';
 import '../../domain/repositories/accessibility_repository.dart';
 import '../../domain/usecases/accessibility_usecases.dart';
+import '../widgets/accessibility_report_widget.dart';
 import '../widgets/accessibility_settings_widget.dart';
 import '../widgets/accessibility_test_widget.dart';
-import '../widgets/accessibility_report_widget.dart';
 
 /// Demo-Screen für Barrierefreiheit und Accessibility
 class AccessibilityDemoScreen extends StatefulWidget {
   const AccessibilityDemoScreen({super.key});
 
   @override
-  State<AccessibilityDemoScreen> createState() => _AccessibilityDemoScreenState();
+  State<AccessibilityDemoScreen> createState() =>
+      _AccessibilityDemoScreenState();
 }
 
 class _AccessibilityDemoScreenState extends State<AccessibilityDemoScreen>
     with TickerProviderStateMixin {
-  final AccessibilityRepository _accessibilityRepository = AccessibilityRepositoryImpl();
+  final AccessibilityRepository _accessibilityRepository =
+      AccessibilityRepositoryImpl();
   late final GetAccessibilitySettingsUseCase _getSettingsUseCase;
   late final SaveAccessibilitySettingsUseCase _saveSettingsUseCase;
   late final ResetAccessibilitySettingsUseCase _resetSettingsUseCase;
@@ -44,12 +45,16 @@ class _AccessibilityDemoScreenState extends State<AccessibilityDemoScreen>
   }
 
   void _initializeUseCases() {
-    _getSettingsUseCase = GetAccessibilitySettingsUseCase(_accessibilityRepository);
-    _saveSettingsUseCase = SaveAccessibilitySettingsUseCase(_accessibilityRepository);
-    _resetSettingsUseCase = ResetAccessibilitySettingsUseCase(_accessibilityRepository);
+    _getSettingsUseCase =
+        GetAccessibilitySettingsUseCase(_accessibilityRepository);
+    _saveSettingsUseCase =
+        SaveAccessibilitySettingsUseCase(_accessibilityRepository);
+    _resetSettingsUseCase =
+        ResetAccessibilitySettingsUseCase(_accessibilityRepository);
     _runTestsUseCase = RunAccessibilityTestsUseCase(_accessibilityRepository);
     _checkWCAGUseCase = CheckWCAGComplianceUseCase(_accessibilityRepository);
-    _generateReportUseCase = GenerateAccessibilityReportUseCase(_accessibilityRepository);
+    _generateReportUseCase =
+        GenerateAccessibilityReportUseCase(_accessibilityRepository);
   }
 
   Future<void> _loadSettings() async {
@@ -222,8 +227,9 @@ class _AccessibilityDemoScreenState extends State<AccessibilityDemoScreen>
                   child: Text(
                     'Barrierefreiheit & Accessibility',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -243,8 +249,8 @@ class _AccessibilityDemoScreenState extends State<AccessibilityDemoScreen>
               '• Keyboard Navigation\n'
               '• WCAG-Konformität',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-              ),
+                    color: Colors.grey[600],
+                  ),
             ),
           ],
         ),
@@ -295,4 +301,4 @@ class _AccessibilityDemoScreenState extends State<AccessibilityDemoScreen>
       ),
     );
   }
-} 
+}
