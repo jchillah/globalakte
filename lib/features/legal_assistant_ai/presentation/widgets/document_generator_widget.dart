@@ -145,151 +145,154 @@ class _DocumentGeneratorWidgetState extends State<DocumentGeneratorWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Dokument-Generator',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 16),
-
-          // Template-Bereich
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Vorlage',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  GlobalTextField(
-                    controller: _templateController,
-                    label: 'Dokument-Vorlage',
-                    hint: 'Geben Sie Ihre Vorlage ein...',
-                    maxLines: 10,
-                  ),
-                ],
-              ),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dokument-Generator',
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-          ),
+            const SizedBox(height: 16),
 
-          const SizedBox(height: 16),
-
-          // Daten-Bereich
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Daten (JSON-Format)',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  GlobalTextField(
-                    controller: _dataController,
-                    label: 'Daten',
-                    hint:
-                        'betreff: Mietkündigung\ndatum: 2024-01-15\nparteien: Mieter und Vermieter\nsachverhalt: ...',
-                    maxLines: 8,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Kontext-Anzeige
-          if (widget.selectedContext.isNotEmpty)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info, color: Colors.blue),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Kontext: ${widget.selectedContext}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-          const SizedBox(height: 16),
-
-          // Generieren-Button
-          SizedBox(
-            width: double.infinity,
-            child: GlobalButton(
-              onPressed:
-                  widget.isLoading || _isGenerating ? null : _generateDocument,
-              text: 'Dokument generieren',
-              isLoading: _isGenerating,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Generiertes Dokument
-          if (_generatedDocument != null) ...[
+            // Template-Bereich
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.description, color: Colors.green),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Generiertes Dokument',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const Spacer(),
-                        IconButton(
-                          onPressed: () {
-                            // Copy to clipboard
-                            // Clipboard.setData(ClipboardData(text: _generatedDocument!));
-                            SnackBarUtils.showSuccessSnackBar(
-                              context,
-                              'Dokument kopiert',
-                            );
-                          },
-                          icon: const Icon(Icons.copy),
-                        ),
-                      ],
+                    Text(
+                      'Vorlage',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[300]!),
-                      ),
-                      child: Text(
-                        _generatedDocument!,
-                        style: const TextStyle(fontFamily: 'monospace'),
-                      ),
+                    GlobalTextField(
+                      controller: _templateController,
+                      label: 'Dokument-Vorlage',
+                      hint: 'Geben Sie Ihre Vorlage ein...',
+                      maxLines: 10,
                     ),
                   ],
                 ),
               ),
             ),
+
+            const SizedBox(height: 16),
+
+            // Daten-Bereich
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Daten (JSON-Format)',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    GlobalTextField(
+                      controller: _dataController,
+                      label: 'Daten',
+                      hint:
+                          'betreff: Mietkündigung\ndatum: 2024-01-15\nparteien: Mieter und Vermieter\nsachverhalt: ...',
+                      maxLines: 8,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Kontext-Anzeige
+            if (widget.selectedContext.isNotEmpty)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info, color: Colors.blue),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Kontext: ${widget.selectedContext}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            const SizedBox(height: 16),
+
+            // Generieren-Button
+            SizedBox(
+              width: double.infinity,
+              child: GlobalButton(
+                onPressed: widget.isLoading || _isGenerating
+                    ? null
+                    : _generateDocument,
+                text: 'Dokument generieren',
+                isLoading: _isGenerating,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Generiertes Dokument
+            if (_generatedDocument != null) ...[
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.description, color: Colors.green),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Generiertes Dokument',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            onPressed: () {
+                              // Copy to clipboard
+                              // Clipboard.setData(ClipboardData(text: _generatedDocument!));
+                              SnackBarUtils.showSuccessSnackBar(
+                                context,
+                                'Dokument kopiert',
+                              );
+                            },
+                            icon: const Icon(Icons.copy),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Text(
+                          _generatedDocument!,
+                          style: const TextStyle(fontFamily: 'monospace'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

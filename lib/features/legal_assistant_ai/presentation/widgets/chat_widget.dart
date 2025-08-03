@@ -1,3 +1,4 @@
+// features/legal_assistant_ai/presentation/widgets/chat_widget.dart
 import 'package:flutter/material.dart';
 
 import '../../../../shared/widgets/global_button.dart';
@@ -63,7 +64,7 @@ class _ChatWidgetState extends State<ChatWidget> {
               ? _buildEmptyState()
               : _buildChatHistory(),
         ),
-        
+
         // Eingabe-Bereich
         _buildInputArea(),
       ],
@@ -84,15 +85,15 @@ class _ChatWidgetState extends State<ChatWidget> {
           Text(
             'Starten Sie eine Unterhaltung',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Colors.grey[600],
-            ),
+                  color: Colors.grey[600],
+                ),
           ),
           const SizedBox(height: 8),
           Text(
             'Stellen Sie Ihre rechtliche Frage',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[500],
-            ),
+                  color: Colors.grey[500],
+                ),
           ),
         ],
       ),
@@ -113,7 +114,7 @@ class _ChatWidgetState extends State<ChatWidget> {
 
   Widget _buildMessageBubble(AiMessage message) {
     final isUser = message.sender == 'user';
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -124,9 +125,8 @@ class _ChatWidgetState extends State<ChatWidget> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isUser 
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey[100],
+                color:
+                    isUser ? Theme.of(context).primaryColor : Colors.grey[100],
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -138,7 +138,8 @@ class _ChatWidgetState extends State<ChatWidget> {
                       color: isUser ? Colors.white : Colors.black87,
                     ),
                   ),
-                  if (message.suggestions != null && message.suggestions!.isNotEmpty) ...[
+                  if (message.suggestions != null &&
+                      message.suggestions!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -146,7 +147,7 @@ class _ChatWidgetState extends State<ChatWidget> {
                         return ActionChip(
                           label: Text(suggestion),
                           onPressed: () => widget.onSendMessage(suggestion),
-                          backgroundColor: Colors.white.withOpacity(0.2),
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
                         );
                       }).toList(),
                     ),
@@ -168,7 +169,7 @@ class _ChatWidgetState extends State<ChatWidget> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, -2),
           ),
@@ -194,4 +195,4 @@ class _ChatWidgetState extends State<ChatWidget> {
       ),
     );
   }
-} 
+}

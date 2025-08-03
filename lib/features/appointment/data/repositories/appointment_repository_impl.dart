@@ -2,6 +2,8 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+
 import '../../domain/entities/appointment.dart';
 import '../../domain/repositories/appointment_repository.dart';
 
@@ -106,7 +108,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     );
 
     _appointments.add(newAppointment);
-    print('Termin erstellt: ${newAppointment.title}');
+    if (kDebugMode) {
+      print('Termin erstellt: ${newAppointment.title}');
+    }
     return newAppointment;
   }
 
@@ -125,7 +129,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     );
 
     _appointments[index] = updatedAppointment;
-    print('Termin aktualisiert: ${updatedAppointment.title}');
+    if (kDebugMode) {
+      print('Termin aktualisiert: ${updatedAppointment.title}');
+    }
     return updatedAppointment;
   }
 
@@ -135,7 +141,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     await Future.delayed(Duration(milliseconds: 150 + _random.nextInt(200)));
 
     _appointments.removeWhere((a) => a.id == appointmentId);
-    print('Termin gelöscht: $appointmentId');
+    if (kDebugMode) {
+      print('Termin gelöscht: $appointmentId');
+    }
   }
 
   @override
@@ -164,7 +172,8 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
         appointment.startTime.month,
         appointment.startTime.day,
       );
-      return appointmentDate.isAfter(startDate.subtract(const Duration(days: 1))) &&
+      return appointmentDate
+              .isAfter(startDate.subtract(const Duration(days: 1))) &&
           appointmentDate.isBefore(endDate.add(const Duration(days: 1)));
     }).toList();
   }
@@ -215,9 +224,7 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     await Future.delayed(Duration(milliseconds: 200 + _random.nextInt(300)));
 
     final now = DateTime.now();
-    return _appointments
-        .where((a) => a.startTime.isAfter(now))
-        .toList()
+    return _appointments.where((a) => a.startTime.isAfter(now)).toList()
       ..sort((a, b) => a.startTime.compareTo(b.startTime));
   }
 
@@ -228,7 +235,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
 
     final now = DateTime.now();
     return _appointments
-        .where((a) => a.startTime.isBefore(now) && a.status == AppointmentStatus.scheduled)
+        .where((a) =>
+            a.startTime.isBefore(now) &&
+            a.status == AppointmentStatus.scheduled)
         .toList();
   }
 
@@ -245,7 +254,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     // Simuliere Netzwerk-Verzögerung
     await Future.delayed(Duration(milliseconds: 1000 + _random.nextInt(2000)));
 
-    print('Termine mit externem Kalender synchronisiert');
+    if (kDebugMode) {
+      print('Termine mit externem Kalender synchronisiert');
+    }
   }
 
   @override
@@ -258,7 +269,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
       'appointments': appointments.map((a) => a.toJson()).toList(),
     };
 
-    print('Termine exportiert: ${appointments.length} Termine');
+    if (kDebugMode) {
+      print('Termine exportiert: ${appointments.length} Termine');
+    }
     return jsonEncode(exportData);
   }
 
@@ -270,13 +283,15 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     try {
       final jsonData = jsonDecode(data) as Map<String, dynamic>;
       final appointmentsJson = jsonData['appointments'] as List;
-      
+
       final importedAppointments = appointmentsJson
           .map((json) => Appointment.fromJson(json as Map<String, dynamic>))
           .toList();
 
       _appointments.addAll(importedAppointments);
-      print('Termine importiert: ${importedAppointments.length} Termine');
+      if (kDebugMode) {
+        print('Termine importiert: ${importedAppointments.length} Termine');
+      }
       return importedAppointments;
     } catch (e) {
       throw Exception('Fehler beim Importieren der Termine: $e');
@@ -300,7 +315,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     );
 
     _appointments[index] = updatedAppointment;
-    print('Erinnerung gesetzt für Termin: ${appointment.title}');
+    if (kDebugMode) {
+      print('Erinnerung gesetzt für Termin: ${appointment.title}');
+    }
   }
 
   @override
@@ -320,7 +337,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     );
 
     _appointments[index] = updatedAppointment;
-    print('Erinnerung entfernt für Termin: ${appointment.title}');
+    if (kDebugMode) {
+      print('Erinnerung entfernt für Termin: ${appointment.title}');
+    }
   }
 
   @override
@@ -340,7 +359,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     );
 
     _appointments[index] = updatedAppointment;
-    print('Termin als abgeschlossen markiert: ${appointment.title}');
+    if (kDebugMode) {
+      print('Termin als abgeschlossen markiert: ${appointment.title}');
+    }
   }
 
   @override
@@ -360,7 +381,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     );
 
     _appointments[index] = updatedAppointment;
-    print('Termin als abgesagt markiert: ${appointment.title}');
+    if (kDebugMode) {
+      print('Termin als abgesagt markiert: ${appointment.title}');
+    }
   }
 
   @override
@@ -385,7 +408,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     );
 
     _appointments[index] = updatedAppointment;
-    print('Termin verschoben: ${appointment.title}');
+    if (kDebugMode) {
+      print('Termin verschoben: ${appointment.title}');
+    }
     return updatedAppointment;
   }
-} 
+}

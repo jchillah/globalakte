@@ -1,7 +1,6 @@
 // features/accessibility/presentation/widgets/accessibility_test_widget.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 
 import '../../domain/entities/accessibility_settings.dart';
 
@@ -39,13 +38,14 @@ class AccessibilityTestWidget extends StatelessWidget {
                 Text(
                   'Accessibility-Tests',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const Spacer(),
                 if (testResults.isNotEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: wcagCompliant ? Colors.green : Colors.red,
                       borderRadius: BorderRadius.circular(12),
@@ -237,4 +237,4 @@ class AccessibilityTestWidget extends StatelessWidget {
       ),
     );
   }
-} 
+}
