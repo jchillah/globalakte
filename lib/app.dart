@@ -1,5 +1,6 @@
 // app.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/app_config.dart';
 import 'core/app_theme.dart';
@@ -31,6 +32,16 @@ class GlobalAkteApp extends StatelessWidget {
       title: AppConfig.appName,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('de', 'DE'),
+        Locale('en', 'US'),
+      ],
+      locale: const Locale('de', 'DE'),
       initialRoute: '/welcome',
       routes: {
         '/welcome': (context) => const WelcomeScreen(),

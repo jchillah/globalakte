@@ -70,8 +70,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         Text(
           DateFormat('MMMM yyyy', 'de_DE').format(_focusedDate),
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+                fontWeight: FontWeight.bold,
+              ),
         ),
         IconButton(
           onPressed: _nextMonth,
@@ -83,7 +83,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   }
 
   Widget _buildCalendarGrid() {
-    final daysInMonth = DateTime(_focusedDate.year, _focusedDate.month + 1, 0).day;
+    final daysInMonth =
+        DateTime(_focusedDate.year, _focusedDate.month + 1, 0).day;
     final firstDayOfMonth = DateTime(_focusedDate.year, _focusedDate.month, 1);
     final firstWeekday = firstDayOfMonth.weekday; // 1 = Montag, 7 = Sonntag
 
@@ -99,9 +100,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                         day,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[600],
-                        ),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                            ),
                       ),
                     ),
                   ))
@@ -109,16 +110,18 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         ),
         const SizedBox(height: 8),
         // Kalender-Grid
-        ...List.generate((daysInMonth + firstWeekday - 2) ~/ 7 + 1, (weekIndex) {
+        ...List.generate((daysInMonth + firstWeekday - 2) ~/ 7 + 1,
+            (weekIndex) {
           return Row(
             children: List.generate(7, (dayIndex) {
               final dayNumber = weekIndex * 7 + dayIndex - firstWeekday + 2;
-              
+
               if (dayNumber < 1 || dayNumber > daysInMonth) {
                 return const Expanded(child: SizedBox());
               }
 
-              final date = DateTime(_focusedDate.year, _focusedDate.month, dayNumber);
+              final date =
+                  DateTime(_focusedDate.year, _focusedDate.month, dayNumber);
               final isSelected = _isSameDay(date, _selectedDate);
               final isToday = _isSameDay(date, DateTime.now());
               final hasAppointments = _hasAppointmentsOnDate(date);
@@ -217,4 +220,4 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       return _isSameDay(appointmentDate, date);
     });
   }
-} 
+}
