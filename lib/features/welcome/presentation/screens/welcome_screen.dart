@@ -59,6 +59,8 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildDocumentManagementDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
+                _buildAccessibilityDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
                 _buildAppointmentDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
               ],
@@ -370,6 +372,28 @@ class WelcomeScreen extends StatelessWidget {
         label: const Text('📄 Dokumentenverwaltung Demo'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.purple,
+          foregroundColor: Colors.white,
+          padding:
+              const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccessibilityDemoButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/accessibility-demo');
+        },
+        icon: const Icon(Icons.accessibility_new),
+        label: const Text('♿ Barrierefreiheit Demo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.teal,
           foregroundColor: Colors.white,
           padding:
               const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
