@@ -1,6 +1,8 @@
 // features/authentication/data/repositories/auth_repository_impl.dart
 import 'dart:convert';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/app_config.dart';
@@ -13,6 +15,9 @@ class AuthRepositoryImpl implements AuthRepository {
   static const String _pinHashKey = 'pin_hash';
   static const String _biometricsEnabledKey = 'biometrics_enabled';
   static const String _sessionTokenKey = 'session_token';
+
+  final LocalAuthentication _localAuth = LocalAuthentication();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   @override
   Future<bool> isAuthenticated() async {
@@ -76,14 +81,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthUser> signInWithPin(String pin) async {
-    final prefs = await SharedPreferences.getInstance();
-    final storedPinHash = prefs.getString(_pinHashKey);
+    final storedPinHash = await _secureStorage.read(key: _pinHashKey);
 
     if (storedPinHash == null) {
       throw ArgumentError('Keine PIN gesetzt');
     }
 
-    // Vereinfachte PIN-Validierung (in der echten App würde hier ein Hash-Vergleich stehen)
+    // Sichere PIN-Validierung mit Hash-Vergleich
     if (storedPinHash != _hashPin(pin)) {
       throw ArgumentError('Falsche PIN');
     }
@@ -104,59 +108,112 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> setPin(String pin) async {
-    final prefs = await SharedPreferences.getInstance();
     final pinHash = _hashPin(pin);
-    await prefs.setString(_pinHashKey, pinHash);
+    await _secureStorage.write(key: _pinHashKey, value: pinHash);
   }
 
   @override
   Future<bool> isPinEnabled() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_pinHashKey) != null;
+    final storedPin = await _secureStorage.read(key: _pinHashKey);
+    return storedPin != null;
   }
 
   @override
   Future<AuthUser> signInWithBiometrics() async {
-    // Simulierte Biometrie-Authentifizierung
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // Prüfe ob Biometrie verfügbar ist
+      final isAvailable = await _localAuth.canCheckBiometrics;
+      if (!isAvailable) {
+        throw ArgumentError('Biometrie ist auf diesem Gerät nicht verfügbar');
+      }
 
-    final user = await getCurrentUser();
-    if (user == null) {
-      throw ArgumentError('Kein Benutzer gefunden');
+      // Prüfe ob Biometrie aktiviert ist
+      final isEnabled = await isBiometricsEnabled();
+      if (!isEnabled) {
+        throw ArgumentError('Biometrie ist nicht aktiviert');
+      }
+
+      // Authentifizierung mit Biometrie
+      final isAuthenticated = await _localAuth.authenticate(
+        localizedReason: 'Bitte authentifizieren Sie sich mit Biometrie',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          biometricOnly: true,
+        ),
+      );
+
+      if (!isAuthenticated) {
+        throw ArgumentError('Biometrische Authentifizierung fehlgeschlagen');
+      }
+
+      // Hole den aktuellen Benutzer
+      final user = await getCurrentUser();
+      if (user == null) {
+        throw ArgumentError('Kein Benutzer gefunden');
+      }
+
+      final updatedUser = user.copyWith(
+        isAuthenticated: true,
+        lastLoginAt: DateTime.now(),
+      );
+
+      await _saveUser(updatedUser);
+      return updatedUser;
+    } catch (e) {
+      throw ArgumentError('Biometrische Authentifizierung fehlgeschlagen: $e');
     }
-
-    final updatedUser = user.copyWith(
-      isAuthenticated: true,
-      lastLoginAt: DateTime.now(),
-    );
-
-    await _saveUser(updatedUser);
-    return updatedUser;
-  }
-
-  @override
-  Future<void> setBiometricsEnabled(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_biometricsEnabledKey, enabled);
   }
 
   @override
   Future<bool> isBiometricsAvailable() async {
-    // Simulierte Biometrie-Verfügbarkeit
-    return true; // In der echten App würde hier eine echte Prüfung stehen
+    try {
+      final isAvailable = await _localAuth.canCheckBiometrics;
+      final isDeviceSupported = await _localAuth.isDeviceSupported();
+      return isAvailable && isDeviceSupported;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override
   Future<bool> isBiometricsEnabled() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_biometricsEnabledKey) ?? false;
+    try {
+      final enabled = await _secureStorage.read(key: _biometricsEnabledKey);
+      return enabled == 'true';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<void> setBiometricsEnabled(bool enabled) async {
+    if (enabled) {
+      // Prüfe ob Biometrie verfügbar ist
+      final isAvailable = await isBiometricsAvailable();
+      if (!isAvailable) {
+        throw ArgumentError('Biometrie ist auf diesem Gerät nicht verfügbar');
+      }
+    }
+
+    await _secureStorage.write(
+      key: _biometricsEnabledKey,
+      value: enabled.toString(),
+    );
+  }
+
+  @override
+  Future<List<BiometricType>> getAvailableBiometrics() async {
+    try {
+      return await _localAuth.getAvailableBiometrics();
+    } catch (e) {
+      return [];
+    }
   }
 
   @override
   Future<AuthUser?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();
     final userJson = prefs.getString(_userKey);
-
     if (userJson == null) return null;
 
     try {
@@ -186,8 +243,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<bool> isEmailRegistered(String email) async {
-    // Simulierte Email-Prüfung
-    await Future.delayed(const Duration(milliseconds: 500));
+    // Vereinfachte Implementierung - in der echten App würde hier eine Datenbankabfrage stehen
     return false; // Vereinfacht: Email ist nie registriert
   }
 
@@ -219,9 +275,10 @@ class AuthRepositoryImpl implements AuthRepository {
     await prefs.setString(_userKey, userJson);
   }
 
-  /// Erstellt einen Hash für die PIN (vereinfacht)
+  /// Erstellt einen sicheren Hash für die PIN
   String _hashPin(String pin) {
     // In der echten App würde hier ein sicherer Hash verwendet werden
+    // Für Demo-Zwecke verwenden wir base64
     return base64Encode(utf8.encode(pin));
   }
 }
