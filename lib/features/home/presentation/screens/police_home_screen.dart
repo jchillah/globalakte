@@ -96,8 +96,8 @@ class _PoliceHomeScreenState extends State<PoliceHomeScreen> {
   }
 
   Widget _buildPoliceFeatures() {
-          return SizedBox(
-        height: 300,
+    return SizedBox(
+      height: 400,
       child: GridView.count(
         crossAxisCount: 2,
         crossAxisSpacing: AppConfig.defaultPadding,

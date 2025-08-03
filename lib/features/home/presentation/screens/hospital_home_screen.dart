@@ -96,8 +96,8 @@ class _HospitalHomeScreenState extends State<HospitalHomeScreen> {
   }
 
   Widget _buildHospitalFeatures() {
-          return SizedBox(
-        height: 300,
+    return SizedBox(
+      height: 400,
       child: GridView.count(
         crossAxisCount: 2,
         crossAxisSpacing: AppConfig.defaultPadding,

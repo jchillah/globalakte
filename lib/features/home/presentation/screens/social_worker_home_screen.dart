@@ -96,8 +96,8 @@ class _SocialWorkerHomeScreenState extends State<SocialWorkerHomeScreen> {
   }
 
   Widget _buildSocialWorkerFeatures() {
-          return SizedBox(
-        height: 300,
+    return SizedBox(
+      height: 400,
       child: GridView.count(
         crossAxisCount: 2,
         crossAxisSpacing: AppConfig.defaultPadding,

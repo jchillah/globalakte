@@ -88,7 +88,7 @@ class _CourtHomeScreenState extends State<CourtHomeScreen> {
 
   Widget _buildCourtFeatures() {
     return SizedBox(
-      height: 300,
+      height: 400,
       child: GridView.count(
         physics: const BouncingScrollPhysics(),
         crossAxisCount: 2,

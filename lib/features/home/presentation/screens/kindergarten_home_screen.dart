@@ -97,7 +97,7 @@ class _KindergartenHomeScreenState extends State<KindergartenHomeScreen> {
 
   Widget _buildKindergartenFeatures() {
     return SizedBox(
-      height: 300,
+      height: 400,
       child: GridView.count(
         crossAxisCount: 2,
         crossAxisSpacing: AppConfig.defaultPadding,

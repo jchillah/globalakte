@@ -96,7 +96,7 @@ class _CitizenHomeScreenState extends State<CitizenHomeScreen> {
 
   Widget _buildCitizenFeatures() {
     return SizedBox(
-      height: 300,
+      height: 400,
       child: GridView.count(
         physics: const BouncingScrollPhysics(),
         crossAxisCount: 2,

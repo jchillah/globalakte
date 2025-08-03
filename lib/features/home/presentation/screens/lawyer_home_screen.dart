@@ -96,7 +96,7 @@ class _LawyerHomeScreenState extends State<LawyerHomeScreen> {
 
   Widget _buildLawyerFeatures() {
     return SizedBox(
-      height: 300, // Feste Höhe für scrollbaren Bereich
+      height: 400, // Feste Höhe für scrollbaren Bereich
       child: GridView.count(
         physics: const BouncingScrollPhysics(), // Scrollbar machen
         crossAxisCount: 2,

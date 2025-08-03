@@ -104,110 +104,112 @@ Mieter: _________________
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Dokument-Analyse',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 16),
-
-          // Dokument-Eingabe
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Dokument zur Analyse',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  GlobalTextField(
-                    controller: _documentController,
-                    label: 'Dokument-Text',
-                    hint: 'Fügen Sie hier Ihr rechtliches Dokument ein...',
-                    maxLines: 12,
-                  ),
-                ],
-              ),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dokument-Analyse',
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-          ),
+            const SizedBox(height: 16),
 
-          const SizedBox(height: 16),
-
-          // Analysieren-Button
-          SizedBox(
-            width: double.infinity,
-            child: GlobalButton(
-              onPressed:
-                  widget.isLoading || _isAnalyzing ? null : _analyzeDocument,
-              text: 'Dokument analysieren',
-              isLoading: _isAnalyzing,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Analyse-Ergebnisse
-          if (_analysisResult != null) ...[
+            // Dokument-Eingabe
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.analytics, color: Colors.blue),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Analyse-Ergebnisse',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
+                    Text(
+                      'Dokument zur Analyse',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 16),
-
-                    // Statistiken
-                    _buildAnalysisSection(
-                      'Statistiken',
-                      [
-                        'Wörter: ${_analysisResult!['word_count']}',
-                        'Absätze: ${_analysisResult!['paragraph_count']}',
-                        'Vertrauenswert: ${(_analysisResult!['confidence_score'] * 100).toStringAsFixed(1)}%',
-                      ],
+                    const SizedBox(height: 8),
+                    GlobalTextField(
+                      controller: _documentController,
+                      label: 'Dokument-Text',
+                      hint: 'Fügen Sie hier Ihr rechtliches Dokument ein...',
+                      maxLines: 12,
                     ),
-
-                    const SizedBox(height: 16),
-
-                    // Rechtliche Begriffe
-                    if (_analysisResult!['legal_terms'] != null)
-                      _buildAnalysisSection(
-                        'Rechtliche Begriffe',
-                        (_analysisResult!['legal_terms'] as List)
-                            .cast<String>(),
-                      ),
-
-                    const SizedBox(height: 16),
-
-                    // Empfehlungen
-                    if (_analysisResult!['recommendations'] != null)
-                      _buildAnalysisSection(
-                        'Empfehlungen',
-                        (_analysisResult!['recommendations'] as List)
-                            .cast<String>(),
-                        icon: Icons.lightbulb,
-                        color: Colors.orange,
-                      ),
                   ],
                 ),
               ),
             ),
+
+            const SizedBox(height: 16),
+
+            // Analysieren-Button
+            SizedBox(
+              width: double.infinity,
+              child: GlobalButton(
+                onPressed:
+                    widget.isLoading || _isAnalyzing ? null : _analyzeDocument,
+                text: 'Dokument analysieren',
+                isLoading: _isAnalyzing,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Analyse-Ergebnisse
+            if (_analysisResult != null) ...[
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.analytics, color: Colors.blue),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Analyse-Ergebnisse',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Statistiken
+                      _buildAnalysisSection(
+                        'Statistiken',
+                        [
+                          'Wörter: ${_analysisResult!['word_count']}',
+                          'Absätze: ${_analysisResult!['paragraph_count']}',
+                          'Vertrauenswert: ${(_analysisResult!['confidence_score'] * 100).toStringAsFixed(1)}%',
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Rechtliche Begriffe
+                      if (_analysisResult!['legal_terms'] != null)
+                        _buildAnalysisSection(
+                          'Rechtliche Begriffe',
+                          (_analysisResult!['legal_terms'] as List)
+                              .cast<String>(),
+                        ),
+
+                      const SizedBox(height: 16),
+
+                      // Empfehlungen
+                      if (_analysisResult!['recommendations'] != null)
+                        _buildAnalysisSection(
+                          'Empfehlungen',
+                          (_analysisResult!['recommendations'] as List)
+                              .cast<String>(),
+                          icon: Icons.lightbulb,
+                          color: Colors.orange,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
