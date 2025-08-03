@@ -55,6 +55,8 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildCaseFilesDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
+                _buildDocumentManagementDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
               ],
 
               // Version Info
@@ -323,6 +325,28 @@ class WelcomeScreen extends StatelessWidget {
         label: const Text('📁 Fallakten Demo'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+          padding:
+              const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDocumentManagementDemoButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/document-management');
+        },
+        icon: const Icon(Icons.description),
+        label: const Text('📄 Dokumentenverwaltung Demo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.purple,
           foregroundColor: Colors.white,
           padding:
               const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),

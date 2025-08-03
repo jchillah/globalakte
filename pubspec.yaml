@@ -45,6 +45,9 @@ dependencies:
   local_auth: ^2.3.0
   flutter_secure_storage: ^9.2.4
   win32: ^5.0.0
+  
+  # Datei-System & Pfad-Management
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:
