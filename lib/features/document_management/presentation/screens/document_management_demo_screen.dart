@@ -40,26 +40,35 @@ class _DocumentManagementDemoScreenState
   void initState() {
     super.initState();
     _initializeRepository();
-    _loadDocuments();
   }
 
   /// Initialisiert das Repository und die Use Cases
   Future<void> _initializeRepository() async {
-    final prefs = await SharedPreferences.getInstance();
-    final encryptionRepository = EncryptionRepositoryImpl();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final encryptionRepository = EncryptionRepositoryImpl();
 
-    _documentRepository = DocumentRepositoryImpl(prefs, encryptionRepository);
+      _documentRepository = DocumentRepositoryImpl(prefs, encryptionRepository);
 
-    _createDocumentUseCase = CreateDocumentUseCase(_documentRepository);
-    _getAllDocumentsUseCase = GetAllDocumentsUseCase(_documentRepository);
-    _searchDocumentsUseCase = SearchDocumentsUseCase(_documentRepository);
-    _getDocumentStatisticsUseCase =
-        GetDocumentStatisticsUseCase(_documentRepository);
-    _encryptDocumentUseCase = EncryptDocumentUseCase(_documentRepository);
-    _decryptDocumentUseCase = DecryptDocumentUseCase(_documentRepository);
-    _exportDocumentUseCase = ExportDocumentUseCase(_documentRepository);
-    _createBackupUseCase = CreateBackupUseCase(_documentRepository);
-    _syncWithCloudUseCase = SyncWithCloudUseCase(_documentRepository);
+      _createDocumentUseCase = CreateDocumentUseCase(_documentRepository);
+      _getAllDocumentsUseCase = GetAllDocumentsUseCase(_documentRepository);
+      _searchDocumentsUseCase = SearchDocumentsUseCase(_documentRepository);
+      _getDocumentStatisticsUseCase =
+          GetDocumentStatisticsUseCase(_documentRepository);
+      _encryptDocumentUseCase = EncryptDocumentUseCase(_documentRepository);
+      _decryptDocumentUseCase = DecryptDocumentUseCase(_documentRepository);
+      _exportDocumentUseCase = ExportDocumentUseCase(_documentRepository);
+      _createBackupUseCase = CreateBackupUseCase(_documentRepository);
+      _syncWithCloudUseCase = SyncWithCloudUseCase(_documentRepository);
+
+      // Nach der Initialisierung Dokumente laden
+      await _loadDocuments();
+    } catch (e) {
+      if (mounted) {
+        SnackBarUtils.showErrorSnackBar(
+            context, 'Fehler bei der Initialisierung: $e');
+      }
+    }
   }
 
   /// Lädt alle Dokumente
