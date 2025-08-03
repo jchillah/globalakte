@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/app_config.dart';
 import 'core/app_theme.dart';
 import 'features/authentication/presentation/screens/register_screen.dart';
+import 'features/accessibility/presentation/screens/accessibility_demo_screen.dart';
 import 'features/communication/presentation/screens/communication_demo_screen.dart';
 import 'features/document_management/presentation/screens/document_management_demo_screen.dart';
 import 'features/appointment/presentation/screens/appointment_demo_screen.dart';
@@ -59,6 +60,7 @@ class GlobalAkteApp extends StatelessWidget {
         '/communication': (context) => const CommunicationDemoScreen(),
         '/document-management': (context) =>
             const DocumentManagementDemoScreen(),
+        '/accessibility-demo': (context) => const AccessibilityDemoScreen(),
         '/encryption-demo': (context) => const EncryptionDemoScreen(),
         '/appointment-demo': (context) => const AppointmentDemoScreen(),
       },
