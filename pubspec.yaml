@@ -37,6 +37,11 @@ dependencies:
   
   # Local Storage für Authentifizierung
   shared_preferences: ^2.2.2
+  
+  # Verschlüsselung & Sicherheit
+  crypto: ^3.0.3
+  encrypt: ^5.0.3
+  pointycastle: ^3.7.3
 
 dev_dependencies:
   flutter_test:

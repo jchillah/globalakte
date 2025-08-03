@@ -47,9 +47,11 @@ class WelcomeScreen extends StatelessWidget {
 
               const SizedBox(height: AppConfig.defaultPadding),
 
-              // Demo Button (nur im Debug-Modus)
+              // Demo Buttons (nur im Debug-Modus)
               if (kDebugMode) ...[
                 _buildDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
+                _buildEncryptionDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
               ],
 
@@ -172,6 +174,37 @@ class WelcomeScreen extends StatelessWidget {
         ),
         child: const Text(
           'SnackBar Demo testen',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEncryptionDemoButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          SnackBarUtils.showInfoSnackBar(
+            context,
+            '🔐 Verschlüsselung Demo wird in Sprint 3 implementiert!',
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(
+            vertical: AppConfig.defaultPadding,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
+        ),
+        child: const Text(
+          '🔐 Verschlüsselung Demo',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
