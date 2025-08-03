@@ -243,9 +243,7 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
           const SizedBox(height: AppConfig.largePadding),
           GlobalButton(
             onPressed: () {
-              // TODO: Navigation zur Fallakte erstellen
-              SnackBarUtils.showInfoSnackBar(
-                  context, 'Fallakte erstellen - Coming Soon');
+              _showCreateCaseDialog();
             },
             text: 'Erste Fallakte erstellen',
           ),
