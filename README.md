@@ -24,35 +24,47 @@ Eine Flutter-basierte mobile Anwendung, die Bürgern bei rechtlichen Angelegenhe
 ### Setup
 
 1. **Repository klonen**
+
    ```bash
    git clone https://github.com/jchillah/globalakte.git
    cd globalakte
    ```
 
 2. **Dependencies installieren**
+
    ```bash
    flutter pub get
    ```
 
 3. **GitHub Setup ausführen**
+
    ```bash
    # Labels und Milestones erstellen
    python3 scripts/setup_github.py
-   
+
    # Sprint Issues erstellen
    python3 scripts/create_project_board.py
    ```
 
-### Cursor IDE Integration
+### VSCode IDE Integration
 
-Das Projekt ist für Cursor IDE optimiert mit:
+Das Projekt ist für VSCode IDE optimiert mit:
 
 - **GitHub Integration**: Issue Templates, Labels, Milestones
-- **Keyboard Shortcuts**: 
+- **Keyboard Shortcuts**:
   - `Ctrl+Shift+I`: Issue erstellen
   - `Ctrl+Shift+S`: Sprint anzeigen
-  - `Ctrl+Shift+P`: Pull Request erstellen
+  - `Ctrl+Shift+R`: Pull Request erstellen
+  - `Ctrl+Shift+B`: GitHub Setup
+  - `Ctrl+Shift+N`: Sprint Issues erstellen
 - **Tasks**: Automatisierte GitHub-Workflows
+
+**Alternative (falls Shortcuts nicht funktionieren):**
+
+```bash
+./scripts/gh_shortcuts.sh [command]
+# Commands: issue, sprint, pr, setup, sprint-issues
+```
 
 ### Projekt-Struktur
 
@@ -71,13 +83,13 @@ lib/
 
 ## 📋 Sprint-Plan
 
-| Sprint | Fokus | Deadline |
-|--------|-------|----------|
-| Sprint 1 | Setup & Architektur | Dez 2024 |
-| Sprint 2 | Authentifizierung | Dez 2024 |
+| Sprint   | Fokus                        | Deadline |
+| -------- | ---------------------------- | -------- |
+| Sprint 1 | Setup & Architektur          | Dez 2024 |
+| Sprint 2 | Authentifizierung            | Dez 2024 |
 | Sprint 3 | Sicherheit & Verschlüsselung | Dez 2024 |
-| Sprint 4 | UI & Navigation | Dez 2024 |
-| Sprint 5 | Wissensdatenbank | Dez 2024 |
+| Sprint 4 | UI & Navigation              | Dez 2024 |
+| Sprint 5 | Wissensdatenbank             | Dez 2024 |
 
 ## 🤝 Beitragen
 
@@ -95,4 +107,5 @@ Dieses Projekt steht unter der MIT-Lizenz - siehe [LICENSE](LICENSE) für Detail
 - [GitHub Issues](https://github.com/jchillah/globalakte/issues)
 - [Projekt-Board](https://github.com/jchillah/globalakte/projects)
 - [Wiki](https://github.com/jchillah/globalakte/wiki)
+
 # globalakte

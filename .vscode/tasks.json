@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Create Issue",
+      "type": "shell",
+      "command": "gh",
+      "args": ["issue", "create", "--web"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "View Current Sprint",
+      "type": "shell",
+      "command": "gh",
+      "args": ["issue", "list", "--label", "Sprint-1-Setup", "--state", "open"],
+      "group": "build"
+    },
+    {
+      "label": "Create Pull Request",
+      "type": "shell",
+      "command": "gh",
+      "args": ["pr", "create", "--web"],
+      "group": "build"
+    },
+    {
+      "label": "Sync Project Board",
+      "type": "shell",
+      "command": "gh",
+      "args": ["project", "list"],
+      "group": "build"
+    },
+    {
+      "label": "Setup GitHub",
+      "type": "shell",
+      "command": "python3",
+      "args": ["scripts/setup_github.py"],
+      "group": "build"
+    },
+    {
+      "label": "Create Sprint Issues",
+      "type": "shell",
+      "command": "python3",
+      "args": ["scripts/create_project_board.py"],
+      "group": "build"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+name: ⚡ Sprint Task
+description: Entwicklungsaufgabe für aktuellen Sprint
+title: "[TASK] "
+labels: ["feature"]
+body:
+  - type: dropdown
+    id: sprint
+    attributes:
+      label: Sprint
+      options:
+        - Sprint-1-Setup
+        - Sprint-2-Auth
+        - Sprint-3-Security
+        - Sprint-4-UI
+        - Sprint-5-Knowledge
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: feature_area
+    attributes:
+      label: Feature Bereich
+      options:
+        - label: Authentication
+        - label: Case Management
+        - label: Communication
+        - label: Document Generator
+        - label: Encryption
+        - label: LLM Integration
+        - label: Accessibility
+
+  - type: textarea
+    id: task_description
+    attributes:
+      label: Task Beschreibung
+      placeholder: "Was soll implementiert werden?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: definition_of_done
+    attributes:
+      label: Definition of Done
+      placeholder: |
+        - [ ] Code geschrieben
+        - [ ] Tests geschrieben
+        - [ ] Code Review
+        - [ ] Dokumentation
+    validations:
+      required: true 

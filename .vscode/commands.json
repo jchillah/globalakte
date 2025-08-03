@@ -1,0 +1,24 @@
+{
+  "commands": [
+    {
+      "command": "globalakte.createIssue",
+      "title": "GlobalAkte: Create Issue",
+      "category": "GitHub"
+    },
+    {
+      "command": "globalakte.viewSprint",
+      "title": "GlobalAkte: View Current Sprint",
+      "category": "GitHub"
+    },
+    {
+      "command": "globalakte.createPR",
+      "title": "GlobalAkte: Create Pull Request",
+      "category": "GitHub"
+    },
+    {
+      "command": "globalakte.setupGitHub",
+      "title": "GlobalAkte: Setup GitHub",
+      "category": "GitHub"
+    }
+  ]
+} 

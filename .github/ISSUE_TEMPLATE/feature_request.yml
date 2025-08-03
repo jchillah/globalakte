@@ -1,0 +1,69 @@
+name: 🚀 Feature Request
+description: Neue Funktion für GlobalAkte vorschlagen
+title: "[FEATURE] "
+labels: ["feature", "priority-medium"]
+body:
+  - type: dropdown
+    id: sprint
+    attributes:
+      label: Sprint
+      description: Welchem Sprint soll diese Funktion zugeordnet werden?
+      options:
+        - Sprint-1-Setup
+        - Sprint-2-Auth
+        - Sprint-3-Security
+        - Sprint-4-UI
+        - Sprint-5-Knowledge
+        - Sprint-6-Database
+        - Sprint-7-Case-Files
+        - Sprint-8-Timeline
+        - Sprint-9-Evidence
+        - Sprint-10-Deletion
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorität
+      options:
+        - priority-critical
+        - priority-high
+        - priority-medium
+        - priority-low
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Beschreibung
+      description: Was soll implementiert werden?
+      placeholder: "Detaillierte Beschreibung der gewünschten Funktion..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Wann ist die Funktion fertig?
+      placeholder: |
+        - [ ] Kriterium 1
+        - [ ] Kriterium 2
+        - [ ] Kriterium 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical_notes
+    attributes:
+      label: Technische Hinweise
+      description: Abhängigkeiten, spezielle Anforderungen
+      placeholder: "Flutter packages, APIs, Architektur-Details..."
+
+  - type: input
+    id: time_estimate
+    attributes:
+      label: Zeitschätzung
+      placeholder: "z.B. 2 Tage, 1 Woche" 
