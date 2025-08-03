@@ -1,5 +1,6 @@
 // shared/widgets/global_button.dart
 import 'package:flutter/material.dart';
+
 import '../../core/app_config.dart';
 
 /// Wiederverwendbare Button-Widgets für GlobalAkte

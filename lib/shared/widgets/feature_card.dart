@@ -1,4 +1,3 @@
-// shared/widgets/feature_card.dart
 import 'package:flutter/material.dart';
 
 import '../../core/app_config.dart';

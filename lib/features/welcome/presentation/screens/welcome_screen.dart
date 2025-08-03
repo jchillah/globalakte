@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../../../shared/widgets/feature_card.dart';
+import '../../../authentication/presentation/screens/login_screen.dart';
 
 /// Willkommens-Screen für GlobalAkte
 /// Verantwortlich für die Darstellung der App-Übersicht und Navigation
@@ -125,11 +126,10 @@ class WelcomeScreen extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          // TODO: Navigation zur Authentifizierung implementieren
-          SnackBarUtils.showSnackBarWithAction(
-            context,
-            'Authentifizierung wird implementiert...',
-            actionLabel: 'Verstanden',
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const LoginScreen(),
+            ),
           );
         },
         style: ElevatedButton.styleFrom(
