@@ -2,13 +2,15 @@
 import 'package:flutter/material.dart';
 
 import '../../../../shared/utils/snackbar_utils.dart';
-import '../../../../shared/widgets/global_button.dart';
-import '../../../../shared/widgets/global_input.dart';
 import '../../data/repositories/encryption_repository_impl.dart';
 import '../../domain/entities/encrypted_data.dart';
 import '../../domain/entities/encryption_key.dart';
 import '../../domain/repositories/encryption_repository.dart';
 import '../../domain/usecases/encryption_usecases.dart';
+import '../widgets/benchmark_section_widget.dart';
+import '../widgets/encryption_section_widget.dart';
+import '../widgets/key_management_widget.dart';
+import '../widgets/password_section_widget.dart';
 
 /// Demo-Screen für Verschlüsselungs-Features
 class EncryptionDemoScreen extends StatefulWidget {
@@ -19,10 +21,6 @@ class EncryptionDemoScreen extends StatefulWidget {
 }
 
 class _EncryptionDemoScreenState extends State<EncryptionDemoScreen> {
-  final TextEditingController _textController = TextEditingController();
-  final TextEditingController _keyNameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
   final EncryptionRepository _encryptionRepository = EncryptionRepositoryImpl();
   late final EncryptDataUseCase _encryptDataUseCase;
   late final DecryptDataUseCase _decryptDataUseCase;
@@ -73,25 +71,16 @@ class _EncryptionDemoScreenState extends State<EncryptionDemoScreen> {
     }
   }
 
-  Future<void> _createKey() async {
-    if (_keyNameController.text.trim().isEmpty) {
-      SnackBarUtils.showErrorSnackBar(
-          context, 'Bitte geben Sie einen Schlüsselnamen ein');
-      return;
-    }
-
+  Future<void> _createKey(String keyName) async {
     setState(() => _isLoading = true);
 
     try {
-      final key =
-          await _createKeyUseCase(_keyNameController.text.trim(), 'symmetric');
+      await _createKeyUseCase(keyName, 'symmetric');
       await _loadKeys();
 
       if (!mounted) return;
       SnackBarUtils.showSuccessSnackBar(
-          context, 'Schlüssel "${key.name}" erfolgreich erstellt');
-
-      _keyNameController.clear();
+          context, 'Schlüssel "$keyName" erfolgreich erstellt');
     } catch (e) {
       if (!mounted) return;
       SnackBarUtils.showErrorSnackBar(
@@ -103,24 +92,11 @@ class _EncryptionDemoScreenState extends State<EncryptionDemoScreen> {
     }
   }
 
-  Future<void> _encryptData() async {
-    if (_textController.text.trim().isEmpty) {
-      SnackBarUtils.showErrorSnackBar(
-          context, 'Bitte geben Sie Text zum Verschlüsseln ein');
-      return;
-    }
-
-    if (_selectedKeyId.isEmpty) {
-      SnackBarUtils.showErrorSnackBar(
-          context, 'Bitte wählen Sie einen Schlüssel aus');
-      return;
-    }
-
+  Future<void> _encryptData(String text) async {
     setState(() => _isLoading = true);
 
     try {
-      final encryptedData = await _encryptDataUseCase(
-          _textController.text.trim(), _selectedKeyId);
+      final encryptedData = await _encryptDataUseCase(text, _selectedKeyId);
       if (!mounted) return;
       setState(() => _lastEncryptedData = encryptedData);
 
@@ -137,12 +113,6 @@ class _EncryptionDemoScreenState extends State<EncryptionDemoScreen> {
   }
 
   Future<void> _decryptData() async {
-    if (_lastEncryptedData == null) {
-      SnackBarUtils.showErrorSnackBar(
-          context, 'Keine verschlüsselten Daten vorhanden');
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     try {
@@ -162,17 +132,11 @@ class _EncryptionDemoScreenState extends State<EncryptionDemoScreen> {
     }
   }
 
-  Future<void> _hashPassword() async {
-    if (_passwordController.text.trim().isEmpty) {
-      SnackBarUtils.showErrorSnackBar(
-          context, 'Bitte geben Sie ein Passwort ein');
-      return;
-    }
-
+  Future<void> _hashPassword(String password) async {
     setState(() => _isLoading = true);
 
     try {
-      final hash = await _hashPasswordUseCase(_passwordController.text.trim());
+      final hash = await _hashPasswordUseCase(password);
       if (!mounted) return;
       setState(() => _lastHash = hash);
 
@@ -188,18 +152,11 @@ class _EncryptionDemoScreenState extends State<EncryptionDemoScreen> {
     }
   }
 
-  Future<void> _verifyPassword() async {
-    if (_passwordController.text.trim().isEmpty || _lastHash.isEmpty) {
-      SnackBarUtils.showErrorSnackBar(context,
-          'Bitte geben Sie ein Passwort ein und erstellen Sie zuerst einen Hash');
-      return;
-    }
-
+  Future<void> _verifyPassword(String password) async {
     setState(() => _isLoading = true);
 
     try {
-      final isValid = await _verifyPasswordUseCase(
-          _passwordController.text.trim(), _lastHash);
+      final isValid = await _verifyPasswordUseCase(password, _lastHash);
 
       if (!mounted) return;
       if (isValid) {
@@ -251,242 +208,37 @@ class _EncryptionDemoScreenState extends State<EncryptionDemoScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildKeyManagementSection(),
+                  KeyManagementWidget(
+                    keys: _keys,
+                    selectedKeyId: _selectedKeyId,
+                    onKeySelected: (keyId) =>
+                        setState(() => _selectedKeyId = keyId),
+                    onCreateKey: _createKey,
+                    isLoading: _isLoading,
+                  ),
                   const SizedBox(height: 24),
-                  _buildEncryptionSection(),
+                  EncryptionSectionWidget(
+                    selectedKeyId: _selectedKeyId,
+                    lastEncryptedData: _lastEncryptedData,
+                    onEncrypt: _encryptData,
+                    onDecrypt: _decryptData,
+                    isLoading: _isLoading,
+                  ),
                   const SizedBox(height: 24),
-                  _buildPasswordSection(),
+                  PasswordSectionWidget(
+                    lastHash: _lastHash,
+                    onHashPassword: _hashPassword,
+                    onVerifyPassword: _verifyPassword,
+                    isLoading: _isLoading,
+                  ),
                   const SizedBox(height: 24),
-                  _buildBenchmarkSection(),
+                  BenchmarkSectionWidget(
+                    onRunBenchmark: _runBenchmark,
+                    isLoading: _isLoading,
+                  ),
                 ],
               ),
             ),
     );
-  }
-
-  Widget _buildKeyManagementSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Schlüssel-Verwaltung',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            GlobalTextField(
-              controller: _keyNameController,
-              label: 'Schlüsselname',
-              hint: 'z.B. MeinSchlüssel',
-            ),
-            const SizedBox(height: 16),
-            GlobalButton(
-              onPressed: _createKey,
-              text: 'Schlüssel erstellen',
-              isLoading: _isLoading,
-            ),
-            const SizedBox(height: 16),
-            if (_keys.isNotEmpty) ...[
-              Text(
-                'Verfügbare Schlüssel:',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              ...(_keys.map((key) => ListTile(
-                    title: Text(key.name),
-                    subtitle: Text(
-                        '${key.algorithm} - ${key.isValid ? 'Aktiv' : 'Inaktiv'}'),
-                    trailing: DropdownButton<String>(
-                      value: _selectedKeyId == key.id ? key.id : null,
-                      onChanged: (value) {
-                        setState(() => _selectedKeyId = value!);
-                      },
-                      items: _keys
-                          .map((k) => DropdownMenuItem(
-                                value: k.id,
-                                child: Text(k.name),
-                              ))
-                          .toList(),
-                    ),
-                  ))),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEncryptionSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Verschlüsselung',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            GlobalTextField(
-              controller: _textController,
-              label: 'Text zum Verschlüsseln',
-              hint: 'Geben Sie hier Ihren Text ein...',
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: GlobalButton(
-                    onPressed: _encryptData,
-                    text: 'Verschlüsseln',
-                    isLoading: _isLoading,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: GlobalButton(
-                    onPressed: _decryptData,
-                    text: 'Entschlüsseln',
-                    isLoading: _isLoading,
-                  ),
-                ),
-              ],
-            ),
-            if (_lastEncryptedData != null) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Letzte verschlüsselte Daten:',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text('ID: ${_lastEncryptedData!.id}'),
-                    Text('Algorithmus: ${_lastEncryptedData!.algorithm}'),
-                    Text(
-                        'Erstellt: ${_lastEncryptedData!.createdAt.toString()}'),
-                    if (_lastEncryptedData!.hasChecksum)
-                      Text(
-                          'Checksum: ${_lastEncryptedData!.checksum!.substring(0, 16)}...'),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPasswordSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Passwort-Hashing',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            GlobalTextField(
-              controller: _passwordController,
-              label: 'Passwort',
-              hint: 'Geben Sie ein Passwort ein...',
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: GlobalButton(
-                    onPressed: _hashPassword,
-                    text: 'Hash erstellen',
-                    isLoading: _isLoading,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: GlobalButton(
-                    onPressed: _verifyPassword,
-                    text: 'Verifizieren',
-                    isLoading: _isLoading,
-                  ),
-                ),
-              ],
-            ),
-            if (_lastHash.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Letzter Hash:',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(_lastHash,
-                        style: const TextStyle(fontFamily: 'monospace')),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBenchmarkSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Performance-Benchmark',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            GlobalButton(
-              onPressed: _runBenchmark,
-              text: 'Benchmark ausführen',
-              isLoading: _isLoading,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Testet die Verschlüsselungs-Performance mit verschiedenen Algorithmen.',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    _keyNameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }

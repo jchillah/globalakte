@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'core/app_config.dart';
 import 'core/app_theme.dart';
+import 'features/encryption/presentation/screens/encryption_demo_screen.dart';
 import 'features/welcome/presentation/screens/welcome_screen.dart';
 
 /// Haupt-App-Klasse für GlobalAkte
@@ -16,7 +17,11 @@ class GlobalAkteApp extends StatelessWidget {
       title: AppConfig.appName,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      home: const WelcomeScreen(),
+      initialRoute: '/welcome',
+      routes: {
+        '/welcome': (context) => const WelcomeScreen(),
+        '/encryption-demo': (context) => const EncryptionDemoScreen(),
+      },
       debugShowCheckedModeBanner: false,
       // ScaffoldMessenger für bessere SnackBar-Unterstützung
       scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
