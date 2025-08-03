@@ -10,7 +10,7 @@ import 'features/authentication/presentation/screens/register_screen.dart';
 import 'features/communication/presentation/screens/communication_demo_screen.dart';
 import 'features/document_management/presentation/screens/document_management_demo_screen.dart';
 import 'features/encryption/presentation/screens/encryption_demo_screen.dart';
-import 'features/legal_assistant_ai/presentation/screens/legal_ai_demo_screen.dart';
+import 'features/evidence_collection/presentation/screens/evidence_collection_demo_screen.dart';
 import 'features/home/presentation/screens/admin_home_screen.dart';
 import 'features/home/presentation/screens/citizen_home_screen.dart';
 import 'features/home/presentation/screens/court_home_screen.dart';
@@ -21,6 +21,7 @@ import 'features/home/presentation/screens/lawyer_home_screen.dart';
 import 'features/home/presentation/screens/police_home_screen.dart';
 import 'features/home/presentation/screens/school_home_screen.dart';
 import 'features/home/presentation/screens/social_worker_home_screen.dart';
+import 'features/legal_assistant_ai/presentation/screens/legal_ai_demo_screen.dart';
 import 'features/welcome/presentation/screens/welcome_screen.dart';
 
 /// Haupt-App-Klasse für GlobalAkte
@@ -64,6 +65,8 @@ class GlobalAkteApp extends StatelessWidget {
         '/accessibility-demo': (context) => const AccessibilityDemoScreen(),
         '/encryption-demo': (context) => const EncryptionDemoScreen(),
         '/legal-ai-demo': (context) => const LegalAiDemoScreen(),
+        '/evidence-collection-demo': (context) =>
+            const EvidenceCollectionDemoScreen(),
         '/appointment-demo': (context) => const AppointmentDemoScreen(),
       },
       debugShowCheckedModeBanner: false,

@@ -63,6 +63,8 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildLegalAiDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
+                _buildEvidenceCollectionDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
                 _buildAppointmentDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
               ],
@@ -418,6 +420,28 @@ class WelcomeScreen extends StatelessWidget {
         label: const Text('🤖 Legal AI Demo'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
+          padding:
+              const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEvidenceCollectionDemoButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/evidence-collection-demo');
+        },
+        icon: const Icon(Icons.photo_camera),
+        label: const Text('📸 Beweismittel Demo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange,
           foregroundColor: Colors.white,
           padding:
               const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
