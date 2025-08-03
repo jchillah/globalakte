@@ -16,6 +16,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
   static const String _documentCounterKey = 'document_counter';
 
   final SharedPreferences _prefs;
+  // ignore: unused_field
   final EncryptionRepository _encryptionRepository;
 
   DocumentRepositoryImpl(this._prefs, this._encryptionRepository);
@@ -294,7 +295,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<String> createBackup() async {
     try {
-      final documents = await getAllDocuments();
+      await getAllDocuments(); // Dokumente laden für Backup-Vorbereitung
 
       final backupPath =
           '/backups/documents_${DateTime.now().millisecondsSinceEpoch}.json';
