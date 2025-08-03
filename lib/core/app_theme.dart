@@ -1,5 +1,6 @@
 // core/app_theme.dart
 import 'package:flutter/material.dart';
+
 import 'app_config.dart';
 
 /// GlobalAkte App Theme - Material Design 3
@@ -13,7 +14,6 @@ class AppTheme {
         seedColor: AppConfig.primaryColor,
         brightness: Brightness.light,
         surface: AppConfig.surfaceColor,
-        background: AppConfig.backgroundColor,
       ),
 
       // App Bar Theme
@@ -30,7 +30,7 @@ class AppTheme {
       ),
 
       // Card Theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
@@ -97,7 +97,7 @@ class AppTheme {
       ),
 
       // Dialog Theme
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: AppConfig.surfaceColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConfig.largeRadius),

@@ -1,5 +1,7 @@
+// shared/widgets/global_input.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../../core/app_config.dart';
 
 /// Wiederverwendbare Input-Widgets für GlobalAkte
@@ -70,11 +72,13 @@ class GlobalTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-              borderSide: const BorderSide(color: AppConfig.primaryColor, width: 2),
+              borderSide:
+                  const BorderSide(color: AppConfig.primaryColor, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-              borderSide: const BorderSide(color: AppConfig.accentColor, width: 2),
+              borderSide:
+                  const BorderSide(color: AppConfig.accentColor, width: 2),
             ),
             filled: true,
             fillColor: enabled ? Colors.grey[50] : Colors.grey[200],
@@ -162,7 +166,7 @@ class EmailInputField extends StatelessWidget {
 }
 
 /// Password Input Widget
-class PasswordInputField extends StatelessWidget {
+class PasswordInputField extends StatefulWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final ValueChanged<String>? onChanged;
@@ -179,35 +183,36 @@ class PasswordInputField extends StatelessWidget {
   });
 
   @override
+  State<PasswordInputField> createState() => _PasswordInputFieldState();
+}
+
+class _PasswordInputFieldState extends State<PasswordInputField> {
+  bool _obscureText = true;
+
+  @override
   Widget build(BuildContext context) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        bool obscureText = true;
-        
-        return GlobalTextField(
-          label: 'Passwort',
-          hint: 'Passwort eingeben',
-          controller: controller,
-          keyboardType: TextInputType.visiblePassword,
-          obscureText: obscureText,
-          enabled: enabled,
-          validator: validator,
-          onChanged: onChanged,
-          prefixIcon: const Icon(Icons.lock_outline),
-          suffixIcon: showPasswordToggle
-              ? IconButton(
-                  icon: Icon(
-                    obscureText ? Icons.visibility : Icons.visibility_off,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      obscureText = !obscureText;
-                    });
-                  },
-                )
-              : null,
-        );
-      },
+    return GlobalTextField(
+      label: 'Passwort',
+      hint: 'Passwort eingeben',
+      controller: widget.controller,
+      keyboardType: TextInputType.visiblePassword,
+      obscureText: _obscureText,
+      enabled: widget.enabled,
+      validator: widget.validator,
+      onChanged: widget.onChanged,
+      prefixIcon: const Icon(Icons.lock_outline),
+      suffixIcon: widget.showPasswordToggle
+          ? IconButton(
+              icon: Icon(
+                _obscureText ? Icons.visibility : Icons.visibility_off,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+            )
+          : null,
     );
   }
-} 
+}
