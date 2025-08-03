@@ -48,6 +48,11 @@ dependencies:
   
   # Datei-System & Pfad-Management
   path_provider: ^2.1.2
+  
+  # Internationalisierung & Datumsformatierung
+  intl: ^0.20.2
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:

@@ -1,11 +1,13 @@
 // app.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/app_config.dart';
 import 'core/app_theme.dart';
 import 'features/authentication/presentation/screens/register_screen.dart';
 import 'features/communication/presentation/screens/communication_demo_screen.dart';
 import 'features/document_management/presentation/screens/document_management_demo_screen.dart';
+import 'features/appointment/presentation/screens/appointment_demo_screen.dart';
 import 'features/encryption/presentation/screens/encryption_demo_screen.dart';
 import 'features/home/presentation/screens/admin_home_screen.dart';
 import 'features/home/presentation/screens/citizen_home_screen.dart';
@@ -30,6 +32,16 @@ class GlobalAkteApp extends StatelessWidget {
       title: AppConfig.appName,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('de', 'DE'),
+        Locale('en', 'US'),
+      ],
+      locale: const Locale('de', 'DE'),
       initialRoute: '/welcome',
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
@@ -48,6 +60,7 @@ class GlobalAkteApp extends StatelessWidget {
         '/document-management': (context) =>
             const DocumentManagementDemoScreen(),
         '/encryption-demo': (context) => const EncryptionDemoScreen(),
+        '/appointment-demo': (context) => const AppointmentDemoScreen(),
       },
       debugShowCheckedModeBanner: false,
       // ScaffoldMessenger für bessere SnackBar-Unterstützung
