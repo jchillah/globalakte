@@ -26,7 +26,7 @@ class EvidenceChainWidget extends StatefulWidget {
 
 class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
   List<EvidenceItem> _allEvidence = [];
-  List<EvidenceItem> _selectedEvidence = [];
+  final List<EvidenceItem> _selectedEvidence = [];
   final _chainNameController = TextEditingController();
   bool _isLoading = true;
   bool _isCreatingChain = false;
@@ -76,48 +76,26 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Beweismittel-Ketten',
-          style: Theme.of(context).textTheme.headlineSmall,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
+        // const SizedBox(height: 16),
 
-        // Info-Box
-        Card(
-          color: AppConfig.primaryColor.withValues(alpha: 0.1),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: AppConfig.primaryColor,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Beweismittel-Ketten',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppConfig.primaryColor,
-                          ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Erstellen Sie logische Verbindungen zwischen Beweismitteln, '
-                  'um Zusammenhänge zu dokumentieren und die Beweiskette zu stärken.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade700,
-                      ),
-                ),
-              ],
+        // Info-Button
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              'Beweismittel-Ketten',
+              style: Theme.of(context).textTheme.headlineSmall,
+              textAlign: TextAlign.center,
             ),
-          ),
+            IconButton(
+              onPressed: _showInfoDialog,
+              icon: Icon(
+                Icons.info_outline,
+                color: AppConfig.primaryColor,
+              ),
+              tooltip: 'Informationen zu Beweismittel-Ketten',
+            ),
+          ],
         ),
 
         const SizedBox(height: 24),
@@ -202,11 +180,13 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
           child: CheckboxListTile(
             value: isSelected,
             onChanged: (selected) {
-              if (selected == true) {
-                _addEvidenceToSelection(evidence);
-              } else {
-                _removeEvidenceFromSelection(evidence);
-              }
+              setState(() {
+                if (selected == true) {
+                  _addEvidenceToSelection(evidence);
+                } else {
+                  _removeEvidenceFromSelection(evidence);
+                }
+              });
             },
             title: Text(
               evidence.title,
@@ -364,6 +344,31 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
     });
   }
 
+  void _showInfoDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.info_outline, color: AppConfig.primaryColor),
+            const SizedBox(width: 8),
+            const Text('Beweismittel-Ketten'),
+          ],
+        ),
+        content: const Text(
+          'Erstellen Sie logische Verbindungen zwischen Beweismitteln, '
+          'um Zusammenhänge zu dokumentieren und die Beweiskette zu stärken.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Verstanden'),
+          ),
+        ],
+      ),
+    );
+  }
+
   bool _canCreateChain() {
     return _chainNameController.text.trim().isNotEmpty &&
         _selectedEvidence.length >= 2;
@@ -408,4 +413,4 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
       }
     }
   }
-} 
+}

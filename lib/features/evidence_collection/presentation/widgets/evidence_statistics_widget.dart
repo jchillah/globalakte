@@ -128,6 +128,7 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
               label: const Text('Statistiken aktualisieren'),
             ),
           ),
+          const SizedBox(height: 16), // Extra padding at bottom
         ],
       ),
     );

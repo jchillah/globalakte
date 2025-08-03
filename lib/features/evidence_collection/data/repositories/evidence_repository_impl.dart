@@ -9,6 +9,8 @@ import '../../domain/repositories/evidence_repository.dart';
 class EvidenceRepositoryImpl implements EvidenceRepository {
   final List<EvidenceItem> _evidenceItems = [];
   final Map<String, List<String>> _evidenceChains = {};
+  // Random wird für zukünftige Erweiterungen benötigt
+  // ignore: unused_field
   final Random _random = Random();
 
   EvidenceRepositoryImpl() {
@@ -116,9 +118,7 @@ class EvidenceRepositoryImpl implements EvidenceRepository {
   @override
   Future<List<EvidenceItem>> getEvidenceByType(String type) async {
     await Future.delayed(Duration(milliseconds: 300));
-    return _evidenceItems
-        .where((evidence) => evidence.type == type)
-        .toList();
+    return _evidenceItems.where((evidence) => evidence.type == type).toList();
   }
 
   @override
@@ -276,7 +276,8 @@ class EvidenceRepositoryImpl implements EvidenceRepository {
   }
 
   @override
-  Future<void> createEvidenceChain(List<String> evidenceIds, String chainName) async {
+  Future<void> createEvidenceChain(
+      List<String> evidenceIds, String chainName) async {
     await Future.delayed(Duration(milliseconds: 300));
     final chainId = 'CHAIN-${DateTime.now().millisecondsSinceEpoch}';
     _evidenceChains[chainId] = evidenceIds;
@@ -296,4 +297,4 @@ class EvidenceRepositoryImpl implements EvidenceRepository {
     await Future.delayed(Duration(milliseconds: 200));
     _evidenceChains.remove(chainId);
   }
-} 
+}
