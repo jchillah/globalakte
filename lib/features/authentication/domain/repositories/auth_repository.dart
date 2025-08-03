@@ -30,6 +30,9 @@ abstract class AuthRepository {
   /// Authentifiziert mit Biometrie
   Future<AuthUser> signInWithBiometrics();
 
+  /// Authentifiziert mit Biometrie (Boolean-Rückgabe)
+  Future<bool> authenticateWithBiometrics();
+
   /// Aktiviert/Deaktiviert Biometrie
   Future<void> setBiometricsEnabled(bool enabled);
 

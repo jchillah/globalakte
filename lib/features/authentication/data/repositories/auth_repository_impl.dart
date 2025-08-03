@@ -1,6 +1,7 @@
 // features/authentication/data/repositories/auth_repository_impl.dart
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,15 +37,25 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthUser> signInWithEmailAndPassword(
       String email, String password) async {
-    // Simulierte Authentifizierung - in der echten App würde hier ein API-Call stehen
-    await Future.delayed(
-        const Duration(seconds: 1)); // Simuliere Netzwerk-Verzögerung
+    // Demo-Authentifizierung mit Test-Daten
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Demo-Benutzer für Tests
+    final demoUsers = {
+      'demo@globalakte.de': 'Demo123!',
+      'test@globalakte.de': 'Test123!',
+      'admin@globalakte.de': 'Admin123!',
+    };
+
+    if (!demoUsers.containsKey(email) || demoUsers[email] != password) {
+      throw ArgumentError('Ungültige Email oder Passwort');
+    }
 
     final user = AuthUser(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: 'demo_user_${email.hashCode}',
       email: email,
-      name: email.split('@')[0], // Vereinfachter Name aus Email
-      role: 'citizen', // Standard-Rolle
+      name: email.split('@')[0],
+      role: email.contains('admin') ? 'admin' : 'citizen',
       isAuthenticated: true,
       lastLoginAt: DateTime.now(),
     );
@@ -56,11 +67,17 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthUser> signUpWithEmailAndPassword(
       String email, String password, String name, String role) async {
-    // Simulierte Registrierung
+    // Demo-Registrierung
     await Future.delayed(const Duration(seconds: 1));
 
+    // Prüfe ob Email bereits existiert
+    final existingUser = await getCurrentUser();
+    if (existingUser != null && existingUser.email == email) {
+      throw ArgumentError('Email bereits registriert');
+    }
+
     final user = AuthUser(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: 'user_${DateTime.now().millisecondsSinceEpoch}',
       email: email,
       name: name,
       role: role,
@@ -186,6 +203,26 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<bool> authenticateWithBiometrics() async {
+    try {
+      final isAvailable = await isBiometricsAvailable();
+      if (!isAvailable) {
+        return false;
+      }
+
+      return await _localAuth.authenticate(
+        localizedReason: 'Authentifizieren Sie sich mit Biometrie',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
   Future<void> setBiometricsEnabled(bool enabled) async {
     if (enabled) {
       // Prüfe ob Biometrie verfügbar ist
@@ -212,13 +249,21 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthUser?> getCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString(_userKey);
-    if (userJson == null) return null;
-
     try {
-      return AuthUser.fromJson(jsonDecode(userJson));
+      final prefs = await SharedPreferences.getInstance();
+      final userJson = prefs.getString(_userKey);
+      if (userJson == null) return null;
+
+      try {
+        return AuthUser.fromJson(jsonDecode(userJson));
+      } catch (e) {
+        debugPrint('Error parsing user data: $e');
+        // Lösche ungültige Daten
+        await prefs.remove(_userKey);
+        return null;
+      }
     } catch (e) {
+      debugPrint('Error getting current user: $e');
       return null;
     }
   }
