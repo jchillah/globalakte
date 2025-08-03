@@ -11,6 +11,7 @@ import 'features/communication/presentation/screens/communication_demo_screen.da
 import 'features/document_management/presentation/screens/document_management_demo_screen.dart';
 import 'features/encryption/presentation/screens/encryption_demo_screen.dart';
 import 'features/evidence_collection/presentation/screens/evidence_collection_demo_screen.dart';
+import 'features/help_network/presentation/screens/help_network_demo_screen.dart';
 import 'features/home/presentation/screens/admin_home_screen.dart';
 import 'features/home/presentation/screens/citizen_home_screen.dart';
 import 'features/home/presentation/screens/court_home_screen.dart';
@@ -65,6 +66,7 @@ class GlobalAkteApp extends StatelessWidget {
         '/accessibility-demo': (context) => const AccessibilityDemoScreen(),
         '/encryption-demo': (context) => const EncryptionDemoScreen(),
         '/legal-ai-demo': (context) => const LegalAiDemoScreen(),
+        '/help-network-demo': (context) => const HelpNetworkDemoScreen(),
         '/evidence-collection-demo': (context) =>
             const EvidenceCollectionDemoScreen(),
         '/appointment-demo': (context) => const AppointmentDemoScreen(),
