@@ -4,206 +4,173 @@
 
 Eine Flutter-basierte mobile Anwendung, die Bürgern bei rechtlichen Angelegenheiten hilft - mit Fokus auf Datenschutz, Verschlüsselung und benutzerfreundliche Bedienung.
 
-## 🚀 Features
+## 🚀 Was ist GlobalAkte?
 
-- 🔐 **Sichere Authentifizierung** - PIN & biometrische Authentifizierung
-- 📁 **Fallakten-Verwaltung** - Digitale Akten mit ePA-Integration
-- 🤖 **KI-gestützte Hilfe** - LLM-Integration für rechtliche Beratung
-- 📄 **Dokument-Generator** - Automatische PDF-Erstellung
-- 🔒 **End-to-End Verschlüsselung** - Alle Daten lokal verschlüsselt
-- ♿ **Barrierefreiheit** - Vollständig zugänglich für alle Nutzer
-- 📅 **Terminverwaltung** - Kalender-System für rechtliche Termine
-- 💬 **Kommunikation** - Verschlüsselte Nachrichten zwischen Beteiligten
+GlobalAkte ist eine innovative App, die Bürgern dabei hilft, rechtliche Angelegenheiten selbstständig zu bewältigen. Die App bietet eine sichere, benutzerfreundliche Plattform für die Verwaltung von Fallakten, Kommunikation mit rechtlichen Beteiligten und Zugang zu rechtlichen Informationen.
 
-## ✅ Abgeschlossene Sprints
+## ✨ Features
 
-### Sprint 1: Setup & Architektur ✅
-- **Clean Architecture** implementiert
-- **Features First** Struktur
-- **Repository Pattern** für alle Features
-- **GitHub Integration** mit Labels und Milestones
+### 🔐 **Sichere Authentifizierung**
 
-### Sprint 2: Authentifizierung ✅
-- **PIN-Setup** und -Verifikation
+- **PIN-basierte Anmeldung** für einfache Nutzung
 - **Biometrische Authentifizierung** (Fingerabdruck, Face ID)
-- **Sichere Speicherung** mit flutter_secure_storage
-- **Benutzer-Rollen** (Bürger, Anwalt, Gericht, etc.)
+- **Sichere Speicherung** aller sensiblen Daten
+- **Verschiedene Benutzer-Rollen** (Bürger, Anwalt, Gericht, etc.)
 
-### Sprint 3: Sicherheit & Verschlüsselung ✅
-- **Verschlüsselung Demo** vollständig funktional
-- **Schlüssel-Verwaltung** mit UI
-- **Verschlüsselung/Entschlüsselung** von Text
-- **Passwort-Hashing** und -Verifikation
-- **Performance-Benchmark** für Verschlüsselung
-- **Code-Qualität** verbessert (KISS, DRY, Clean Code)
+### 📁 **Fallakten-Verwaltung**
 
-### Sprint 4: UI & Navigation ✅
-- **Welcome Screen** mit Feature-Navigation
-- **Home Screens** für verschiedene Benutzer-Rollen
-- **Responsive Design** für alle Bildschirmgrößen
-- **Intuitive Navigation** zwischen Features
+- **Digitale Akten** mit strukturierter Dokumentation
+- **Timeline-Funktion** für chronologische Übersicht
+- **Dokument-Upload** und -Verwaltung
+- **ePA-Integration** für elektronische Patientenakte
 
-### Sprint 5: Wissensdatenbank ✅
-- **Rechtliche Informationen** strukturiert
-- **Suchfunktion** für relevante Gesetze
-- **Kategorisierung** nach Rechtsgebieten
-- **Offline-Zugriff** auf wichtige Informationen
+### 🤖 **KI-gestützte Hilfe**
 
-### Sprint 6: Dokumenten-Management ✅
-- **Dokument-Erstellung** und -Verwaltung
-- **PDF-Generator** für rechtliche Dokumente
-- **Cloud-Synchronisation** mit Backup
+- **Intelligente Rechtsberatung** durch LLM-Integration
+- **Automatische Dokumentenerstellung** basierend auf Falldaten
+- **Personalisiertes Feedback** für rechtliche Fragen
+- **Kontextbewusste Empfehlungen**
+
+### 📄 **Dokument-Generator**
+
+- **Automatische PDF-Erstellung** für rechtliche Dokumente
+- **Vorlagen-System** für häufige Dokumente
+- **Cloud-Synchronisation** mit Backup-Funktion
 - **Versionierung** und Änderungsverfolgung
 
-### Sprint 7: Terminverwaltung & Kalender ✅
-- **Kalender-System** für rechtliche Termine
-- **Termin-Erstellung** und -Verwaltung
-- **Erinnerungen** und Notifikationen
-- **Integration** mit Fallakten
+### 🔒 **End-to-End Verschlüsselung**
 
-### Sprint 8: Barrierefreiheit & Accessibility ✅
+- **Alle Daten lokal verschlüsselt** für maximale Sicherheit
+- **Schlüssel-Verwaltung** mit benutzerfreundlicher UI
+- **Passwort-Hashing** und -Verifikation
+- **Performance-Benchmark** für Verschlüsselungsalgorithmen
+
+### ♿ **Vollständige Barrierefreiheit**
+
 - **Screen Reader** Unterstützung für alle UI-Elemente
 - **Voice Control** für Navigation und Aktionen
 - **High Contrast Mode** für bessere Sichtbarkeit
 - **Skalierbare Schriftgrößen** (0.5x - 3.0x)
 - **Vollständige Tastaturnavigation**
-- **Focus-Indikatoren** für bessere Orientierung
-- **Motion Reduction** für empfindliche Benutzer
 - **WCAG 2.1 AA Konformität**
-- **Accessibility Testing** Suite implementiert
 
-## 🛠️ Entwicklung
+### 📅 **Terminverwaltung**
 
-### Voraussetzungen
+- **Intelligentes Kalender-System** für rechtliche Termine
+- **Automatische Erinnerungen** und Notifikationen
+- **Integration** mit Fallakten und Dokumenten
+- **Synchronisation** mit externen Kalendern
 
-- Flutter 3.32+
-- Dart 3.8+
-- GitHub CLI (`gh`)
+### 💬 **Verschlüsselte Kommunikation**
 
-### Setup
+- **Sichere Nachrichten** zwischen allen Beteiligten
+- **End-to-End Verschlüsselung** für alle Kommunikation
+- **Push-Benachrichtigungen** für wichtige Updates
+- **Chat-Historie** mit Suchfunktion
 
-1. **Repository klonen**
+## 🎯 Zielgruppe
 
-   ```bash
-   git clone https://github.com/jchillah/globalakte.git
-   cd globalakte
-   ```
+### **Primäre Nutzer:**
 
-2. **Dependencies installieren**
+- **Bürger** mit rechtlichen Angelegenheiten
+- **Anwälte** für effiziente Fallverwaltung
+- **Gerichte** für digitale Aktenführung
+- **Sozialarbeiter** für Klientenbetreuung
 
-   ```bash
-   flutter pub get
-   ```
+### **Anwendungsbereiche:**
 
-3. **GitHub Setup ausführen**
+- **Zivilrecht** (Verträge, Schadensersatz, etc.)
+- **Familienrecht** (Scheidung, Sorgerecht, etc.)
+- **Sozialrecht** (Hartz IV, Rente, etc.)
+- **Verwaltungsrecht** (Behördenangelegenheiten)
 
-   ```bash
-   # Labels und Milestones erstellen
-   python3 scripts/setup_github.py
+## 🛡️ Sicherheit & Datenschutz
 
-   # Sprint Issues erstellen
-   python3 scripts/create_project_board.py
-   ```
+### **Datenschutz-First Ansatz:**
 
-### VSCode IDE Integration
+- **Lokale Datenverarbeitung** wo möglich
+- **End-to-End Verschlüsselung** für alle Daten
+- **DSGVO-konform** von Grund auf
+- **Transparente Datenverarbeitung**
 
-Das Projekt ist für VSCode IDE optimiert mit:
+### **Sicherheits-Features:**
 
-- **GitHub Integration**: Issue Templates, Labels, Milestones
-- **Keyboard Shortcuts**:
-  - `Ctrl+Shift+I`: Issue erstellen
-  - `Ctrl+Shift+S`: Sprint anzeigen
-  - `Ctrl+Shift+R`: Pull Request erstellen
-  - `Ctrl+Shift+B`: GitHub Setup
-  - `Ctrl+Shift+N`: Sprint Issues erstellen
-- **Tasks**: Automatisierte GitHub-Workflows
+- **Biometrische Authentifizierung**
+- **Automatische Session-Timeouts**
+- **Verschlüsselte Backups**
+- **Audit-Logs** für alle Aktionen
 
-**Alternative (falls Shortcuts nicht funktionieren):**
+## 🏗️ Technische Architektur
 
-```bash
-./scripts/gh_shortcuts.sh [command]
-# Commands: issue, sprint, pr, setup, sprint-issues
-```
+### **Clean Architecture**
 
-### Projekt-Struktur
+- **Domain Layer**: Geschäftslogik und Entities
+- **Data Layer**: Repository Pattern für Datenzugriff
+- **Presentation Layer**: UI und State Management
 
-```
-lib/
-├── features/           # Feature-basierte Architektur
-│   ├── accessibility/ # Barrierefreiheit & Accessibility
-│   ├── authentication/ # Login, PIN, Biometrie
-│   ├── case_timeline/ # Fallakten & Timeline
-│   ├── communication/ # Verschlüsselte Kommunikation
-│   ├── document_management/ # PDF & Dokumente
-│   ├── encryption/    # Verschlüsselung & Sicherheit
-│   ├── appointment/   # Terminverwaltung & Kalender
-│   ├── legal_assistant_ai/ # LLM-Integration
-│   └── welcome/       # Welcome Screen & Navigation
-├── shared/            # Gemeinsame Widgets & Utils
-├── core/              # App-Konfiguration & Theme
-└── main.dart          # App-Einstiegspunkt
-```
+### **Features First**
 
-## 🏗️ Architektur
-
-### Clean Architecture
-- **Domain Layer**: Entities, Repository Interfaces, Use Cases
-- **Data Layer**: Repository Implementations, Data Sources
-- **Presentation Layer**: Screens, Widgets, State Management
-
-### Features First
 Jedes Feature ist in sich geschlossen mit:
+
 - `data/` - Repository Implementations
 - `domain/` - Entities, Repositories, Use Cases
 - `presentation/` - Screens und Widgets
 
-### Repository Pattern
-- Abstrakte Repository Interfaces
-- Mock Implementations für Demo
-- Einfacher Austausch der Datenquellen
+### **Technologie-Stack**
 
-## 📊 Technische Qualität
+- **Flutter 3.32+** für Cross-Platform Entwicklung
+- **Dart 3.8+** für moderne Programmierung
+- **Clean Code** Standards (KISS, DRY)
+- **Repository Pattern** für Datenzugriff
 
-### Code-Qualität
-- **KISS** (Keep It Simple, Stupid)
-- **DRY** (Don't Repeat Yourself)
-- **Clean Code** Standards
-- **Single Responsibility Principle**
-- **Separation of Concerns**
+## 📱 Plattformen
 
-### Testing
-- **Unit Tests** für Use Cases
-- **Widget Tests** für UI-Komponenten
-- **Integration Tests** für Features
-- **Accessibility Tests** für Barrierefreiheit
+- **iOS** (iPhone, iPad)
+- **Android** (Smartphone, Tablet)
+- **Web** (Browser-basiert)
+- **Desktop** (Windows, macOS, Linux)
 
-### Performance
-- **Lazy Loading** für große Datenmengen
-- **Memory Management** mit dispose()
-- **Optimierte Widgets** mit const Constructors
-- **Benchmark-Tests** für kritische Funktionen
+## 🚀 Installation
 
-## 📋 Nächste Sprints
+### **Für Endnutzer:**
 
-| Sprint   | Fokus                        | Status |
-| -------- | ---------------------------- | ------ |
-| Sprint 9 | KI-Integration & LLM         | 🔄 Geplant |
-| Sprint 10| ePA-Integration              | 🔄 Geplant |
-| Sprint 11| Offline-Funktionalität       | 🔄 Geplant |
-| Sprint 12| Performance-Optimierung      | 🔄 Geplant |
+1. App Store oder Google Play Store öffnen
+2. "GlobalAkte" suchen
+3. App herunterladen und installieren
+4. Registrierung mit E-Mail oder Telefonnummer
+5. PIN oder biometrische Authentifizierung einrichten
+
+### **Für Entwickler:**
+
+```bash
+# Repository klonen
+git clone https://github.com/jchillah/globalakte.git
+cd globalakte
+
+# Dependencies installieren
+flutter pub get
+
+# App starten
+flutter run
+```
 
 ## 🤝 Beitragen
 
-1. **Issue erstellen**: Verwende die GitHub Issue Templates
-2. **Branch erstellen**: `git checkout -b feature/neue-funktion`
-3. **Code schreiben**: Folge den Flutter Best Practices
-4. **Pull Request**: Verwende die PR-Template
+Wir freuen uns über Beiträge! Bitte beachten Sie:
 
-### Coding Standards
+### **Coding Standards:**
+
 - **Deutsche Kommentare** und Dokumentation
 - **Semantic Commits** mit Präfixen
 - **Linter-Regeln** befolgen
 - **Accessibility** bei allen UI-Elementen
+
+### **Beitragsprozess:**
+
+1. **Issue erstellen** mit detaillierter Beschreibung
+2. **Branch erstellen** für neue Features
+3. **Code schreiben** nach Clean Code Standards
+4. **Pull Request** mit aussagekräftiger Beschreibung
 
 ## 📄 Lizenz
 
@@ -211,10 +178,18 @@ Dieses Projekt steht unter der MIT-Lizenz - siehe [LICENSE](LICENSE) für Detail
 
 ## 🔗 Links
 
-- [GitHub Issues](https://github.com/jchillah/globalakte/issues)
-- [Projekt-Board](https://github.com/jchillah/globalakte/projects)
-- [Wiki](https://github.com/jchillah/globalakte/wiki)
+- [GitHub Repository](https://github.com/jchillah/globalakte)
+- [Issues & Bug Reports](https://github.com/jchillah/globalakte/issues)
+- [Wiki & Dokumentation](https://github.com/jchillah/globalakte/wiki)
+
+## 📞 Support
+
+- **E-Mail**: support@globalakte.de
+- **Telefon**: +49 (0) 123 456789
+- **Chat**: In-App Support verfügbar
 
 ---
 
 **Entwickelt mit ❤️ für die digitale Transformation der Rechtshilfe**
+
+_GlobalAkte - Sichere, benutzerfreundliche und barrierefreie rechtliche Selbsthilfe_
