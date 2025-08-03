@@ -5,6 +5,9 @@ import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../../../shared/widgets/global_button.dart';
 import '../../../../shared/widgets/global_input.dart';
+import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/repositories/auth_repository.dart';
+import '../../domain/usecases/auth_usecases.dart';
 
 /// Login Screen für GlobalAkte
 class LoginScreen extends StatefulWidget {
@@ -20,9 +23,21 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _pinController = TextEditingController();
 
+  final AuthRepository _authRepository = AuthRepositoryImpl();
+  late final SignInWithEmailAndPasswordUseCase _signInWithEmailUseCase;
+  late final SignInWithPinUseCase _signInWithPinUseCase;
+
   bool _isLoading = false;
   bool _isPinMode = false;
   bool _showPassword = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _signInWithEmailUseCase =
+        SignInWithEmailAndPasswordUseCase(_authRepository);
+    _signInWithPinUseCase = SignInWithPinUseCase(_authRepository);
+  }
 
   @override
   void dispose() {
@@ -349,6 +364,22 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: AppConfig.defaultPadding),
         ],
 
+        // Demo Info Button
+        GlobalTextButton(
+          text: 'Demo Login-Daten anzeigen',
+          onPressed: () {
+            SnackBarUtils.showInfoSnackBar(
+              context,
+              'Demo Accounts:\n'
+              'demo@globalakte.de / Demo123!\n'
+              'test@globalakte.de / Test123!\n'
+              'admin@globalakte.de / Admin123!',
+            );
+          },
+          icon: Icons.info_outline,
+        ),
+        const SizedBox(height: AppConfig.defaultPadding),
+
         // Back to Welcome
         GlobalTextButton(
           text: 'Zurück zum Start',
@@ -369,32 +400,43 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      // Simulierte Authentifizierung
-      await Future.delayed(const Duration(seconds: 1));
-
-      if (!mounted) return;
-
       if (_isPinMode) {
-        // PIN Login
-        if (_pinController.text == '123456') {
+        try {
+          final user = await _signInWithPinUseCase.call(_pinController.text);
           SnackBarUtils.showSuccessSnackBar(
             context,
-            'Erfolgreich mit PIN angemeldet',
+            'Erfolgreich mit PIN angemeldet: ${user.name}',
           );
-          // TODO: Navigation zur Haupt-App
-        } else {
+          // Navigation zur Haupt-App
+          if (mounted) {
+            Navigator.of(context).pushReplacementNamed('/home');
+          }
+        } catch (e) {
           SnackBarUtils.showErrorSnackBar(
             context,
-            'Falsche PIN',
+            'Falsche PIN: $e',
           );
         }
       } else {
-        // Email/Password Login
-        SnackBarUtils.showSuccessSnackBar(
-          context,
-          'Erfolgreich angemeldet',
-        );
-        // TODO: Navigation zur Haupt-App
+        try {
+          final user = await _signInWithEmailUseCase.call(
+            _emailController.text,
+            _passwordController.text,
+          );
+          SnackBarUtils.showSuccessSnackBar(
+            context,
+            'Erfolgreich angemeldet: ${user.name}',
+          );
+          // Navigation zur Haupt-App
+          if (mounted) {
+            Navigator.of(context).pushReplacementNamed('/home');
+          }
+        } catch (e) {
+          SnackBarUtils.showErrorSnackBar(
+            context,
+            'Anmeldung fehlgeschlagen: $e',
+          );
+        }
       }
     } catch (e) {
       if (!mounted) return;

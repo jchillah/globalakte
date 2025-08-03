@@ -36,15 +36,25 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthUser> signInWithEmailAndPassword(
       String email, String password) async {
-    // Simulierte Authentifizierung - in der echten App würde hier ein API-Call stehen
-    await Future.delayed(
-        const Duration(seconds: 1)); // Simuliere Netzwerk-Verzögerung
+    // Demo-Authentifizierung mit Test-Daten
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Demo-Benutzer für Tests
+    final demoUsers = {
+      'demo@globalakte.de': 'Demo123!',
+      'test@globalakte.de': 'Test123!',
+      'admin@globalakte.de': 'Admin123!',
+    };
+
+    if (!demoUsers.containsKey(email) || demoUsers[email] != password) {
+      throw ArgumentError('Ungültige Email oder Passwort');
+    }
 
     final user = AuthUser(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: 'demo_user_${email.hashCode}',
       email: email,
-      name: email.split('@')[0], // Vereinfachter Name aus Email
-      role: 'citizen', // Standard-Rolle
+      name: email.split('@')[0],
+      role: email.contains('admin') ? 'admin' : 'citizen',
       isAuthenticated: true,
       lastLoginAt: DateTime.now(),
     );
@@ -56,11 +66,17 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthUser> signUpWithEmailAndPassword(
       String email, String password, String name, String role) async {
-    // Simulierte Registrierung
+    // Demo-Registrierung
     await Future.delayed(const Duration(seconds: 1));
 
+    // Prüfe ob Email bereits existiert
+    final existingUser = await getCurrentUser();
+    if (existingUser != null && existingUser.email == email) {
+      throw ArgumentError('Email bereits registriert');
+    }
+
     final user = AuthUser(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: 'user_${DateTime.now().millisecondsSinceEpoch}',
       email: email,
       name: name,
       role: role,

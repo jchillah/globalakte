@@ -53,6 +53,8 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildEncryptionDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
+                _buildCaseFilesDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
               ],
 
               // Version Info
@@ -307,6 +309,29 @@ class WelcomeScreen extends StatelessWidget {
     } else {
       SnackBarUtils.showSnackBar(context, message, duration: duration);
     }
+  }
+
+  Widget _buildCaseFilesDemoButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          SnackBarUtils.showInfoSnackBar(
+              context, '📁 Fallakten Demo - Coming Soon');
+        },
+        icon: const Icon(Icons.folder),
+        label: const Text('📁 Fallakten Demo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+          padding:
+              const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildVersionInfo() {
