@@ -1,3 +1,4 @@
+// features/case_timeline/data/repositories/case_file_repository_impl.dart
 import 'dart:convert';
 import 'dart:math';
 
@@ -16,17 +17,17 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
 
   @override
   Future<CaseFile> createCaseFile(CaseFile caseFile) async {
-    final prefs = await SharedPreferences.getInstance();
     final caseFiles = await getAllCaseFiles();
-    
+
     // Prüfe ob Fallnummer bereits existiert
     if (await isCaseNumberExists(caseFile.caseNumber)) {
-      throw ArgumentError('Fallnummer bereits vergeben: ${caseFile.caseNumber}');
+      throw ArgumentError(
+          'Fallnummer bereits vergeben: ${caseFile.caseNumber}');
     }
 
     caseFiles.add(caseFile);
     await _saveCaseFiles(caseFiles);
-    
+
     return caseFile;
   }
 
@@ -44,7 +45,7 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<List<CaseFile>> getAllCaseFiles() async {
     final prefs = await SharedPreferences.getInstance();
     final caseFilesJson = prefs.getString(_caseFilesKey);
-    
+
     if (caseFilesJson == null) return [];
 
     try {
@@ -64,19 +65,22 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   @override
   Future<List<CaseFile>> getCaseFilesByCategory(String category) async {
     final caseFiles = await getAllCaseFiles();
-    return caseFiles.where((caseFile) => caseFile.category == category).toList();
+    return caseFiles
+        .where((caseFile) => caseFile.category == category)
+        .toList();
   }
 
   @override
   Future<List<CaseFile>> searchCaseFiles(String query) async {
     final caseFiles = await getAllCaseFiles();
     final lowercaseQuery = query.toLowerCase();
-    
+
     return caseFiles.where((caseFile) {
       return caseFile.title.toLowerCase().contains(lowercaseQuery) ||
-             caseFile.description.toLowerCase().contains(lowercaseQuery) ||
-             caseFile.caseNumber.toLowerCase().contains(lowercaseQuery) ||
-             (caseFile.assignedTo?.toLowerCase().contains(lowercaseQuery) ?? false);
+          caseFile.description.toLowerCase().contains(lowercaseQuery) ||
+          caseFile.caseNumber.toLowerCase().contains(lowercaseQuery) ||
+          (caseFile.assignedTo?.toLowerCase().contains(lowercaseQuery) ??
+              false);
     }).toList();
   }
 
@@ -84,14 +88,14 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<CaseFile> updateCaseFile(CaseFile caseFile) async {
     final caseFiles = await getAllCaseFiles();
     final index = caseFiles.indexWhere((cf) => cf.id == caseFile.id);
-    
+
     if (index == -1) {
       throw ArgumentError('Fallakte nicht gefunden: ${caseFile.id}');
     }
 
     caseFiles[index] = caseFile.copyWith(updatedAt: DateTime.now());
     await _saveCaseFiles(caseFiles);
-    
+
     return caseFiles[index];
   }
 
@@ -100,10 +104,11 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
     final caseFiles = await getAllCaseFiles();
     caseFiles.removeWhere((caseFile) => caseFile.id == id);
     await _saveCaseFiles(caseFiles);
-    
+
     // Lösche auch alle zugehörigen Timeline Events
     final events = await getAllTimelineEvents();
-    final remainingEvents = events.where((event) => event.caseFileId != id).toList();
+    final remainingEvents =
+        events.where((event) => event.caseFileId != id).toList();
     await _saveTimelineEvents(remainingEvents);
   }
 
@@ -112,7 +117,7 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
     final events = await getAllTimelineEvents();
     events.add(event);
     await _saveTimelineEvents(events);
-    
+
     return event;
   }
 
@@ -126,14 +131,14 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<TimelineEvent> updateTimelineEvent(TimelineEvent event) async {
     final events = await getAllTimelineEvents();
     final index = events.indexWhere((e) => e.id == event.id);
-    
+
     if (index == -1) {
       throw ArgumentError('Timeline Event nicht gefunden: ${event.id}');
     }
 
     events[index] = event;
     await _saveTimelineEvents(events);
-    
+
     return events[index];
   }
 
@@ -145,7 +150,8 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   }
 
   @override
-  Future<void> addDocumentToCaseFile(String caseFileId, String documentId) async {
+  Future<void> addDocumentToCaseFile(
+      String caseFileId, String documentId) async {
     final caseFile = await getCaseFile(caseFileId);
     if (caseFile == null) {
       throw ArgumentError('Fallakte nicht gefunden: $caseFileId');
@@ -161,7 +167,8 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   }
 
   @override
-  Future<void> removeDocumentFromCaseFile(String caseFileId, String documentId) async {
+  Future<void> removeDocumentFromCaseFile(
+      String caseFileId, String documentId) async {
     final caseFile = await getCaseFile(caseFileId);
     if (caseFile == null) {
       throw ArgumentError('Fallakte nicht gefunden: $caseFileId');
@@ -178,9 +185,9 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<bool> checkEpaIntegration(String caseFileId) async {
     final prefs = await SharedPreferences.getInstance();
     final epaData = prefs.getString(_epaIntegrationKey);
-    
+
     if (epaData == null) return false;
-    
+
     try {
       final Map<String, dynamic> epaMap = jsonDecode(epaData);
       return epaMap[caseFileId] == true;
@@ -193,7 +200,7 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<void> enableEpaIntegration(String caseFileId) async {
     final prefs = await SharedPreferences.getInstance();
     final epaData = prefs.getString(_epaIntegrationKey);
-    
+
     Map<String, dynamic> epaMap = {};
     if (epaData != null) {
       try {
@@ -202,7 +209,7 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
         epaMap = {};
       }
     }
-    
+
     epaMap[caseFileId] = true;
     await prefs.setString(_epaIntegrationKey, jsonEncode(epaMap));
   }
@@ -211,11 +218,12 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<void> disableEpaIntegration(String caseFileId) async {
     final prefs = await SharedPreferences.getInstance();
     final epaData = prefs.getString(_epaIntegrationKey);
-    
+
     if (epaData == null) return;
-    
+
     try {
-      final Map<String, dynamic> epaMap = Map<String, dynamic>.from(jsonDecode(epaData));
+      final Map<String, dynamic> epaMap =
+          Map<String, dynamic>.from(jsonDecode(epaData));
       epaMap.remove(caseFileId);
       await prefs.setString(_epaIntegrationKey, jsonEncode(epaMap));
     } catch (e) {
@@ -227,7 +235,7 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<String?> getEpaStatus(String caseFileId) async {
     final isIntegrated = await checkEpaIntegration(caseFileId);
     if (!isIntegrated) return null;
-    
+
     // Simuliere ePA-Status
     return 'synchronized';
   }
@@ -236,9 +244,10 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<void> syncWithEpa(String caseFileId) async {
     final isIntegrated = await checkEpaIntegration(caseFileId);
     if (!isIntegrated) {
-      throw ArgumentError('ePA-Integration nicht aktiviert für Fallakte: $caseFileId');
+      throw ArgumentError(
+          'ePA-Integration nicht aktiviert für Fallakte: $caseFileId');
     }
-    
+
     // Simuliere Synchronisation
     await Future.delayed(const Duration(seconds: 2));
   }
@@ -247,13 +256,13 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<Map<String, dynamic>> getCaseFileStatistics() async {
     final caseFiles = await getAllCaseFiles();
     final events = await getAllTimelineEvents();
-    
+
     final totalCases = caseFiles.length;
     final activeCases = caseFiles.where((cf) => cf.isActive).length;
     final completedCases = caseFiles.where((cf) => cf.isCompleted).length;
     final overdueCases = caseFiles.where((cf) => cf.isOverdue).length;
     final totalEvents = events.length;
-    
+
     return {
       'totalCases': totalCases,
       'activeCases': activeCases,
@@ -266,16 +275,15 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
 
   @override
   Future<void> createBackup() async {
-    final prefs = await SharedPreferences.getInstance();
     final caseFiles = await getAllCaseFiles();
     final events = await getAllTimelineEvents();
-    
+
     final backup = {
       'timestamp': DateTime.now().toIso8601String(),
       'caseFiles': caseFiles.map((cf) => cf.toJson()).toList(),
       'timelineEvents': events.map((e) => e.toJson()).toList(),
     };
-    
+
     final backups = await _getBackups();
     backups.add(backup);
     await _saveBackups(backups);
@@ -288,15 +296,15 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
       (b) => b['timestamp'] == backupId,
       orElse: () => throw ArgumentError('Backup nicht gefunden: $backupId'),
     );
-    
+
     final caseFiles = (backup['caseFiles'] as List)
         .map((json) => CaseFile.fromJson(json))
         .toList();
-    
+
     final events = (backup['timelineEvents'] as List)
         .map((json) => TimelineEvent.fromJson(json))
         .toList();
-    
+
     await _saveCaseFiles(caseFiles);
     await _saveTimelineEvents(events);
   }
@@ -304,18 +312,18 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   @override
   bool isValidCaseFile(CaseFile caseFile) {
     return caseFile.title.isNotEmpty &&
-           caseFile.description.isNotEmpty &&
-           caseFile.caseNumber.isNotEmpty &&
-           caseFile.status.isNotEmpty &&
-           caseFile.category.isNotEmpty;
+        caseFile.description.isNotEmpty &&
+        caseFile.caseNumber.isNotEmpty &&
+        caseFile.status.isNotEmpty &&
+        caseFile.category.isNotEmpty;
   }
 
   @override
   bool isValidTimelineEvent(TimelineEvent event) {
     return event.title.isNotEmpty &&
-           event.description.isNotEmpty &&
-           event.caseFileId.isNotEmpty &&
-           event.eventType.isNotEmpty;
+        event.description.isNotEmpty &&
+        event.caseFileId.isNotEmpty &&
+        event.eventType.isNotEmpty;
   }
 
   @override
@@ -335,14 +343,15 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   // Private Hilfsmethoden
   Future<void> _saveCaseFiles(List<CaseFile> caseFiles) async {
     final prefs = await SharedPreferences.getInstance();
-    final caseFilesJson = jsonEncode(caseFiles.map((cf) => cf.toJson()).toList());
+    final caseFilesJson =
+        jsonEncode(caseFiles.map((cf) => cf.toJson()).toList());
     await prefs.setString(_caseFilesKey, caseFilesJson);
   }
 
   Future<List<TimelineEvent>> getAllTimelineEvents() async {
     final prefs = await SharedPreferences.getInstance();
     final eventsJson = prefs.getString(_timelineEventsKey);
-    
+
     if (eventsJson == null) return [];
 
     try {
@@ -362,7 +371,7 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
   Future<List<Map<String, dynamic>>> _getBackups() async {
     final prefs = await SharedPreferences.getInstance();
     final backupsJson = prefs.getString(_backupsKey);
-    
+
     if (backupsJson == null) return [];
 
     try {
@@ -378,4 +387,4 @@ class CaseFileRepositoryImpl implements CaseFileRepository {
     final backupsJson = jsonEncode(backups);
     await prefs.setString(_backupsKey, backupsJson);
   }
-} 
+}

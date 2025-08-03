@@ -30,6 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   bool _showPassword = false;
   bool _showConfirmPassword = false;
+  bool _termsAccepted = false;
   String _selectedRole = 'citizen';
 
   @override
@@ -162,7 +163,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         // Role Selection
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppConfig.defaultPadding),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppConfig.defaultPadding),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
@@ -182,6 +184,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
               DropdownMenuItem(
                 value: 'lawyer',
                 child: Text('Anwalt'),
+              ),
+              DropdownMenuItem(
+                value: 'court',
+                child: Text('Gericht'),
+              ),
+              DropdownMenuItem(
+                value: 'school',
+                child: Text('Schule'),
+              ),
+              DropdownMenuItem(
+                value: 'kindergarten',
+                child: Text('Kindergarten'),
+              ),
+              DropdownMenuItem(
+                value: 'police',
+                child: Text('Polizei'),
+              ),
+              DropdownMenuItem(
+                value: 'hospital',
+                child: Text('Krankenhaus'),
+              ),
+              DropdownMenuItem(
+                value: 'social_worker',
+                child: Text('Sozialarbeiter'),
               ),
               DropdownMenuItem(
                 value: 'admin',
@@ -211,7 +237,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             if (value.length < 8) {
               return 'Passwort muss mindestens 8 Zeichen haben';
             }
-            if (!RegExp(r'^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])').hasMatch(value)) {
+            if (!RegExp(r'^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])')
+                .hasMatch(value)) {
               return 'Passwort muss Großbuchstabe, Zahl und Sonderzeichen enthalten';
             }
             return null;
@@ -265,9 +292,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Row(
           children: [
             Checkbox(
-              value: true,
+              value: _termsAccepted,
               onChanged: (value) {
-                // TODO: Implement terms acceptance
+                setState(() {
+                  _termsAccepted = value ?? false;
+                });
               },
             ),
             Expanded(
@@ -354,8 +383,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'Registrierung erfolgreich: ${user.name}',
       );
 
-      // Navigation zur PIN-Setup
-      Navigator.of(context).pushReplacementNamed('/pin-setup');
+      // Navigation zur Haupt-App - ohne Zurück-Button
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/home',
+        (route) => false, // Entfernt alle vorherigen Routes
+      );
     } catch (e) {
       if (!mounted) return;
       SnackBarUtils.showErrorSnackBar(
@@ -370,4 +402,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     }
   }
-} 
+}

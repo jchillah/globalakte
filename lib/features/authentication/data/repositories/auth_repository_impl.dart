@@ -1,6 +1,7 @@
 // features/authentication/data/repositories/auth_repository_impl.dart
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -248,13 +249,21 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthUser?> getCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString(_userKey);
-    if (userJson == null) return null;
-
     try {
-      return AuthUser.fromJson(jsonDecode(userJson));
+      final prefs = await SharedPreferences.getInstance();
+      final userJson = prefs.getString(_userKey);
+      if (userJson == null) return null;
+
+      try {
+        return AuthUser.fromJson(jsonDecode(userJson));
+      } catch (e) {
+        debugPrint('Error parsing user data: $e');
+        // Lösche ungültige Daten
+        await prefs.remove(_userKey);
+        return null;
+      }
     } catch (e) {
+      debugPrint('Error getting current user: $e');
       return null;
     }
   }

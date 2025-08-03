@@ -403,19 +403,24 @@ class _LoginScreenState extends State<LoginScreen> {
       if (_isPinMode) {
         try {
           final user = await _signInWithPinUseCase.call(_pinController.text);
-          SnackBarUtils.showSuccessSnackBar(
-            context,
-            'Erfolgreich mit PIN angemeldet: ${user.name}',
-          );
-          // Navigation zur Haupt-App
           if (mounted) {
-            Navigator.of(context).pushReplacementNamed('/home');
+            SnackBarUtils.showSuccessSnackBar(
+              context,
+              'Erfolgreich mit PIN angemeldet: ${user.name}',
+            );
+            // Navigation zur Haupt-App - ohne Zurück-Button
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/home',
+              (route) => false, // Entfernt alle vorherigen Routes
+            );
           }
         } catch (e) {
-          SnackBarUtils.showErrorSnackBar(
-            context,
-            'Falsche PIN: $e',
-          );
+          if (mounted) {
+            SnackBarUtils.showErrorSnackBar(
+              context,
+              'Falsche PIN: $e',
+            );
+          }
         }
       } else {
         try {
@@ -423,19 +428,24 @@ class _LoginScreenState extends State<LoginScreen> {
             _emailController.text,
             _passwordController.text,
           );
-          SnackBarUtils.showSuccessSnackBar(
-            context,
-            'Erfolgreich angemeldet: ${user.name}',
-          );
-          // Navigation zur Haupt-App
           if (mounted) {
-            Navigator.of(context).pushReplacementNamed('/home');
+            SnackBarUtils.showSuccessSnackBar(
+              context,
+              'Erfolgreich angemeldet: ${user.name}',
+            );
+            // Navigation zur Haupt-App - ohne Zurück-Button
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/home',
+              (route) => false, // Entfernt alle vorherigen Routes
+            );
           }
         } catch (e) {
-          SnackBarUtils.showErrorSnackBar(
-            context,
-            'Anmeldung fehlgeschlagen: $e',
-          );
+          if (mounted) {
+            SnackBarUtils.showErrorSnackBar(
+              context,
+              'Anmeldung fehlgeschlagen: $e',
+            );
+          }
         }
       }
     } catch (e) {
@@ -463,10 +473,12 @@ class _LoginScreenState extends State<LoginScreen> {
       final biometrics = await authRepository.getAvailableBiometrics();
 
       if (biometrics.isEmpty) {
-        SnackBarUtils.showErrorSnackBar(
-          context,
-          'Biometrie ist auf diesem Gerät nicht verfügbar',
-        );
+        if (mounted) {
+          SnackBarUtils.showErrorSnackBar(
+            context,
+            'Biometrie ist auf diesem Gerät nicht verfügbar',
+          );
+        }
         return;
       }
 
@@ -475,17 +487,24 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (isAuthenticated) {
-        SnackBarUtils.showSuccessSnackBar(
-          context,
-          'Biometrie-Authentifizierung erfolgreich',
-        );
-        // Navigation zur Haupt-App
-        Navigator.of(context).pushReplacementNamed('/home');
+        if (mounted) {
+          SnackBarUtils.showSuccessSnackBar(
+            context,
+            'Biometrie-Authentifizierung erfolgreich',
+          );
+          // Navigation zur Haupt-App - ohne Zurück-Button
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            '/home',
+            (route) => false, // Entfernt alle vorherigen Routes
+          );
+        }
       } else {
-        SnackBarUtils.showErrorSnackBar(
-          context,
-          'Biometrie-Authentifizierung fehlgeschlagen',
-        );
+        if (mounted) {
+          SnackBarUtils.showErrorSnackBar(
+            context,
+            'Biometrie-Authentifizierung fehlgeschlagen',
+          );
+        }
       }
     } catch (e) {
       if (!mounted) return;
@@ -502,7 +521,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _showPasswordResetDialog() {
     final emailController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -554,9 +573,9 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final authRepository = AuthRepositoryImpl();
       await authRepository.sendPasswordResetEmail(email);
-      
+
       if (!mounted) return;
-      
+
       SnackBarUtils.showSuccessSnackBar(
         context,
         'Passwort-Reset Email wurde an $email gesendet',

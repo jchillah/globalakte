@@ -17,24 +17,24 @@ class AppConfig {
 
   // Text Styles
   static const TextStyle headlineStyle = TextStyle(
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: FontWeight.bold,
     color: primaryColor,
   );
 
   static const TextStyle titleStyle = TextStyle(
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: FontWeight.w600,
     color: primaryColor,
   );
 
   static const TextStyle bodyStyle = TextStyle(
-    fontSize: 16,
+    fontSize: 12,
     color: Color(0xFF374151),
   );
 
   // Padding & Spacing
-  static const double defaultPadding = 16.0;
+  static const double defaultPadding = 12.0;
   static const double smallPadding = 8.0;
   static const double largePadding = 24.0;
 

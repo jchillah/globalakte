@@ -2,11 +2,19 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_config.dart';
-import '../../../../shared/utils/snackbar_utils.dart';
-import '../../../../shared/widgets/global_button.dart';
 import '../../../authentication/data/repositories/auth_repository_impl.dart';
+import 'admin_home_screen.dart';
+import 'citizen_home_screen.dart';
+import 'court_home_screen.dart';
+import 'hospital_home_screen.dart';
+import 'kindergarten_home_screen.dart';
+import 'lawyer_home_screen.dart';
+import 'police_home_screen.dart';
+import 'school_home_screen.dart';
+import 'social_worker_home_screen.dart';
 
 /// Home Screen - Hauptseite nach erfolgreicher Anmeldung
+/// Zeigt rollenspezifische Dashboards basierend auf der Benutzerrolle
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -15,264 +23,88 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final AuthRepositoryImpl _authRepository = AuthRepositoryImpl();
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppConfig.backgroundColor,
-      appBar: AppBar(
-        title: const Text('GlobalAkte'),
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _handleLogout,
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppConfig.largePadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildWelcomeHeader(),
-              const SizedBox(height: AppConfig.largePadding * 2),
-              _buildFeatureGrid(),
-              const SizedBox(height: AppConfig.largePadding),
-              _buildQuickActions(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWelcomeHeader() {
-    return Container(
-      padding: const EdgeInsets.all(AppConfig.largePadding),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppConfig.primaryColor,
-            AppConfig.primaryColor.withValues(alpha: 0.8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(AppConfig.largeRadius),
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.gavel,
-            size: 48,
-            color: Colors.white,
-          ),
-          const SizedBox(height: AppConfig.defaultPadding),
-          const Text(
-            'Willkommen bei GlobalAkte',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+    return FutureBuilder(
+      future: _getCurrentUser(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            backgroundColor: AppConfig.backgroundColor,
+            body: Center(
+              child: CircularProgressIndicator(),
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppConfig.smallPadding),
-          const Text(
-            'Ihre sichere Plattform für Fallakten-Management',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white70,
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: AppConfig.backgroundColor,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: AppConfig.defaultPadding),
+                  const Text(
+                    'Fehler beim Laden des Dashboards',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: AppConfig.defaultPadding),
+                  ElevatedButton(
+                    onPressed: () => setState(() {}),
+                    child: const Text('Erneut versuchen'),
+                  ),
+                ],
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+          );
+        }
+
+        final user = snapshot.data;
+        if (user == null) {
+          // Fallback für Demo-Zwecke
+          return const CitizenHomeScreen();
+        }
+
+        // Rollenspezifische Navigation
+        switch (user.role) {
+          case 'citizen':
+            return const CitizenHomeScreen();
+          case 'lawyer':
+            return const LawyerHomeScreen();
+          case 'court':
+            return const CourtHomeScreen();
+          case 'school':
+            return const SchoolHomeScreen();
+          case 'kindergarten':
+            return const KindergartenHomeScreen();
+          case 'police':
+            return const PoliceHomeScreen();
+          case 'hospital':
+            return const HospitalHomeScreen();
+          case 'social_worker':
+            return const SocialWorkerHomeScreen();
+          case 'admin':
+            return const AdminHomeScreen();
+          default:
+            return const CitizenHomeScreen();
+        }
+      },
     );
   }
 
-  Widget _buildFeatureGrid() {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      crossAxisSpacing: AppConfig.defaultPadding,
-      mainAxisSpacing: AppConfig.defaultPadding,
-      childAspectRatio: 1.2,
-      children: [
-        _buildFeatureCard(
-          icon: Icons.folder,
-          title: 'Fallakten',
-          subtitle: 'Verwalten Sie Ihre Fälle',
-          color: Colors.blue,
-          onTap: _handleCaseFiles,
-        ),
-        _buildFeatureCard(
-          icon: Icons.security,
-          title: 'Verschlüsselung',
-          subtitle: 'Sichere Datenübertragung',
-          color: Colors.green,
-          onTap: _handleEncryption,
-        ),
-        _buildFeatureCard(
-          icon: Icons.timeline,
-          title: 'Timeline',
-          subtitle: 'Fallverlauf verfolgen',
-          color: Colors.orange,
-          onTap: _handleTimeline,
-        ),
-        _buildFeatureCard(
-          icon: Icons.people,
-          title: 'Kontakte',
-          subtitle: 'Netzwerk verwalten',
-          color: Colors.purple,
-          onTap: _handleContacts,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFeatureCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-        child: Padding(
-          padding: const EdgeInsets.all(AppConfig.defaultPadding),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppConfig.defaultPadding),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-                ),
-                child: Icon(
-                  icon,
-                  size: 32,
-                  color: color,
-                ),
-              ),
-              const SizedBox(height: AppConfig.defaultPadding),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppConfig.smallPadding),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActions() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        GlobalButton(
-          text: 'Neue Fallakte erstellen',
-          onPressed: _handleCreateCase,
-          icon: Icons.add,
-        ),
-        const SizedBox(height: AppConfig.defaultPadding),
-        GlobalButton(
-          text: 'Schnellzugriff',
-          onPressed: _handleQuickAccess,
-          icon: Icons.speed,
-        ),
-      ],
-    );
-  }
-
-  void _handleCaseFiles() {
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Fallakten-Verwaltung wird implementiert...',
-    );
-  }
-
-  void _handleEncryption() {
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Verschlüsselungs-Demo wird geöffnet...',
-    );
-  }
-
-  void _handleTimeline() {
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Timeline-Feature wird implementiert...',
-    );
-  }
-
-  void _handleContacts() {
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Kontakte-Verwaltung wird implementiert...',
-    );
-  }
-
-  void _handleCreateCase() {
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Neue Fallakte erstellen wird implementiert...',
-    );
-  }
-
-  void _handleQuickAccess() {
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Schnellzugriff wird implementiert...',
-    );
-  }
-
-  Future<void> _handleLogout() async {
+  Future<dynamic> _getCurrentUser() async {
     try {
-      final authRepository = AuthRepositoryImpl();
-      await authRepository.signOut();
-      
-      if (!mounted) return;
-      
-      SnackBarUtils.showSuccessSnackBar(
-        context,
-        'Erfolgreich abgemeldet',
-      );
-      
-      Navigator.of(context).pushReplacementNamed('/welcome');
+      return await _authRepository.getCurrentUser();
     } catch (e) {
-      if (!mounted) return;
-      SnackBarUtils.showErrorSnackBar(
-        context,
-        'Abmeldung fehlgeschlagen: ${e.toString()}',
-      );
+      return null;
     }
   }
-} 
+}

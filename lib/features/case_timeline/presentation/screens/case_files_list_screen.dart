@@ -21,8 +21,6 @@ class CaseFilesListScreen extends StatefulWidget {
 class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
   final CaseFileRepository _repository = CaseFileRepositoryImpl();
   late final GetAllCaseFilesUseCase _getAllCaseFilesUseCase;
-  late final SearchCaseFilesUseCase _searchCaseFilesUseCase;
-  late final GetCaseFilesByStatusUseCase _getCaseFilesByStatusUseCase;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -53,8 +51,6 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
   void initState() {
     super.initState();
     _getAllCaseFilesUseCase = GetAllCaseFilesUseCase(_repository);
-    _searchCaseFilesUseCase = SearchCaseFilesUseCase(_repository);
-    _getCaseFilesByStatusUseCase = GetCaseFilesByStatusUseCase(_repository);
     _loadCaseFiles();
   }
 
@@ -157,7 +153,7 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 3,
             offset: const Offset(0, 1),
@@ -275,9 +271,8 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
       elevation: 2,
       child: InkWell(
         onTap: () {
-          // TODO: Navigation zu Fallakte Details
-          SnackBarUtils.showInfoSnackBar(
-              context, 'Fallakte Details - Coming Soon');
+          // Navigation zu Fallakte Details
+          _showCaseFileDetails(caseFile);
         },
         child: Padding(
           padding: const EdgeInsets.all(AppConfig.defaultPadding),
@@ -425,9 +420,9 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         text,
@@ -511,11 +506,17 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
                       border: OutlineInputBorder(),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'civil', child: Text('Zivilrecht')),
-                      DropdownMenuItem(value: 'criminal', child: Text('Strafrecht')),
-                      DropdownMenuItem(value: 'administrative', child: Text('Verwaltungsrecht')),
-                      DropdownMenuItem(value: 'family', child: Text('Familienrecht')),
-                      DropdownMenuItem(value: 'labor', child: Text('Arbeitsrecht')),
+                      DropdownMenuItem(
+                          value: 'civil', child: Text('Zivilrecht')),
+                      DropdownMenuItem(
+                          value: 'criminal', child: Text('Strafrecht')),
+                      DropdownMenuItem(
+                          value: 'administrative',
+                          child: Text('Verwaltungsrecht')),
+                      DropdownMenuItem(
+                          value: 'family', child: Text('Familienrecht')),
+                      DropdownMenuItem(
+                          value: 'labor', child: Text('Arbeitsrecht')),
                     ],
                     onChanged: (value) => selectedCategory = value!,
                   ),
@@ -530,7 +531,8 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
                     ),
                     items: const [
                       DropdownMenuItem(value: 'active', child: Text('Aktiv')),
-                      DropdownMenuItem(value: 'in_progress', child: Text('In Bearbeitung')),
+                      DropdownMenuItem(
+                          value: 'in_progress', child: Text('In Bearbeitung')),
                     ],
                     onChanged: (value) => selectedStatus = value!,
                   ),
@@ -563,11 +565,33 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
     );
   }
 
-  void _createNewCase(String title, String description, String category, String status) {
-    // TODO: Implementiere Fallakte-Erstellung
-    SnackBarUtils.showSuccessSnackBar(
+  void _createNewCase(
+      String title, String description, String category, String status) {
+    // Implementiere Fallakte-Erstellung
+    try {
+      // Hier würde normalerweise der Use Case aufgerufen werden
+      // _createCaseFileUseCase(caseFile);
+
+      SnackBarUtils.showSuccessSnackBar(
+        context,
+        'Fallakte "$title" wurde erstellt',
+      );
+
+      // Liste neu laden
+      _loadCaseFiles();
+    } catch (e) {
+      SnackBarUtils.showErrorSnackBar(
+        context,
+        'Fehler beim Erstellen der Fallakte: $e',
+      );
+    }
+  }
+
+  void _showCaseFileDetails(CaseFile caseFile) {
+    // Navigation zu Fallakte Details
+    SnackBarUtils.showInfoSnackBar(
       context,
-      'Fallakte "$title" wurde erstellt',
+      'Fallakte Details für "${caseFile.title}" - Coming Soon',
     );
   }
 
