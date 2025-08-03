@@ -56,7 +56,10 @@ class WelcomeScreen extends StatelessWidget {
                 _buildCaseFilesDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildCommunicationDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
                 _buildDocumentManagementDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
+                _buildAppointmentDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
               ],
 
@@ -367,6 +370,28 @@ class WelcomeScreen extends StatelessWidget {
         label: const Text('📄 Dokumentenverwaltung Demo'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.purple,
+          foregroundColor: Colors.white,
+          padding:
+              const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppointmentDemoButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/appointment-demo');
+        },
+        icon: const Icon(Icons.calendar_month),
+        label: const Text('📅 Terminverwaltung Demo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.indigo,
           foregroundColor: Colors.white,
           padding:
               const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),

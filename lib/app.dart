@@ -6,6 +6,7 @@ import 'core/app_theme.dart';
 import 'features/authentication/presentation/screens/register_screen.dart';
 import 'features/communication/presentation/screens/communication_demo_screen.dart';
 import 'features/document_management/presentation/screens/document_management_demo_screen.dart';
+import 'features/appointment/presentation/screens/appointment_demo_screen.dart';
 import 'features/encryption/presentation/screens/encryption_demo_screen.dart';
 import 'features/home/presentation/screens/admin_home_screen.dart';
 import 'features/home/presentation/screens/citizen_home_screen.dart';
@@ -48,6 +49,7 @@ class GlobalAkteApp extends StatelessWidget {
         '/document-management': (context) =>
             const DocumentManagementDemoScreen(),
         '/encryption-demo': (context) => const EncryptionDemoScreen(),
+        '/appointment-demo': (context) => const AppointmentDemoScreen(),
       },
       debugShowCheckedModeBanner: false,
       // ScaffoldMessenger für bessere SnackBar-Unterstützung
