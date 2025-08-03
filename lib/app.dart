@@ -10,6 +10,7 @@ import 'package:globalakte/features/home/presentation/screens/social_worker_home
 import 'core/app_config.dart';
 import 'core/app_theme.dart';
 import 'features/authentication/presentation/screens/register_screen.dart';
+import 'features/communication/presentation/screens/communication_demo_screen.dart';
 import 'features/document_management/presentation/screens/document_management_demo_screen.dart';
 import 'features/home/presentation/screens/admin_home_screen.dart';
 import 'features/home/presentation/screens/citizen_home_screen.dart';
@@ -42,8 +43,10 @@ class GlobalAkteApp extends StatelessWidget {
         '/police': (context) => const PoliceHomeScreen(),
         '/hospital': (context) => const HospitalHomeScreen(),
         '/social_worker': (context) => const SocialWorkerHomeScreen(),
-        '/document-management': (context) =>
-            const DocumentManagementDemoScreen(),
+                  '/communication': (context) =>
+              const CommunicationDemoScreen(),
+          '/document-management': (context) =>
+              const DocumentManagementDemoScreen(),
       },
       debugShowCheckedModeBanner: false,
       // ScaffoldMessenger für bessere SnackBar-Unterstützung
