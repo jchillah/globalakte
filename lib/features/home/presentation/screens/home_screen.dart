@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../../../shared/widgets/global_button.dart';
+import '../../../authentication/data/repositories/auth_repository_impl.dart';
 
 /// Home Screen - Hauptseite nach erfolgreicher Anmeldung
 class HomeScreen extends StatefulWidget {
@@ -253,12 +254,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _handleLogout() {
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Abmeldung wird implementiert...',
-    );
-    // TODO: Implementiere Logout-Logik
-    Navigator.of(context).pushReplacementNamed('/welcome');
+  Future<void> _handleLogout() async {
+    try {
+      final authRepository = AuthRepositoryImpl();
+      await authRepository.signOut();
+      
+      if (!mounted) return;
+      
+      SnackBarUtils.showSuccessSnackBar(
+        context,
+        'Erfolgreich abgemeldet',
+      );
+      
+      Navigator.of(context).pushReplacementNamed('/welcome');
+    } catch (e) {
+      if (!mounted) return;
+      SnackBarUtils.showErrorSnackBar(
+        context,
+        'Abmeldung fehlgeschlagen: ${e.toString()}',
+      );
+    }
   }
 } 

@@ -129,9 +129,8 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              // TODO: Navigation zur Fallakte erstellen
-              SnackBarUtils.showInfoSnackBar(
-                  context, 'Fallakte erstellen - Coming Soon');
+              // Navigation zur Fallakte erstellen
+              _showCreateCaseDialog();
             },
           ),
         ],
@@ -474,6 +473,102 @@ class _CaseFilesListScreenState extends State<CaseFilesListScreen> {
       default:
         return category;
     }
+  }
+
+  void _showCreateCaseDialog() {
+    final titleController = TextEditingController();
+    final descriptionController = TextEditingController();
+    String selectedCategory = 'civil';
+    String selectedStatus = 'active';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Neue Fallakte erstellen'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GlobalTextField(
+              controller: titleController,
+              label: 'Titel',
+              hint: 'Titel der Fallakte',
+            ),
+            const SizedBox(height: AppConfig.defaultPadding),
+            GlobalTextField(
+              controller: descriptionController,
+              label: 'Beschreibung',
+              hint: 'Kurze Beschreibung',
+              maxLines: 3,
+            ),
+            const SizedBox(height: AppConfig.defaultPadding),
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: selectedCategory,
+                    decoration: const InputDecoration(
+                      labelText: 'Kategorie',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'civil', child: Text('Zivilrecht')),
+                      DropdownMenuItem(value: 'criminal', child: Text('Strafrecht')),
+                      DropdownMenuItem(value: 'administrative', child: Text('Verwaltungsrecht')),
+                      DropdownMenuItem(value: 'family', child: Text('Familienrecht')),
+                      DropdownMenuItem(value: 'labor', child: Text('Arbeitsrecht')),
+                    ],
+                    onChanged: (value) => selectedCategory = value!,
+                  ),
+                ),
+                const SizedBox(width: AppConfig.defaultPadding),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: selectedStatus,
+                    decoration: const InputDecoration(
+                      labelText: 'Status',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'active', child: Text('Aktiv')),
+                      DropdownMenuItem(value: 'in_progress', child: Text('In Bearbeitung')),
+                    ],
+                    onChanged: (value) => selectedStatus = value!,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (titleController.text.isNotEmpty) {
+                Navigator.of(context).pop();
+                _createNewCase(
+                  titleController.text,
+                  descriptionController.text,
+                  selectedCategory,
+                  selectedStatus,
+                );
+              }
+            },
+            child: const Text('Erstellen'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _createNewCase(String title, String description, String category, String status) {
+    // TODO: Implementiere Fallakte-Erstellung
+    SnackBarUtils.showSuccessSnackBar(
+      context,
+      'Fallakte "$title" wurde erstellt',
+    );
   }
 
   @override

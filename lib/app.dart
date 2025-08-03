@@ -5,6 +5,7 @@ import 'core/app_config.dart';
 import 'core/app_theme.dart';
 import 'features/home/presentation/screens/home_screen.dart';
 import 'features/welcome/presentation/screens/welcome_screen.dart';
+import 'features/authentication/presentation/screens/register_screen.dart';
 
 /// Haupt-App-Klasse für GlobalAkte
 /// Verantwortlich für die App-Konfiguration und das Theme-Setup
@@ -21,6 +22,7 @@ class GlobalAkteApp extends StatelessWidget {
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
         '/home': (context) => const HomeScreen(),
+        '/register': (context) => const RegisterScreen(),
       },
       debugShowCheckedModeBanner: false,
       // ScaffoldMessenger für bessere SnackBar-Unterstützung

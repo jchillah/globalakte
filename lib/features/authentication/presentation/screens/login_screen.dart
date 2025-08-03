@@ -454,26 +454,119 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleRegister() {
-    // TODO: Navigation zur Registrierung
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Registrierung wird implementiert...',
-    );
+    Navigator.of(context).pushNamed('/register');
   }
 
-  void _handleBiometricLogin() {
-    // TODO: Biometrie-Authentifizierung
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Biometrie-Authentifizierung wird implementiert...',
-    );
+  Future<void> _handleBiometricLogin() async {
+    try {
+      final authRepository = AuthRepositoryImpl();
+      final biometrics = await authRepository.getAvailableBiometrics();
+
+      if (biometrics.isEmpty) {
+        SnackBarUtils.showErrorSnackBar(
+          context,
+          'Biometrie ist auf diesem Gerät nicht verfügbar',
+        );
+        return;
+      }
+
+      final isAuthenticated = await authRepository.authenticateWithBiometrics();
+
+      if (!mounted) return;
+
+      if (isAuthenticated) {
+        SnackBarUtils.showSuccessSnackBar(
+          context,
+          'Biometrie-Authentifizierung erfolgreich',
+        );
+        // Navigation zur Haupt-App
+        Navigator.of(context).pushReplacementNamed('/home');
+      } else {
+        SnackBarUtils.showErrorSnackBar(
+          context,
+          'Biometrie-Authentifizierung fehlgeschlagen',
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      SnackBarUtils.showErrorSnackBar(
+        context,
+        'Biometrie-Fehler: ${e.toString()}',
+      );
+    }
   }
 
   void _handleForgotPassword() {
-    // TODO: Passwort-Reset
-    SnackBarUtils.showInfoSnackBar(
-      context,
-      'Passwort-Reset wird implementiert...',
+    _showPasswordResetDialog();
+  }
+
+  void _showPasswordResetDialog() {
+    final emailController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Passwort zurücksetzen'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Geben Sie Ihre Email-Adresse ein, um Ihr Passwort zurückzusetzen.',
+            ),
+            const SizedBox(height: AppConfig.defaultPadding),
+            GlobalTextField(
+              controller: emailController,
+              label: 'Email',
+              hint: 'ihre.email@beispiel.de',
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Email ist erforderlich';
+                }
+                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
+                  return 'Ungültige Email-Adresse';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (emailController.text.isNotEmpty) {
+                Navigator.of(context).pop();
+                await _handlePasswordReset(emailController.text);
+              }
+            },
+            child: const Text('Senden'),
+          ),
+        ],
+      ),
     );
+  }
+
+  Future<void> _handlePasswordReset(String email) async {
+    try {
+      final authRepository = AuthRepositoryImpl();
+      await authRepository.sendPasswordResetEmail(email);
+      
+      if (!mounted) return;
+      
+      SnackBarUtils.showSuccessSnackBar(
+        context,
+        'Passwort-Reset Email wurde an $email gesendet',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      SnackBarUtils.showErrorSnackBar(
+        context,
+        'Passwort-Reset fehlgeschlagen: ${e.toString()}',
+      );
+    }
   }
 }

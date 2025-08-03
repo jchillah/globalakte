@@ -202,6 +202,26 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<bool> authenticateWithBiometrics() async {
+    try {
+      final isAvailable = await isBiometricsAvailable();
+      if (!isAvailable) {
+        return false;
+      }
+
+      return await _localAuth.authenticate(
+        localizedReason: 'Authentifizieren Sie sich mit Biometrie',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
   Future<void> setBiometricsEnabled(bool enabled) async {
     if (enabled) {
       // Prüfe ob Biometrie verfügbar ist
