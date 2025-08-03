@@ -1,21 +1,22 @@
 // app.dart
 import 'package:flutter/material.dart';
-import 'package:globalakte/features/home/presentation/screens/court_home_screen.dart';
-import 'package:globalakte/features/home/presentation/screens/hospital_home_screen.dart';
-import 'package:globalakte/features/home/presentation/screens/kindergarten_home_screen.dart';
-import 'package:globalakte/features/home/presentation/screens/police_home_screen.dart';
-import 'package:globalakte/features/home/presentation/screens/school_home_screen.dart';
-import 'package:globalakte/features/home/presentation/screens/social_worker_home_screen.dart';
 
 import 'core/app_config.dart';
 import 'core/app_theme.dart';
 import 'features/authentication/presentation/screens/register_screen.dart';
 import 'features/communication/presentation/screens/communication_demo_screen.dart';
 import 'features/document_management/presentation/screens/document_management_demo_screen.dart';
+import 'features/encryption/presentation/screens/encryption_demo_screen.dart';
 import 'features/home/presentation/screens/admin_home_screen.dart';
 import 'features/home/presentation/screens/citizen_home_screen.dart';
+import 'features/home/presentation/screens/court_home_screen.dart';
 import 'features/home/presentation/screens/home_screen.dart';
+import 'features/home/presentation/screens/hospital_home_screen.dart';
+import 'features/home/presentation/screens/kindergarten_home_screen.dart';
 import 'features/home/presentation/screens/lawyer_home_screen.dart';
+import 'features/home/presentation/screens/police_home_screen.dart';
+import 'features/home/presentation/screens/school_home_screen.dart';
+import 'features/home/presentation/screens/social_worker_home_screen.dart';
 import 'features/welcome/presentation/screens/welcome_screen.dart';
 
 /// Haupt-App-Klasse für GlobalAkte
@@ -43,10 +44,10 @@ class GlobalAkteApp extends StatelessWidget {
         '/police': (context) => const PoliceHomeScreen(),
         '/hospital': (context) => const HospitalHomeScreen(),
         '/social_worker': (context) => const SocialWorkerHomeScreen(),
-                  '/communication': (context) =>
-              const CommunicationDemoScreen(),
-          '/document-management': (context) =>
-              const DocumentManagementDemoScreen(),
+        '/communication': (context) => const CommunicationDemoScreen(),
+        '/document-management': (context) =>
+            const DocumentManagementDemoScreen(),
+        '/encryption-demo': (context) => const EncryptionDemoScreen(),
       },
       debugShowCheckedModeBanner: false,
       // ScaffoldMessenger für bessere SnackBar-Unterstützung

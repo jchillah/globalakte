@@ -193,10 +193,7 @@ class WelcomeScreen extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          SnackBarUtils.showInfoSnackBar(
-            context,
-            '🔐 Verschlüsselung Demo wird in Sprint 3 implementiert!',
-          );
+          Navigator.of(context).pushNamed('/encryption-demo');
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.orange,
