@@ -46,9 +46,9 @@ Eine Flutter-basierte mobile Anwendung, die Bürgern bei rechtlichen Angelegenhe
    python3 scripts/create_project_board.py
    ```
 
-### Cursor IDE Integration
+### VSCode IDE Integration
 
-Das Projekt ist für Cursor IDE optimiert mit:
+Das Projekt ist für VSCode IDE optimiert mit:
 
 - **GitHub Integration**: Issue Templates, Labels, Milestones
 - **Keyboard Shortcuts**:
