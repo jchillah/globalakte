@@ -55,6 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildCaseFilesDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
+                _buildCommunicationDemoButton(context),
                 _buildDocumentManagementDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
               ],
@@ -325,6 +326,28 @@ class WelcomeScreen extends StatelessWidget {
         label: const Text('📁 Fallakten Demo'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+          padding:
+              const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommunicationDemoButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/communication');
+        },
+        icon: const Icon(Icons.chat),
+        label: const Text('💬 Kommunikation Demo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.teal,
           foregroundColor: Colors.white,
           padding:
               const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
