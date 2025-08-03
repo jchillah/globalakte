@@ -61,6 +61,8 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildAccessibilityDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
+                _buildLegalAiDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
                 _buildAppointmentDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
               ],
@@ -394,6 +396,28 @@ class WelcomeScreen extends StatelessWidget {
         label: const Text('♿ Barrierefreiheit Demo'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.teal,
+          foregroundColor: Colors.white,
+          padding:
+              const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLegalAiDemoButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/legal-ai-demo');
+        },
+        icon: const Icon(Icons.psychology),
+        label: const Text('🤖 Legal AI Demo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepPurple,
           foregroundColor: Colors.white,
           padding:
               const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
