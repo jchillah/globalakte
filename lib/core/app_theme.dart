@@ -1,3 +1,4 @@
+// core/app_theme.dart
 import 'package:flutter/material.dart';
 
 import 'app_config.dart';
