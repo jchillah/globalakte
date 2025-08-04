@@ -374,6 +374,7 @@ class _CaseFilesDemoScreenState extends State<CaseFilesDemoScreen> {
             ),
             const SizedBox(height: AppConfig.defaultPadding),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: GlobalTextField(
@@ -389,6 +390,10 @@ class _CaseFilesDemoScreenState extends State<CaseFilesDemoScreen> {
                     decoration: const InputDecoration(
                       labelText: 'Status',
                       border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
                     ),
                     items: ['active', 'in_progress', 'completed', 'closed']
                         .map((status) => DropdownMenuItem(
@@ -580,20 +585,24 @@ class _CaseFilesDemoScreenState extends State<CaseFilesDemoScreen> {
           ),
           const SizedBox(height: AppConfig.smallPadding),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                'Kategorie: ${_getCategoryDisplayName(caseFile.category)}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
+              Expanded(
+                child: Text(
+                  'Kategorie: ${_getCategoryDisplayName(caseFile.category)}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey.shade600,
+                      ),
+                ),
               ),
-              const Spacer(),
-              if (caseFile.isEpaIntegrated)
+              if (caseFile.isEpaIntegrated) ...[
                 Icon(
                   Icons.cloud_sync,
                   size: 16,
                   color: Colors.blue.shade600,
                 ),
+                const SizedBox(width: 4),
+              ],
             ],
           ),
         ],
@@ -638,6 +647,7 @@ class _CaseFilesDemoScreenState extends State<CaseFilesDemoScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Text(
@@ -647,6 +657,7 @@ class _CaseFilesDemoScreenState extends State<CaseFilesDemoScreen> {
                       ),
                 ),
               ),
+              const SizedBox(width: AppConfig.smallPadding),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
