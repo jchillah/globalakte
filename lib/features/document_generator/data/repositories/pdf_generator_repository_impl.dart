@@ -3,6 +3,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import '../../../../core/data/mock_data_repository.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/entities/pdf_document.dart';
 import '../../domain/entities/pdf_template.dart';
@@ -13,6 +14,7 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   // Mock-Daten für Demo-Zwecke
   final List<PdfDocument> _documents = [];
   final List<PdfTemplate> _templates = [];
+  final MockDataRepository _mockData = MockDataRepository();
   final Random _random = Random();
 
   PdfGeneratorRepositoryImpl() {
@@ -20,251 +22,72 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   }
 
   void _initializeMockData() {
-    // Mock-Templates erstellen
+    // Templates aus zentralem Mock-Data-Repository laden
+    final templatesData = _mockData.pdfTemplates;
     _templates.addAll([
       PdfTemplate(
-        id: '1',
-        name: 'Anwaltsschreiben',
-        description: 'Professionelles Anwaltsschreiben mit Briefkopf',
-        templateType: 'legal_letter',
-        htmlTemplate: '''
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>{{title}}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .logo { font-size: 24px; font-weight: bold; color: #1E3A8A; }
-        .date { text-align: right; margin-bottom: 20px; }
-        .recipient { margin-bottom: 20px; }
-        .content { line-height: 1.6; }
-        .signature { margin-top: 40px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="logo">GlobalAkte Rechtsanwälte</div>
-        <div>Musterstraße 123, 12345 Musterstadt</div>
-        <div>Tel: 0123-456789 | E-Mail: info@globalakte.de</div>
-    </div>
-    
-    <div class="date">{{currentDate}}</div>
-    
-    <div class="recipient">
-        <strong>{{recipientName}}</strong><br>
-        {{recipientAddress}}
-    </div>
-    
-    <div class="content">
-        <h2>{{title}}</h2>
-        <p>{{content}}</p>
-    </div>
-    
-    <div class="signature">
-        <p>Mit freundlichen Grüßen</p>
-        <p><strong>{{author}}</strong></p>
-    </div>
-</body>
-</html>
-        ''',
-        defaultData: {
-          'title': 'Anwaltsschreiben',
-          'recipientName': 'Empfänger Name',
-          'recipientAddress': 'Empfänger Adresse',
-          'content': 'Inhalt des Schreibens',
-          'author': 'Rechtsanwalt',
-        },
-        requiredFields: ['title', 'recipientName', 'recipientAddress', 'content', 'author'],
-        optionalFields: ['currentDate'],
+        id: templatesData['legal_letter']!['id'] as String,
+        name: templatesData['legal_letter']!['name'] as String,
+        description: templatesData['legal_letter']!['description'] as String,
+        templateType: templatesData['legal_letter']!['templateType'] as String,
+        htmlTemplate: templatesData['legal_letter']!['htmlTemplate'] as String,
+        defaultData: Map<String, dynamic>.from(templatesData['legal_letter']!['defaultData'] as Map),
+        requiredFields: List<String>.from(templatesData['legal_letter']!['requiredFields'] as List),
+        optionalFields: List<String>.from(templatesData['legal_letter']!['optionalFields'] as List),
         createdAt: DateTime.now(),
-        category: 'Recht',
-        version: '1.0',
+        category: templatesData['legal_letter']!['category'] as String,
+        version: templatesData['legal_letter']!['version'] as String,
       ),
       PdfTemplate(
-        id: '2',
-        name: 'Vertrag',
-        description: 'Standard-Vertragstemplate',
-        templateType: 'contract',
-        htmlTemplate: '''
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>{{title}}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .title { font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 30px; }
-        .parties { margin-bottom: 20px; }
-        .content { line-height: 1.6; }
-        .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>{{title}}</h1>
-    </div>
-    
-    <div class="parties">
-        <p><strong>Vertragspartei A:</strong> {{partyA}}</p>
-        <p><strong>Vertragspartei B:</strong> {{partyB}}</p>
-    </div>
-    
-    <div class="content">
-        <h3>§ 1 Vertragsgegenstand</h3>
-        <p>{{subject}}</p>
-        
-        <h3>§ 2 Vertragsdauer</h3>
-        <p>{{duration}}</p>
-        
-        <h3>§ 3 Vergütung</h3>
-        <p>{{compensation}}</p>
-        
-        <h3>§ 4 Kündigung</h3>
-        <p>{{termination}}</p>
-    </div>
-    
-    <div class="signatures">
-        <div>
-            <p>_________________</p>
-            <p>{{partyA}}</p>
-        </div>
-        <div>
-            <p>_________________</p>
-            <p>{{partyB}}</p>
-        </div>
-    </div>
-    
-    <div style="margin-top: 20px; text-align: center;">
-        <p>Datum: {{currentDate}}</p>
-    </div>
-</body>
-</html>
-        ''',
-        defaultData: {
-          'title': 'Vertrag',
-          'partyA': 'Vertragspartei A',
-          'partyB': 'Vertragspartei B',
-          'subject': 'Vertragsgegenstand',
-          'duration': 'Vertragsdauer',
-          'compensation': 'Vergütung',
-          'termination': 'Kündigungsbedingungen',
-        },
-        requiredFields: ['title', 'partyA', 'partyB', 'subject', 'duration', 'compensation', 'termination'],
-        optionalFields: ['currentDate'],
+        id: templatesData['contract']!['id'] as String,
+        name: templatesData['contract']!['name'] as String,
+        description: templatesData['contract']!['description'] as String,
+        templateType: templatesData['contract']!['templateType'] as String,
+        htmlTemplate: templatesData['contract']!['htmlTemplate'] as String,
+        defaultData: Map<String, dynamic>.from(templatesData['contract']!['defaultData'] as Map),
+        requiredFields: List<String>.from(templatesData['contract']!['requiredFields'] as List),
+        optionalFields: List<String>.from(templatesData['contract']!['optionalFields'] as List),
         createdAt: DateTime.now(),
-        category: 'Vertrag',
-        version: '1.0',
+        category: templatesData['contract']!['category'] as String,
+        version: templatesData['contract']!['version'] as String,
       ),
       PdfTemplate(
-        id: '3',
-        name: 'Antrag',
-        description: 'Standard-Antragstemplate',
-        templateType: 'application',
-        htmlTemplate: '''
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>{{title}}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .applicant { margin-bottom: 20px; }
-        .content { line-height: 1.6; }
-        .signature { margin-top: 40px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>{{title}}</h1>
-    </div>
-    
-    <div class="applicant">
-        <p><strong>Antragsteller:</strong> {{applicantName}}</p>
-        <p><strong>Adresse:</strong> {{applicantAddress}}</p>
-        <p><strong>Datum:</strong> {{currentDate}}</p>
-    </div>
-    
-    <div class="content">
-        <h3>Antrag</h3>
-        <p>{{applicationText}}</p>
-        
-        <h3>Begründung</h3>
-        <p>{{justification}}</p>
-        
-        <h3>Belege</h3>
-        <p>{{documents}}</p>
-    </div>
-    
-    <div class="signature">
-        <p>_________________</p>
-        <p>{{applicantName}}</p>
-    </div>
-</body>
-</html>
-        ''',
-        defaultData: {
-          'title': 'Antrag',
-          'applicantName': 'Antragsteller Name',
-          'applicantAddress': 'Antragsteller Adresse',
-          'applicationText': 'Antragstext',
-          'justification': 'Begründung',
-          'documents': 'Beigefügte Dokumente',
-        },
-        requiredFields: ['title', 'applicantName', 'applicantAddress', 'applicationText', 'justification', 'documents'],
-        optionalFields: ['currentDate'],
+        id: templatesData['application']!['id'] as String,
+        name: templatesData['application']!['name'] as String,
+        description: templatesData['application']!['description'] as String,
+        templateType: templatesData['application']!['templateType'] as String,
+        htmlTemplate: templatesData['application']!['htmlTemplate'] as String,
+        defaultData: Map<String, dynamic>.from(templatesData['application']!['defaultData'] as Map),
+        requiredFields: List<String>.from(templatesData['application']!['requiredFields'] as List),
+        optionalFields: List<String>.from(templatesData['application']!['optionalFields'] as List),
         createdAt: DateTime.now(),
-        category: 'Antrag',
-        version: '1.0',
+        category: templatesData['application']!['category'] as String,
+        version: templatesData['application']!['version'] as String,
       ),
     ]);
 
-    // Mock-Dokumente erstellen
+    // Dokumente aus zentralem Mock-Data-Repository laden
+    final documentsData = _mockData.pdfDocuments;
     _documents.addAll([
       PdfDocument(
-        id: '1',
-        title: 'Anwaltsschreiben - Musterfall',
-        content: 'HTML-Content für Anwaltsschreiben',
-        templateType: 'legal_letter',
-        metadata: {
-          'templateId': '1',
-          'author': 'Rechtsanwalt Müller',
-          'data': {
-            'title': 'Anwaltsschreiben - Musterfall',
-            'recipientName': 'Max Mustermann',
-            'recipientAddress': 'Musterstraße 1, 12345 Musterstadt',
-            'content': 'Sehr geehrter Herr Mustermann, hiermit bestätigen wir den Erhalt Ihrer Anfrage...',
-            'author': 'Rechtsanwalt Müller',
-          },
-        },
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        author: 'Rechtsanwalt Müller',
-        tags: ['Anwaltsschreiben', 'Musterfall'],
+        id: documentsData[0]['id'] as String,
+        title: documentsData[0]['title'] as String,
+        content: documentsData[0]['content'] as String,
+        templateType: documentsData[0]['templateType'] as String,
+        metadata: Map<String, dynamic>.from(documentsData[0]['metadata'] as Map),
+        createdAt: documentsData[0]['createdAt'] as DateTime,
+        author: documentsData[0]['author'] as String,
+        tags: List<String>.from(documentsData[0]['tags'] as List),
       ),
       PdfDocument(
-        id: '2',
-        title: 'Vertrag - Dienstleistung',
-        content: 'HTML-Content für Vertrag',
-        templateType: 'contract',
-        metadata: {
-          'templateId': '2',
-          'author': 'Rechtsanwalt Schmidt',
-          'data': {
-            'title': 'Dienstleistungsvertrag',
-            'partyA': 'Firma A GmbH',
-            'partyB': 'Firma B GmbH',
-            'subject': 'Dienstleistungen im Bereich IT',
-            'duration': '12 Monate',
-            'compensation': '5.000 EUR monatlich',
-            'termination': '3 Monate Kündigungsfrist',
-          },
-        },
-        createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        author: 'Rechtsanwalt Schmidt',
-        tags: ['Vertrag', 'Dienstleistung'],
+        id: documentsData[1]['id'] as String,
+        title: documentsData[1]['title'] as String,
+        content: documentsData[1]['content'] as String,
+        templateType: documentsData[1]['templateType'] as String,
+        metadata: Map<String, dynamic>.from(documentsData[1]['metadata'] as Map),
+        createdAt: documentsData[1]['createdAt'] as DateTime,
+        author: documentsData[1]['author'] as String,
+        tags: List<String>.from(documentsData[1]['tags'] as List),
       ),
     ]);
   }

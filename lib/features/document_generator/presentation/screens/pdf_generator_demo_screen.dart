@@ -773,23 +773,103 @@ class _PdfGeneratorDemoScreenState extends State<PdfGeneratorDemoScreen>
               if (document.tags.isNotEmpty)
                 Text('Tags: ${document.tags.join(', ')}'),
               const SizedBox(height: AppConfig.defaultPadding),
-              const Text('Inhalt:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('PDF-Vorschau:', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: AppConfig.smallPadding),
               Expanded(
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(AppConfig.defaultPadding),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
                     border: Border.all(color: Colors.grey.shade300),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withValues(alpha: 0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: SingleChildScrollView(
-                    child: Text(
-                      document.content,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontFamily: 'monospace',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // PDF-Header simulieren
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(AppConfig.defaultPadding),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
                           ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                document.title,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue.shade700,
+                                    ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Erstellt am ${document.formattedCreatedAt}',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey.shade600,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // PDF-Inhalt simulieren
+                        Padding(
+                          padding: const EdgeInsets.all(AppConfig.defaultPadding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dokument-Inhalt',
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              const SizedBox(height: AppConfig.smallPadding),
+                              Text(
+                                'Dies ist eine Vorschau des generierten PDF-Dokuments. '
+                                'In einer echten Implementierung würde hier das gerenderte PDF angezeigt werden.',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              const SizedBox(height: AppConfig.defaultPadding),
+                              Container(
+                                padding: const EdgeInsets.all(AppConfig.defaultPadding),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+                                  border: Border.all(color: Colors.grey.shade200),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Dokument-Metadaten:',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text('Template: ${document.templateType}'),
+                                    Text('Autor: ${document.author ?? 'Unbekannt'}'),
+                                    if (document.tags.isNotEmpty)
+                                      Text('Tags: ${document.tags.join(', ')}'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
