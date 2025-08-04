@@ -11,6 +11,7 @@ import 'features/case_timeline/presentation/screens/case_files_demo_screen.dart'
 import 'features/communication/presentation/screens/communication_demo_screen.dart';
 import 'features/document_management/presentation/screens/document_management_demo_screen.dart';
 import 'features/encryption/presentation/screens/encryption_demo_screen.dart';
+import 'features/epa_integration/presentation/screens/epa_integration_demo_screen.dart';
 import 'features/evidence_collection/presentation/screens/evidence_collection_demo_screen.dart';
 import 'features/help_network/presentation/screens/help_network_demo_screen.dart';
 import 'features/home/presentation/screens/admin_home_screen.dart';
@@ -74,6 +75,7 @@ class GlobalAkteApp extends StatelessWidget {
         '/notification-demo': (context) => const NotificationDemoScreen(),
         '/appointment-demo': (context) => const AppointmentDemoScreen(),
         '/case-files-demo': (context) => const CaseFilesDemoScreen(),
+        '/epa-integration-demo': (context) => const EpaIntegrationDemoScreen(),
       },
       debugShowCheckedModeBanner: false,
       // ScaffoldMessenger für bessere SnackBar-Unterstützung

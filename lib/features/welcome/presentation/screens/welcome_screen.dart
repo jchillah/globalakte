@@ -67,11 +67,11 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildNotificationDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
-                _buildCaseFilesDemoButton(context),
-                const SizedBox(height: AppConfig.defaultPadding),
                 _buildEvidenceCollectionDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildAppointmentDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
+                _buildEpaIntegrationDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
               ],
 
@@ -519,6 +519,27 @@ class WelcomeScreen extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEpaIntegrationDemoButton(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: () => Navigator.pushNamed(context, '/epa-integration-demo'),
+      icon: const Icon(Icons.cloud_sync, color: Colors.white),
+      label: const Text(
+        'ePA-Integration Demo',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.purple,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppConfig.largePadding,
+          vertical: AppConfig.defaultPadding,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
         ),
       ),
     );

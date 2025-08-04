@@ -99,17 +99,18 @@ class _HelpChatWidgetState extends State<HelpChatWidget> {
             title: const Text('Nachricht löschen', style: TextStyle(color: Colors.red)),
             onTap: () async {
               Navigator.of(context).pop();
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               try {
                 await widget.useCases.deleteChatMessage(message.id);
                 await _loadChatMessages();
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  scaffoldMessenger.showSnackBar(
                     const SnackBar(content: Text('Nachricht gelöscht')),
                   );
                 }
               } catch (e) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  scaffoldMessenger.showSnackBar(
                     SnackBar(content: Text('Fehler beim Löschen: $e')),
                   );
                 }
