@@ -21,7 +21,6 @@ class HelpRequestListWidget extends StatefulWidget {
 class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
   List<HelpRequest> _helpRequests = [];
   bool _isLoading = true;
-  String _searchQuery = '';
   String _selectedFilter = 'all';
 
   @override
@@ -95,10 +94,14 @@ class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
               Text('Status: ${request.status}'),
               Text('Priorität: ${request.priority}'),
               Text('Erstellt von: ${request.requesterName}'),
-              Text('Erstellt am: ${request.createdAt.toString().split('.')[0]}'),
-              if (request.location != null) Text('Standort: ${request.location}'),
-              if (request.tags.isNotEmpty) Text('Tags: ${request.tags.join(', ')}'),
-              if (request.isUrgent) const Text('⚠️ Dringend', style: TextStyle(color: Colors.red)),
+              Text(
+                  'Erstellt am: ${request.createdAt.toString().split('.')[0]}'),
+              if (request.location != null)
+                Text('Standort: ${request.location}'),
+              if (request.tags.isNotEmpty)
+                Text('Tags: ${request.tags.join(', ')}'),
+              if (request.isUrgent)
+                const Text('⚠️ Dringend', style: TextStyle(color: Colors.red)),
             ],
           ),
         ),
@@ -127,12 +130,7 @@ class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
               border: OutlineInputBorder(),
             ),
             onChanged: (value) {
-              setState(() => _searchQuery = value);
-              if (value.isNotEmpty) {
-                _searchRequests(value);
-              } else {
-                _loadHelpRequests();
-              }
+              setState(() => _searchRequests(value));
             },
           ),
           const SizedBox(height: 16),
@@ -200,25 +198,29 @@ class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(request.description, maxLines: 2, overflow: TextOverflow.ellipsis),
+            Text(request.description,
+                maxLines: 2, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 4),
             Row(
               children: [
                 Chip(
                   label: Text(request.category),
-                  backgroundColor: AppConfig.primaryColor.withValues(alpha: 0.1),
+                  backgroundColor:
+                      AppConfig.primaryColor.withValues(alpha: 0.1),
                   labelStyle: TextStyle(color: AppConfig.primaryColor),
                 ),
                 const SizedBox(width: 8),
                 Chip(
                   label: Text(request.status),
-                  backgroundColor: _getStatusColor(request.status).withValues(alpha: 0.1),
+                  backgroundColor:
+                      _getStatusColor(request.status).withValues(alpha: 0.1),
                   labelStyle: TextStyle(color: _getStatusColor(request.status)),
                 ),
               ],
             ),
             if (request.tags.isNotEmpty)
-              Text('Tags: ${request.tags.take(2).join(', ')}', style: TextStyle(fontSize: 12)),
+              Text('Tags: ${request.tags.take(2).join(', ')}',
+                  style: TextStyle(fontSize: 12)),
           ],
         ),
         trailing: Column(
@@ -242,7 +244,7 @@ class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
   Widget _getPriorityIcon(String priority) {
     IconData icon;
     Color color;
-    
+
     switch (priority) {
       case 'urgent':
         icon = Icons.priority_high;
@@ -264,7 +266,7 @@ class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
         icon = Icons.remove;
         color = Colors.grey;
     }
-    
+
     return Icon(icon, color: color);
   }
 
@@ -286,7 +288,7 @@ class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d';
     } else if (difference.inHours > 0) {
@@ -295,4 +297,4 @@ class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
       return '${difference.inMinutes}m';
     }
   }
-} 
+}

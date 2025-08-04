@@ -23,7 +23,7 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
   final _tagsController = TextEditingController();
-  
+
   String _selectedCategory = 'Behörden';
   String _selectedPriority = 'medium';
   bool _isUrgent = false;
@@ -35,19 +35,10 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
     'Behörden',
     'Gesundheit',
     'Übersetzung',
-    'Transport',
-    'Technik',
     'Bildung',
     'Finanzen',
     'Recht',
     'Sonstiges',
-  ];
-
-  final List<String> _priorities = [
-    'low',
-    'medium',
-    'high',
-    'urgent',
   ];
 
   @override
@@ -92,7 +83,9 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
         deadline: _deadline,
         priority: _selectedPriority,
         tags: tags,
-        location: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
+        location: _locationController.text.trim().isEmpty
+            ? null
+            : _locationController.text.trim(),
         isUrgent: _isUrgent,
         maxHelpers: _maxHelpers,
       );
@@ -254,9 +247,9 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
             // Deadline
             ListTile(
               title: const Text('Deadline (optional)'),
-              subtitle: Text(_deadline == null 
-                ? 'Kein Deadline gesetzt' 
-                : 'Deadline: ${_deadline!.toString().split(' ')[0]}'),
+              subtitle: Text(_deadline == null
+                  ? 'Kein Deadline gesetzt'
+                  : 'Deadline: ${_deadline!.toString().split(' ')[0]}'),
               trailing: const Icon(Icons.calendar_today),
               onTap: _selectDeadline,
             ),
@@ -308,4 +301,4 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
       ),
     );
   }
-} 
+}

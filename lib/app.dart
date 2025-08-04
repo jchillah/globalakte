@@ -23,6 +23,7 @@ import 'features/home/presentation/screens/police_home_screen.dart';
 import 'features/home/presentation/screens/school_home_screen.dart';
 import 'features/home/presentation/screens/social_worker_home_screen.dart';
 import 'features/legal_assistant_ai/presentation/screens/legal_ai_demo_screen.dart';
+import 'features/notifications/presentation/screens/notification_demo_screen.dart';
 import 'features/welcome/presentation/screens/welcome_screen.dart';
 
 /// Haupt-App-Klasse für GlobalAkte
@@ -69,6 +70,7 @@ class GlobalAkteApp extends StatelessWidget {
         '/help-network-demo': (context) => const HelpNetworkDemoScreen(),
         '/evidence-collection-demo': (context) =>
             const EvidenceCollectionDemoScreen(),
+        '/notification-demo': (context) => const NotificationDemoScreen(),
         '/appointment-demo': (context) => const AppointmentDemoScreen(),
       },
       debugShowCheckedModeBanner: false,

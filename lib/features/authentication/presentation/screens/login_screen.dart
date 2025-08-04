@@ -368,7 +368,7 @@ class _LoginScreenState extends State<LoginScreen> {
         GlobalTextButton(
           text: 'Demo Login-Daten anzeigen',
           onPressed: () {
-            SnackBarUtils.showInfoSnackBar(
+            SnackBarUtils.showInfo(
               context,
               'Demo Accounts:\n'
               'demo@globalakte.de / Demo123!\n'
@@ -404,7 +404,7 @@ class _LoginScreenState extends State<LoginScreen> {
         try {
           final user = await _signInWithPinUseCase.call(_pinController.text);
           if (mounted) {
-            SnackBarUtils.showSuccessSnackBar(
+            SnackBarUtils.showSuccess(
               context,
               'Erfolgreich mit PIN angemeldet: ${user.name}',
             );
@@ -416,7 +416,7 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         } catch (e) {
           if (mounted) {
-            SnackBarUtils.showErrorSnackBar(
+            SnackBarUtils.showError(
               context,
               'Falsche PIN: $e',
             );
@@ -429,7 +429,7 @@ class _LoginScreenState extends State<LoginScreen> {
             _passwordController.text,
           );
           if (mounted) {
-            SnackBarUtils.showSuccessSnackBar(
+            SnackBarUtils.showSuccess(
               context,
               'Erfolgreich angemeldet: ${user.name}',
             );
@@ -441,7 +441,7 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         } catch (e) {
           if (mounted) {
-            SnackBarUtils.showErrorSnackBar(
+            SnackBarUtils.showError(
               context,
               'Anmeldung fehlgeschlagen: $e',
             );
@@ -450,7 +450,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      SnackBarUtils.showErrorSnackBar(
+      SnackBarUtils.showError(
         context,
         'Anmeldung fehlgeschlagen: ${e.toString()}',
       );
@@ -474,7 +474,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (biometrics.isEmpty) {
         if (mounted) {
-          SnackBarUtils.showErrorSnackBar(
+          SnackBarUtils.showError(
             context,
             'Biometrie ist auf diesem Gerät nicht verfügbar',
           );
@@ -488,7 +488,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (isAuthenticated) {
         if (mounted) {
-          SnackBarUtils.showSuccessSnackBar(
+          SnackBarUtils.showSuccess(
             context,
             'Biometrie-Authentifizierung erfolgreich',
           );
@@ -500,7 +500,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } else {
         if (mounted) {
-          SnackBarUtils.showErrorSnackBar(
+          SnackBarUtils.showError(
             context,
             'Biometrie-Authentifizierung fehlgeschlagen',
           );
@@ -508,7 +508,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      SnackBarUtils.showErrorSnackBar(
+      SnackBarUtils.showError(
         context,
         'Biometrie-Fehler: ${e.toString()}',
       );
@@ -576,13 +576,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      SnackBarUtils.showSuccessSnackBar(
+      SnackBarUtils.showSuccess(
         context,
         'Passwort-Reset Email wurde an $email gesendet',
       );
     } catch (e) {
       if (!mounted) return;
-      SnackBarUtils.showErrorSnackBar(
+      SnackBarUtils.showError(
         context,
         'Passwort-Reset fehlgeschlagen: ${e.toString()}',
       );

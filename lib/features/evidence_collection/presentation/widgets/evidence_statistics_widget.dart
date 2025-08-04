@@ -40,7 +40,7 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
       });
     } catch (e) {
       if (!mounted) return;
-      SnackBarUtils.showErrorSnackBar(
+      SnackBarUtils.showError(
         context,
         'Fehler beim Laden der Statistiken: $e',
       );
@@ -159,7 +159,8 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Card(
       elevation: 2,
       child: Padding(
@@ -212,7 +213,7 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
               final type = entry.key;
               final count = entry.value as int;
               return _buildStatRow(_getTypeLabel(type), count.toString());
-            }).toList(),
+            }),
           ],
         ),
       ),
@@ -241,7 +242,7 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
               final status = entry.key;
               final count = entry.value as int;
               return _buildStatRow(_getStatusLabel(status), count.toString());
-            }).toList(),
+            }),
           ],
         ),
       ),
@@ -300,4 +301,4 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
         return status;
     }
   }
-} 
+}

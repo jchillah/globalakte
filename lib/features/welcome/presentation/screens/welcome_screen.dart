@@ -63,9 +63,11 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildLegalAiDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
-                _buildHelpNetworkDemoButton(context),
-                const SizedBox(height: AppConfig.defaultPadding),
-                _buildEvidenceCollectionDemoButton(context),
+                            _buildHelpNetworkDemoButton(context),
+            const SizedBox(height: AppConfig.defaultPadding),
+            _buildNotificationDemoButton(context),
+            const SizedBox(height: AppConfig.defaultPadding),
+            _buildEvidenceCollectionDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildAppointmentDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
@@ -314,11 +316,11 @@ class WelcomeScreen extends StatelessWidget {
     Navigator.of(context).pop();
 
     if (isSuccess) {
-      SnackBarUtils.showSuccessSnackBar(context, message, duration: duration);
+      SnackBarUtils.showSuccessSnackBar(context, message);
     } else if (isError) {
-      SnackBarUtils.showErrorSnackBar(context, message, duration: duration);
+      SnackBarUtils.showErrorSnackBar(context, message);
     } else {
-      SnackBarUtils.showSnackBar(context, message, duration: duration);
+      SnackBarUtils.showSnackBar(context, message);
     }
   }
 
@@ -444,6 +446,28 @@ class WelcomeScreen extends StatelessWidget {
         label: const Text('🤝 Hilfe-Netzwerk Demo'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.teal,
+          foregroundColor: Colors.white,
+          padding:
+              const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationDemoButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/notification-demo');
+        },
+        icon: const Icon(Icons.notifications),
+        label: const Text('🔔 Benachrichtigungen Demo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.indigo,
           foregroundColor: Colors.white,
           padding:
               const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),

@@ -75,13 +75,13 @@ class _AppointmentFormWidgetState extends State<AppointmentFormWidget> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
 
-    if (pickedDate != null) {
+    if (pickedDate != null && mounted) {
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(isStartTime ? _startTime : _endTime),
       );
 
-      if (pickedTime != null) {
+      if (pickedTime != null && mounted) {
         setState(() {
           final newDateTime = DateTime(
             pickedDate.year,
@@ -113,13 +113,13 @@ class _AppointmentFormWidgetState extends State<AppointmentFormWidget> {
       lastDate: _startTime,
     );
 
-    if (pickedDate != null) {
+    if (pickedDate != null && mounted) {
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(_reminderTime ?? DateTime.now()),
       );
 
-      if (pickedTime != null) {
+      if (pickedTime != null && mounted) {
         setState(() {
           _reminderTime = DateTime(
             pickedDate.year,

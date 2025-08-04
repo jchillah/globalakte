@@ -1,10 +1,9 @@
 // features/help_network/data/repositories/help_network_repository_impl.dart
 import 'dart:convert';
-import 'dart:math';
 
-import '../../domain/entities/help_request.dart';
-import '../../domain/entities/help_offer.dart';
 import '../../domain/entities/help_chat.dart';
+import '../../domain/entities/help_offer.dart';
+import '../../domain/entities/help_request.dart';
 import '../../domain/repositories/help_network_repository.dart';
 
 /// Implementation des Help Network Repository mit Mock-Daten
@@ -13,7 +12,6 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   final List<HelpOffer> _helpOffers = [];
   final List<HelpChat> _chatMessages = [];
   final List<Map<String, dynamic>> _notifications = [];
-  final Random _random = Random();
 
   HelpNetworkRepositoryImpl() {
     _initializeMockData();
@@ -24,7 +22,8 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
     _helpRequests.addAll([
       HelpRequest.create(
         title: 'Hilfe bei Behördengang',
-        description: 'Ich brauche Hilfe beim Ausfüllen von Formularen für die Arbeitsagentur.',
+        description:
+            'Ich brauche Hilfe beim Ausfüllen von Formularen für die Arbeitsagentur.',
         category: 'Behörden',
         requesterId: 'user1',
         requesterName: 'Max Mustermann',
@@ -36,7 +35,8 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
       ),
       HelpRequest.create(
         title: 'Übersetzung von Dokumenten',
-        description: 'Suche jemanden, der mir bei der Übersetzung von medizinischen Dokumenten helfen kann.',
+        description:
+            'Suche jemanden, der mir bei der Übersetzung von medizinischen Dokumenten helfen kann.',
         category: 'Übersetzung',
         requesterId: 'user2',
         requesterName: 'Anna Schmidt',
@@ -65,13 +65,15 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
         helpRequestId: _helpRequests[0].id,
         helperId: 'helper1',
         helperName: 'Lisa Weber',
-        message: 'Ich kann Ihnen gerne bei den Formularen helfen. Habe Erfahrung mit Behörden.',
+        message:
+            'Ich kann Ihnen gerne bei den Formularen helfen. Habe Erfahrung mit Behörden.',
       ),
       HelpOffer.create(
         helpRequestId: _helpRequests[1].id,
         helperId: 'helper2',
         helperName: 'Dr. Hans Klein',
-        message: 'Ich bin Arzt und kann bei der Übersetzung medizinischer Dokumente helfen.',
+        message:
+            'Ich bin Arzt und kann bei der Übersetzung medizinischer Dokumente helfen.',
       ),
     ]);
 
@@ -114,7 +116,9 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   @override
   Future<List<HelpRequest>> getHelpRequestsByCategory(String category) async {
     await Future.delayed(Duration(milliseconds: 200));
-    return _helpRequests.where((request) => request.category == category).toList();
+    return _helpRequests
+        .where((request) => request.category == category)
+        .toList();
   }
 
   @override
@@ -126,7 +130,9 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   @override
   Future<List<HelpRequest>> getHelpRequestsByUser(String userId) async {
     await Future.delayed(Duration(milliseconds: 200));
-    return _helpRequests.where((request) => request.requesterId == userId).toList();
+    return _helpRequests
+        .where((request) => request.requesterId == userId)
+        .toList();
   }
 
   @override
@@ -176,13 +182,16 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
     await Future.delayed(Duration(milliseconds: 300));
     final requestIndex = _helpRequests.indexWhere((r) => r.id == requestId);
     final offerIndex = _helpOffers.indexWhere((o) => o.id == offerId);
-    
+
     if (requestIndex != -1 && offerIndex != -1) {
       // Update request status
       final request = _helpRequests[requestIndex];
       final updatedRequest = request.copyWith(
         status: 'in_progress',
-        acceptedHelpers: [...request.acceptedHelpers, _helpOffers[offerIndex].helperId],
+        acceptedHelpers: [
+          ...request.acceptedHelpers,
+          _helpOffers[offerIndex].helperId
+        ],
       );
       _helpRequests[requestIndex] = updatedRequest;
 
@@ -219,7 +228,9 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   @override
   Future<List<HelpOffer>> getHelpOffersByRequest(String requestId) async {
     await Future.delayed(Duration(milliseconds: 200));
-    return _helpOffers.where((offer) => offer.helpRequestId == requestId).toList();
+    return _helpOffers
+        .where((offer) => offer.helpRequestId == requestId)
+        .toList();
   }
 
   @override
@@ -266,7 +277,8 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   }
 
   @override
-  Future<void> rateHelpOffer(String offerId, double rating, String? review) async {
+  Future<void> rateHelpOffer(
+      String offerId, double rating, String? review) async {
     await Future.delayed(Duration(milliseconds: 300));
     final index = _helpOffers.indexWhere((o) => o.id == offerId);
     if (index != -1) {
@@ -319,7 +331,8 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
     return {
       'total_requests': _helpRequests.length,
       'open_requests': _helpRequests.where((r) => r.isOpen).length,
-      'completed_requests': _helpRequests.where((r) => r.status == 'completed').length,
+      'completed_requests':
+          _helpRequests.where((r) => r.status == 'completed').length,
       'total_offers': _helpOffers.length,
       'accepted_offers': _helpOffers.where((o) => o.isAccepted).length,
       'total_messages': _chatMessages.length,
@@ -331,7 +344,7 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   Future<List<Map<String, dynamic>>> getTopHelpers() async {
     await Future.delayed(Duration(milliseconds: 300));
     final helperStats = <String, Map<String, dynamic>>{};
-    
+
     for (final offer in _helpOffers) {
       if (!helperStats.containsKey(offer.helperId)) {
         helperStats[offer.helperId] = {
@@ -343,14 +356,14 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
           'ratings': <double>[],
         };
       }
-      
+
       final stats = helperStats[offer.helperId]!;
       stats['totalOffers'] = (stats['totalOffers'] as int) + 1;
-      
+
       if (offer.isAccepted) {
         stats['acceptedOffers'] = (stats['acceptedOffers'] as int) + 1;
       }
-      
+
       if (offer.rating != null) {
         (stats['ratings'] as List<double>).add(offer.rating!);
       }
@@ -360,19 +373,21 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
     for (final stats in helperStats.values) {
       final ratings = stats['ratings'] as List<double>;
       if (ratings.isNotEmpty) {
-        stats['averageRating'] = ratings.reduce((a, b) => a + b) / ratings.length;
+        stats['averageRating'] =
+            ratings.reduce((a, b) => a + b) / ratings.length;
       }
     }
 
     return helperStats.values.toList()
-      ..sort((a, b) => (b['acceptedOffers'] as int).compareTo(a['acceptedOffers'] as int));
+      ..sort((a, b) =>
+          (b['acceptedOffers'] as int).compareTo(a['acceptedOffers'] as int));
   }
 
   @override
   Future<List<Map<String, dynamic>>> getHelpCategories() async {
     await Future.delayed(Duration(milliseconds: 200));
     final categoryStats = <String, Map<String, dynamic>>{};
-    
+
     for (final request in _helpRequests) {
       if (!categoryStats.containsKey(request.category)) {
         categoryStats[request.category] = {
@@ -382,10 +397,10 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
           'completedRequests': 0,
         };
       }
-      
+
       final stats = categoryStats[request.category]!;
       stats['totalRequests'] = (stats['totalRequests'] as int) + 1;
-      
+
       if (request.isOpen) {
         stats['openRequests'] = (stats['openRequests'] as int) + 1;
       } else if (request.status == 'completed') {
@@ -399,26 +414,29 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   @override
   Future<Map<String, dynamic>> getUserHelpStats(String userId) async {
     await Future.delayed(Duration(milliseconds: 300));
-    final userRequests = _helpRequests.where((r) => r.requesterId == userId).toList();
+    final userRequests =
+        _helpRequests.where((r) => r.requesterId == userId).toList();
     final userOffers = _helpOffers.where((o) => o.helperId == userId).toList();
-    
+
     return {
       'totalRequests': userRequests.length,
       'openRequests': userRequests.where((r) => r.isOpen).length,
-      'completedRequests': userRequests.where((r) => r.status == 'completed').length,
+      'completedRequests':
+          userRequests.where((r) => r.status == 'completed').length,
       'totalOffers': userOffers.length,
       'acceptedOffers': userOffers.where((o) => o.isAccepted).length,
       'averageRating': userOffers
-          .where((o) => o.rating != null)
-          .map((o) => o.rating!)
-          .fold(0.0, (sum, rating) => sum + rating) / 
+              .where((o) => o.rating != null)
+              .map((o) => o.rating!)
+              .fold(0.0, (sum, rating) => sum + rating) /
           userOffers.where((o) => o.rating != null).length,
     };
   }
 
   // Benachrichtigungen Implementation
   @override
-  Future<void> sendHelpRequestNotification(String requestId, String message) async {
+  Future<void> sendHelpRequestNotification(
+      String requestId, String message) async {
     await Future.delayed(Duration(milliseconds: 100));
     // Mock implementation
   }
@@ -448,7 +466,7 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   @override
   Future<String> exportHelpData(String userId, {String format = 'json'}) async {
     await Future.delayed(Duration(milliseconds: 500));
-    
+
     if (format == 'json') {
       return jsonEncode({
         'helpRequests': _helpRequests
@@ -487,4 +505,4 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
     await Future.delayed(Duration(milliseconds: 800));
     // Mock implementation
   }
-} 
+}

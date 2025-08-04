@@ -1,7 +1,6 @@
 // features/accessibility/presentation/widgets/accessibility_report_widget.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 
 /// Widget für Accessibility-Reports
 class AccessibilityReportWidget extends StatelessWidget {
@@ -35,8 +34,8 @@ class AccessibilityReportWidget extends StatelessWidget {
                 Text(
                   'Accessibility-Report',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const Spacer(),
                 if (report.isNotEmpty)
@@ -48,10 +47,7 @@ class AccessibilityReportWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            if (report.isEmpty)
-              _buildEmptyState()
-            else
-              _buildReportPreview(),
+            if (report.isEmpty) _buildEmptyState() else _buildReportPreview(),
             const SizedBox(height: 16),
             _buildGenerateReportButton(),
           ],
@@ -233,7 +229,8 @@ class AccessibilityReportWidget extends StatelessWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.assessment),
-        label: Text(isLoading ? 'Report wird generiert...' : 'Report generieren'),
+        label:
+            Text(isLoading ? 'Report wird generiert...' : 'Report generieren'),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 12),
         ),
@@ -283,4 +280,4 @@ class AccessibilityReportWidget extends StatelessWidget {
       ),
     );
   }
-} 
+}

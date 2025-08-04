@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/entities/accessibility_settings.dart';
 import '../../domain/repositories/accessibility_repository.dart';
 
@@ -15,7 +16,7 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
   @override
   Future<AccessibilitySettings> getSettings() async {
     await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(500)));
-    print('Accessibility-Einstellungen geladen'); // Linter warning: avoid_print
+    AppLogger.info('Accessibility-Einstellungen geladen');
     return _currentSettings;
   }
 
@@ -26,8 +27,7 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
     _currentSettings = settings.copyWith(
       updatedAt: DateTime.now(),
     );
-    print(
-        'Accessibility-Einstellungen gespeichert'); // Linter warning: avoid_print
+    AppLogger.info('Accessibility-Einstellungen gespeichert');
     return _currentSettings;
   }
 
@@ -35,22 +35,21 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
   Future<AccessibilitySettings> resetSettings() async {
     await Future.delayed(Duration(milliseconds: 200 + _random.nextInt(300)));
     _currentSettings = AccessibilitySettings.defaultSettings();
-    print(
-        'Accessibility-Einstellungen zurückgesetzt'); // Linter warning: avoid_print
+    AppLogger.info('Accessibility-Einstellungen zurückgesetzt');
     return _currentSettings;
   }
 
   @override
   Future<bool> isScreenReaderEnabled() async {
     await Future.delayed(Duration(milliseconds: 100 + _random.nextInt(200)));
-    print('Screen Reader Status geprüft'); // Linter warning: avoid_print
+    AppLogger.debug('Screen Reader Status geprüft');
     return _currentSettings.screenReaderEnabled;
   }
 
   @override
   Future<bool> isVoiceControlEnabled() async {
     await Future.delayed(Duration(milliseconds: 100 + _random.nextInt(200)));
-    print('Voice Control Status geprüft'); // Linter warning: avoid_print
+    AppLogger.debug('Voice Control Status geprüft');
     return _currentSettings.voiceControlEnabled;
   }
 
@@ -61,8 +60,8 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
       highContrastEnabled: !_currentSettings.highContrastEnabled,
       updatedAt: DateTime.now(),
     );
-    print(
-        'High Contrast Mode umgeschaltet: ${_currentSettings.highContrastEnabled}'); // Linter warning: avoid_print
+    AppLogger.debug(
+        'High Contrast Mode umgeschaltet: ${_currentSettings.highContrastEnabled}');
   }
 
   @override
@@ -72,7 +71,7 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
       fontSizeScale: scale,
       updatedAt: DateTime.now(),
     );
-    print('Schriftgröße geändert: $scale'); // Linter warning: avoid_print
+    AppLogger.debug('Schriftgröße geändert: $scale');
   }
 
   @override
@@ -82,8 +81,8 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
       keyboardNavigationEnabled: !_currentSettings.keyboardNavigationEnabled,
       updatedAt: DateTime.now(),
     );
-    print(
-        'Keyboard Navigation umgeschaltet: ${_currentSettings.keyboardNavigationEnabled}'); // Linter warning: avoid_print
+    AppLogger.debug(
+        'Keyboard Navigation umgeschaltet: ${_currentSettings.keyboardNavigationEnabled}');
   }
 
   @override
@@ -93,8 +92,8 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
       reduceMotionEnabled: !_currentSettings.reduceMotionEnabled,
       updatedAt: DateTime.now(),
     );
-    print(
-        'Motion Reduction umgeschaltet: ${_currentSettings.reduceMotionEnabled}'); // Linter warning: avoid_print
+    AppLogger.debug(
+        'Motion Reduction umgeschaltet: ${_currentSettings.reduceMotionEnabled}');
   }
 
   @override
@@ -104,8 +103,8 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
       showFocusIndicators: !_currentSettings.showFocusIndicators,
       updatedAt: DateTime.now(),
     );
-    print(
-        'Focus Indicators umgeschaltet: ${_currentSettings.showFocusIndicators}'); // Linter warning: avoid_print
+    AppLogger.debug(
+        'Focus Indicators umgeschaltet: ${_currentSettings.showFocusIndicators}');
   }
 
   @override
@@ -115,13 +114,13 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
       preferredLanguage: languageCode,
       updatedAt: DateTime.now(),
     );
-    print('Sprache geändert: $languageCode'); // Linter warning: avoid_print
+    AppLogger.debug('Sprache geändert: $languageCode');
   }
 
   @override
   Future<List<AccessibilityTestResult>> runAccessibilityTests() async {
     await Future.delayed(Duration(milliseconds: 1000 + _random.nextInt(2000)));
-    print('Accessibility-Tests ausgeführt'); // Linter warning: avoid_print
+    AppLogger.debug('Accessibility-Tests ausgeführt');
 
     final now = DateTime.now();
     return [
@@ -180,7 +179,7 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
   @override
   Future<bool> checkWCAGCompliance() async {
     await Future.delayed(Duration(milliseconds: 800 + _random.nextInt(1200)));
-    print('WCAG-Konformität geprüft'); // Linter warning: avoid_print
+    AppLogger.debug('WCAG-Konformität geprüft');
 
     // Simuliere WCAG-Konformitätsprüfung
     final tests = await runAccessibilityTests();
@@ -193,7 +192,7 @@ class AccessibilityRepositoryImpl implements AccessibilityRepository {
   @override
   Future<String> generateAccessibilityReport() async {
     await Future.delayed(Duration(milliseconds: 1500 + _random.nextInt(2000)));
-    print('Accessibility-Report generiert'); // Linter warning: avoid_print
+    AppLogger.debug('Accessibility-Report generiert');
 
     final tests = await runAccessibilityTests();
     final passedTests = tests.where((test) => test.passed).length;

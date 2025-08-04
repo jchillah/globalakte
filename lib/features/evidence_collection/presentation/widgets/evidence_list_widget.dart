@@ -44,7 +44,7 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
       });
     } catch (e) {
       if (!mounted) return;
-      SnackBarUtils.showErrorSnackBar(
+      SnackBarUtils.showError(
         context,
         'Fehler beim Laden der Beweismittel: $e',
       );
@@ -330,7 +330,7 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
         break;
       case 'edit':
         // TODO: Implement edit functionality
-        SnackBarUtils.showInfoSnackBar(
+        SnackBarUtils.showInfo(
           context,
           'Bearbeitung wird implementiert',
         );
@@ -385,16 +385,20 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
   Future<void> _verifyEvidence(EvidenceItem evidence) async {
     try {
       await widget.repository.verifyEvidence(evidence.id, 'Demo User');
-      SnackBarUtils.showSuccessSnackBar(
-        context,
-        'Beweismittel verifiziert',
-      );
-      _loadEvidence(); // Liste neu laden
+      if (mounted) {
+        SnackBarUtils.showSuccess(
+          context,
+          'Beweismittel verifiziert',
+        );
+        _loadEvidence(); // Liste neu laden
+      }
     } catch (e) {
-      SnackBarUtils.showErrorSnackBar(
-        context,
-        'Fehler beim Verifizieren: $e',
-      );
+      if (mounted) {
+        SnackBarUtils.showError(
+          context,
+          'Fehler beim Verifizieren: $e',
+        );
+      }
     }
   }
 
@@ -422,17 +426,21 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
     if (confirmed == true) {
       try {
         await widget.repository.deleteEvidence(evidence.id);
-        SnackBarUtils.showSuccessSnackBar(
-          context,
-          'Beweismittel gelöscht',
-        );
-        _loadEvidence(); // Liste neu laden
+        if (mounted) {
+          SnackBarUtils.showSuccess(
+            context,
+            'Beweismittel gelöscht',
+          );
+          _loadEvidence(); // Liste neu laden
+        }
       } catch (e) {
-        SnackBarUtils.showErrorSnackBar(
-          context,
-          'Fehler beim Löschen: $e',
-        );
+        if (mounted) {
+          SnackBarUtils.showError(
+            context,
+            'Fehler beim Löschen: $e',
+          );
+        }
       }
     }
   }
-} 
+}
