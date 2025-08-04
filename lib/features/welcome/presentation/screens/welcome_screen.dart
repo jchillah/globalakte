@@ -63,11 +63,13 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildLegalAiDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
-                            _buildHelpNetworkDemoButton(context),
-            const SizedBox(height: AppConfig.defaultPadding),
-            _buildNotificationDemoButton(context),
-            const SizedBox(height: AppConfig.defaultPadding),
-            _buildEvidenceCollectionDemoButton(context),
+                _buildHelpNetworkDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
+                _buildNotificationDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
+                _buildCaseFilesDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
+                _buildEvidenceCollectionDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildAppointmentDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
@@ -329,13 +331,12 @@ class WelcomeScreen extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: () {
-          SnackBarUtils.showInfoSnackBar(
-              context, '📁 Fallakten Demo - Coming Soon');
+          Navigator.of(context).pushNamed('/case-files-demo');
         },
         icon: const Icon(Icons.folder),
         label: const Text('📁 Fallakten Demo'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange,
+          backgroundColor: Colors.purple,
           foregroundColor: Colors.white,
           padding:
               const EdgeInsets.symmetric(vertical: AppConfig.defaultPadding),
