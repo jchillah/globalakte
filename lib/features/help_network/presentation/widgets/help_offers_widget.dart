@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_config.dart';
+import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/entities/help_offer.dart';
 import '../../domain/usecases/help_network_usecases.dart';
 
@@ -22,6 +23,9 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
   List<HelpOffer> _helpOffers = [];
   bool _isLoading = true;
   String _selectedFilter = 'all';
+  final TextEditingController _messageController = TextEditingController();
+  final String _selectedRequestId =
+      'demo_request_id'; // Placeholder for request ID
 
   @override
   void initState() {
@@ -41,9 +45,7 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fehler beim Laden der Angebote: $e')),
-        );
+        SnackBarUtils.showError(context, 'Fehler beim Laden der Angebote: $e');
       }
     }
   }
@@ -95,55 +97,26 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
     );
   }
 
-  Future<void> _createHelpOffer() async {
-    final messageController = TextEditingController();
-    
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Hilfe anbieten'),
-        content: TextField(
-          controller: messageController,
-          decoration: const InputDecoration(
-            labelText: 'Ihre Nachricht',
-            hintText: 'Beschreiben Sie, wie Sie helfen können...',
-          ),
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Abbrechen'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(messageController.text),
-            child: const Text('Angebot erstellen'),
-          ),
-        ],
-      ),
-    );
+  Future<void> _createOffer() async {
+    if (_messageController.text.trim().isEmpty) return;
 
-    if (result != null && result.isNotEmpty) {
-      try {
-        await widget.useCases.createHelpOffer(
-          helpRequestId: 'demo_request_id',
-          helperId: 'demo_helper',
-          helperName: 'Demo Helper',
-          message: result,
-        );
+    try {
+      final offer = HelpOffer.create(
+        helpRequestId: _selectedRequestId,
+        helperId: 'demo_helper',
+        helperName: 'Demo Helfer',
+        message: _messageController.text.trim(),
+      );
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Hilfe-Angebot erfolgreich erstellt!')),
-          );
-          _loadHelpOffers();
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Fehler beim Erstellen des Angebots: $e')),
-          );
-        }
+      await widget.useCases.createHelpOffer(offer);
+      _messageController.clear();
+      _loadHelpOffers();
+      if (mounted) {
+        SnackBarUtils.showSuccess(context, 'Angebot erstellt!');
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBarUtils.showError(context, 'Fehler beim Erstellen: $e');
       }
     }
   }
@@ -163,7 +136,7 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               ElevatedButton.icon(
-                onPressed: _createHelpOffer,
+                onPressed: _createOffer,
                 icon: const Icon(Icons.add),
                 label: const Text('Angebot erstellen'),
                 style: ElevatedButton.styleFrom(
@@ -236,7 +209,8 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
           backgroundColor: AppConfig.primaryColor,
           child: Text(
             offer.helperName[0].toUpperCase(),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
         title: Text(
@@ -252,7 +226,8 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
               children: [
                 Chip(
                   label: Text(offer.status),
-                  backgroundColor: _getStatusColor(offer.status).withValues(alpha: 0.1),
+                  backgroundColor:
+                      _getStatusColor(offer.status).withValues(alpha: 0.1),
                   labelStyle: TextStyle(color: _getStatusColor(offer.status)),
                 ),
                 const SizedBox(width: 8),
@@ -260,7 +235,8 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
                   Row(
                     children: [
                       const Icon(Icons.star, size: 16, color: Colors.amber),
-                      Text('${offer.rating}/5', style: const TextStyle(fontSize: 12)),
+                      Text('${offer.rating}/5',
+                          style: const TextStyle(fontSize: 12)),
                     ],
                   ),
               ],
@@ -299,7 +275,7 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d';
     } else if (difference.inHours > 0) {
@@ -308,4 +284,4 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
       return '${difference.inMinutes}m';
     }
   }
-} 
+}

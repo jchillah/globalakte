@@ -51,21 +51,28 @@ class _PushTestWidgetState extends State<PushTestWidget> {
     });
 
     try {
+      // Erstelle eine neue Benachrichtigung
+      await widget.useCases.createNotification(
+        title: _titleController.text,
+        message: _messageController.text,
+        type: _selectedType,
+        category: _selectedCategory,
+      );
+
+      // Sende Push-Benachrichtigung
       final success = await widget.useCases.sendPushNotification(
         title: _titleController.text,
         message: _messageController.text,
         category: _selectedCategory,
-        data: {
-          'test': true,
-          'timestamp': DateTime.now().toIso8601String(),
-        },
       );
 
       if (mounted) {
+        // Zeige Erfolgsmeldung
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Push-Benachrichtigung gesendet!' : 'Fehler beim Senden'),
+            content: Text(success ? 'Test-Benachrichtigung erfolgreich gesendet!' : 'Fehler beim Senden'),
             backgroundColor: success ? Colors.green : Colors.red,
+            duration: const Duration(seconds: 3),
           ),
         );
       }
@@ -73,8 +80,9 @@ class _PushTestWidgetState extends State<PushTestWidget> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Fehler: $e'),
+            content: Text('Fehler beim Senden der Test-Benachrichtigung: $e'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
           ),
         );
       }

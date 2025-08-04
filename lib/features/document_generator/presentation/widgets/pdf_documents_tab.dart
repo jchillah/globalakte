@@ -442,14 +442,57 @@ class _PdfDocumentsTabState extends State<PdfDocumentsTab> {
                                   ))
                               .toList(),
                         ),
+                      const SizedBox(height: 8),
+                      // PDF-Vorschau direkt in der Karte
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.picture_as_pdf,
+                                    size: 16, color: Colors.red[700]),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'PDF-Vorschau',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              document.content.isNotEmpty
+                                  ? document.content.length > 100
+                                      ? '${document.content.substring(0, 100)}...'
+                                      : document.content
+                                  : 'Kein Inhalt verfügbar',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
+                  onTap: () => _showDocumentDetails(document),
                   trailing: PopupMenuButton<String>(
                     onSelected: (value) async {
                       switch (value) {
-                        case 'view':
-                          _showDocumentDetails(document);
-                          break;
                         case 'share':
                           await _sharePdf(context, Uint8List(100));
                           break;
@@ -465,16 +508,6 @@ class _PdfDocumentsTabState extends State<PdfDocumentsTab> {
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'view',
-                        child: Row(
-                          children: [
-                            Icon(Icons.visibility),
-                            SizedBox(width: 8),
-                            Text('Anzeigen'),
-                          ],
-                        ),
-                      ),
                       const PopupMenuItem(
                         value: 'share',
                         child: Row(

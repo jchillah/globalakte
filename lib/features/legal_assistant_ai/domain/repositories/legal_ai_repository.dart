@@ -42,7 +42,7 @@ abstract class LegalAiRepository {
   });
 
   /// Analysiert rechtliche Dokumente
-  Future<Map<String, dynamic>> analyzeLegalDocument(String document);
+  Future<Map<String, dynamic>> analyzeLegalDocument(String documentContent);
 
   /// Gibt rechtliche Empfehlungen
   Future<List<String>> getLegalRecommendations({
@@ -58,4 +58,52 @@ abstract class LegalAiRepository {
 
   /// Importiert Chat-Verlauf
   Future<void> importChatHistory(String data, {String format = 'json'});
+
+  /// Sucht nach Nachrichten
+  Future<List<AiMessage>> searchMessages(String query);
+
+  /// Lädt Nachrichten nach Kontext
+  Future<List<AiMessage>> getMessagesByContext(String context);
+
+  /// Lädt Nachrichten-Statistiken
+  Future<Map<String, dynamic>> getMessageStatistics();
+
+  /// Lädt rechtliche Kontexte nach Kategorie
+  Future<List<LegalContext>> getLegalContextsByCategory(String category);
+
+  /// Lädt einen rechtlichen Kontext nach ID
+  Future<LegalContext?> getLegalContextById(String id);
+
+  /// Lädt alle Kategorien
+  Future<List<String>> getCategories();
+
+  /// Lädt Kontexte nach Keywords
+  Future<List<LegalContext>> getContextsByKeywords(List<String> keywords);
+
+  /// Lädt Kontext-Statistiken
+  Future<Map<String, dynamic>> getContextStatistics();
+
+  /// Lädt beliebte Kontexte
+  Future<List<LegalContext>> getPopularContexts({int limit = 5});
+
+  /// Exportiert Legal AI Daten
+  Future<String> exportLegalData();
+
+  /// Importiert Legal AI Daten
+  Future<void> importLegalData(String data);
+
+  /// Backup von Legal AI Daten
+  Future<void> backupLegalData();
+
+  /// Wiederherstellung von Legal AI Daten
+  Future<void> restoreLegalData();
+
+  /// Lädt Legal AI Statistiken
+  Future<Map<String, dynamic>> getLegalAiStats();
+
+  /// Trainiert das Legal AI Modell
+  Future<void> trainLegalModel(List<Map<String, dynamic>> trainingData);
+
+  /// Lädt Modell-Performance
+  Future<Map<String, dynamic>> getModelPerformance();
 }

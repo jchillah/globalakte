@@ -342,15 +342,22 @@ class EncryptionRepositoryImpl implements EncryptionRepository {
     final encrypter = Encrypter(AES(Key(keyBytes), mode: AESMode.gcm));
 
     final encrypted = encrypter.encrypt(data, iv: iv);
-    return encrypted.base64;
+    // Kombiniere IV und verschlüsselte Daten
+    final combined = base64Encode(iv.bytes + encrypted.bytes);
+    return combined;
   }
 
   String _decryptWithAES(String encryptedData, EncryptionKey key) {
     final keyBytes = base64Decode(key.keyMaterial);
-    final iv = IV.fromSecureRandom(16);
-    final encrypter = Encrypter(AES(Key(keyBytes), mode: AESMode.gcm));
+    final combined = base64Decode(encryptedData);
 
-    final encrypted = Encrypted.fromBase64(encryptedData);
+    // Extrahiere IV (erste 16 Bytes) und verschlüsselte Daten
+    final iv = IV(Uint8List.fromList(combined.take(16).toList()));
+    final encryptedBytes = Uint8List.fromList(combined.skip(16).toList());
+
+    final encrypter = Encrypter(AES(Key(keyBytes), mode: AESMode.gcm));
+    final encrypted = Encrypted(encryptedBytes);
+
     return encrypter.decrypt(encrypted, iv: iv);
   }
 

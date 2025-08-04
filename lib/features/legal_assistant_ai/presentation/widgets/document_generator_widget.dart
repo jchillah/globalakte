@@ -58,6 +58,19 @@ class _DocumentGeneratorWidgetState extends State<DocumentGeneratorWidget> {
     ''';
   }
 
+  String _cleanHtmlFromTemplate(String template) {
+    // Entferne HTML-Tags und behalte nur den Text
+    return template
+        .replaceAll(RegExp(r'<[^>]*>'), '') // Entferne HTML-Tags
+        .replaceAll('&nbsp;', ' ') // Ersetze HTML-Entities
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .trim();
+  }
+
   @override
   void dispose() {
     _templateController.dispose();
@@ -96,7 +109,7 @@ class _DocumentGeneratorWidgetState extends State<DocumentGeneratorWidget> {
       }
 
       final document = await widget.generateDocumentUseCase(
-        template: _templateController.text,
+        template: _cleanHtmlFromTemplate(_templateController.text),
         data: data,
         context:
             widget.selectedContext.isNotEmpty ? widget.selectedContext : null,

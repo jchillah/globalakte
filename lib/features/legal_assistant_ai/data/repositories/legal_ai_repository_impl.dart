@@ -5,203 +5,182 @@ import 'dart:math';
 import '../../domain/entities/ai_message.dart';
 import '../../domain/entities/legal_context.dart';
 import '../../domain/repositories/legal_ai_repository.dart';
+import '../services/legal_ai_chat_service.dart';
+import '../services/legal_context_service.dart';
 
 /// Implementation des Legal AI Repository mit Mock-Daten
+/// Verwendet modulare Services für bessere Wartbarkeit
 class LegalAiRepositoryImpl implements LegalAiRepository {
-  final List<AiMessage> _chatHistory = [];
-  final List<LegalContext> _legalContexts = [];
+  late final LegalAiChatService _chatService;
+  late final LegalContextService _contextService;
   final Random _random = Random();
 
   LegalAiRepositoryImpl() {
-    _initializeMockData();
+    _chatService = LegalAiChatService();
+    _contextService = LegalContextService();
   }
 
-  void _initializeMockData() {
-    // Mock rechtliche Kontexte
-    _legalContexts.addAll([
-      LegalContext.create(
-        title: 'Mietrecht - Kündigung',
-        description: 'Rechtliche Aspekte bei Mietkündigungen',
-        category: 'Zivilrecht',
-        keywords: ['Miete', 'Kündigung', 'Vermieter', 'Mieter'],
-        legalFramework: {
-          'gesetze': ['BGB § 573', 'BGB § 574'],
-          'fristen': '3 Monate Kündigungsfrist',
-        },
-      ),
-      LegalContext.create(
-        title: 'Arbeitsrecht - Kündigungsschutz',
-        description: 'Schutz vor unrechtmäßigen Kündigungen',
-        category: 'Arbeitsrecht',
-        keywords: ['Arbeitsvertrag', 'Kündigung', 'Kündigungsschutz'],
-        legalFramework: {
-          'gesetze': ['KSchG', 'BGB § 626'],
-          'fristen': '4 Wochen Kündigungsfrist',
-        },
-      ),
-      LegalContext.create(
-        title: 'Familienrecht - Sorgerecht',
-        description: 'Rechtliche Aspekte des Sorgerechts',
-        category: 'Familienrecht',
-        keywords: ['Sorgerecht', 'Kind', 'Eltern', 'Trennung'],
-        legalFramework: {
-          'gesetze': ['BGB § 1626', 'BGB § 1627'],
-          'grundsatz': 'Kindeswohl steht im Vordergrund',
-        },
-      ),
-    ]);
-
-    // Mock Chat-Verlauf
-    _chatHistory.addAll([
-      AiMessage.user(content: 'Hallo, ich habe eine Frage zum Mietrecht.'),
-      AiMessage.ai(
-        content:
-            'Gerne helfe ich Ihnen bei Fragen zum Mietrecht. Was möchten Sie wissen?',
-        context: 'Mietrecht',
-        suggestions: [
-          'Kündigung durch Mieter',
-          'Kündigung durch Vermieter',
-          'Miethöhe und Erhöhung',
-          'Schäden und Reparaturen',
-        ],
-      ),
-      AiMessage.user(content: 'Mein Vermieter möchte die Miete erhöhen.'),
-      AiMessage.ai(
-        content:
-            'Mietpreiserhöhungen sind gesetzlich geregelt. Der Vermieter kann die Miete nur unter bestimmten Voraussetzungen erhöhen. Wurde Ihnen eine schriftliche Erhöhung mit Begründung zugestellt?',
-        context: 'Mietrecht',
-        suggestions: [
-          'Mietspiegel prüfen',
-          'Mieterverein kontaktieren',
-          'Widerspruch einlegen',
-        ],
-      ),
-    ]);
-  }
-
+  // Chat Implementation
   @override
   Future<AiMessage> sendMessage(String message, {String? context}) async {
-    // Simuliere Verarbeitungszeit
-    await Future.delayed(Duration(milliseconds: 500 + _random.nextInt(1000)));
-
-    // Erstelle Benutzer-Nachricht
-    final userMessage = AiMessage.user(content: message, context: context);
-    _chatHistory.add(userMessage);
-
-    // Generiere AI-Antwort basierend auf Kontext
-    final aiResponse = _generateAiResponse(message, context);
-    _chatHistory.add(aiResponse);
-
-    return aiResponse;
-  }
-
-  AiMessage _generateAiResponse(String message, String? context) {
-    final responses = {
-      'Mietrecht': [
-        'Im Mietrecht gibt es klare gesetzliche Regelungen. Können Sie mir mehr Details zu Ihrer Situation geben?',
-        'Die Mietpreisbremse und der Mietspiegel sind wichtige Instrumente. Welche Art von Mietangelegenheit betrifft Sie?',
-        'Bei Mietstreitigkeiten ist es wichtig, alle Schriftstücke zu sammeln. Haben Sie bereits schriftliche Kommunikation?',
-      ],
-      'Arbeitsrecht': [
-        'Das Arbeitsrecht schützt Arbeitnehmer vor unrechtmäßigen Kündigungen. Was ist Ihr spezifisches Anliegen?',
-        'Der Kündigungsschutz gilt nach 6 Monaten Betriebszugehörigkeit. Wie lange arbeiten Sie bereits im Unternehmen?',
-        'Bei Arbeitsstreitigkeiten können Sie sich an den Betriebsrat oder Gewerkschaft wenden. Haben Sie das bereits getan?',
-      ],
-      'Familienrecht': [
-        'Im Familienrecht steht das Kindeswohl im Vordergrund. Können Sie mir Ihre Situation schildern?',
-        'Bei Sorgerechtsfragen ist eine anwaltliche Beratung oft sinnvoll. Haben Sie bereits einen Anwalt kontaktiert?',
-        'Das Familiengericht entscheidet im Sinne des Kindeswohls. Welche Aspekte sind für Sie wichtig?',
-      ],
-    };
-
-    final suggestions = [
-      'Weitere Informationen anfordern',
-      'Dokumente sammeln',
-      'Anwaltliche Beratung',
-      'Behörden kontaktieren',
-    ];
-
-    String response;
-    if (context != null && responses.containsKey(context)) {
-      final contextResponses = responses[context]!;
-      response = contextResponses[_random.nextInt(contextResponses.length)];
-    } else {
-      response =
-          'Ich verstehe Ihre Frage. Können Sie mir mehr Details geben, damit ich Ihnen besser helfen kann?';
-    }
-
-    return AiMessage.ai(
-      content: response,
-      context: context,
-      suggestions: suggestions,
-      metadata: {
-        'confidence': _random.nextDouble() * 0.3 + 0.7, // 70-100%
-        'processing_time': _random.nextInt(1000) + 500,
-      },
-    );
+    return await _chatService.sendMessage(message, context: context);
   }
 
   @override
   Future<List<AiMessage>> getChatHistory() async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return List.from(_chatHistory);
+    return await _chatService.getChatHistory();
   }
 
   @override
   Future<void> saveMessage(AiMessage message) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    _chatHistory.add(message);
+    await _chatService.saveMessage(message);
   }
 
   @override
   Future<void> deleteMessage(String messageId) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    _chatHistory.removeWhere((message) => message.id == messageId);
+    await _chatService.deleteMessage(messageId);
   }
 
   @override
   Future<void> clearChatHistory() async {
-    await Future.delayed(Duration(milliseconds: 200));
-    _chatHistory.clear();
+    await _chatService.clearChatHistory();
   }
 
   @override
+  Future<List<AiMessage>> searchMessages(String query) async {
+    return await _chatService.searchMessages(query);
+  }
+
+  @override
+  Future<List<AiMessage>> getMessagesByContext(String context) async {
+    return await _chatService.getMessagesByContext(context);
+  }
+
+  @override
+  Future<Map<String, dynamic>> getMessageStatistics() async {
+    return await _chatService.getMessageStatistics();
+  }
+
+  // Legal Context Implementation
+  @override
   Future<List<LegalContext>> getLegalContexts() async {
-    await Future.delayed(Duration(milliseconds: 300));
-    return List.from(_legalContexts);
+    return await _contextService.getAllLegalContexts();
   }
 
   @override
   Future<void> saveLegalContext(LegalContext context) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    _legalContexts.add(context);
+    await _contextService.saveLegalContext(context);
   }
 
   @override
   Future<void> updateLegalContext(LegalContext context) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    final index = _legalContexts.indexWhere((c) => c.id == context.id);
-    if (index != -1) {
-      _legalContexts[index] = context;
-    }
+    await _contextService.updateLegalContext(context);
   }
 
   @override
   Future<void> deleteLegalContext(String contextId) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    _legalContexts.removeWhere((context) => context.id == contextId);
+    await _contextService.deleteLegalContext(contextId);
   }
 
   @override
   Future<List<LegalContext>> searchLegalContexts(String query) async {
+    return await _contextService.searchLegalContexts(query);
+  }
+
+  @override
+  Future<List<LegalContext>> getLegalContextsByCategory(String category) async {
+    return await _contextService.getLegalContextsByCategory(category);
+  }
+
+  @override
+  Future<LegalContext?> getLegalContextById(String id) async {
+    return await _contextService.getLegalContextById(id);
+  }
+
+  @override
+  Future<List<String>> getCategories() async {
+    return await _contextService.getCategories();
+  }
+
+  @override
+  Future<List<LegalContext>> getContextsByKeywords(
+      List<String> keywords) async {
+    return await _contextService.getContextsByKeywords(keywords);
+  }
+
+  @override
+  Future<Map<String, dynamic>> getContextStatistics() async {
+    return await _contextService.getContextStatistics();
+  }
+
+  @override
+  Future<List<LegalContext>> getPopularContexts({int limit = 5}) async {
+    return await _contextService.getPopularContexts(limit: limit);
+  }
+
+  // Backup und Export Implementation
+  @override
+  Future<String> exportLegalData() async {
+    await Future.delayed(Duration(milliseconds: 500));
+    return jsonEncode({
+      'timestamp': DateTime.now().toIso8601String(),
+      'message':
+          'Mock Export - In einer echten Implementierung würden hier alle Legal AI Daten exportiert',
+    });
+  }
+
+  @override
+  Future<void> importLegalData(String data) async {
+    await Future.delayed(Duration(milliseconds: 300));
+    // Mock Implementation
+  }
+
+  @override
+  Future<void> backupLegalData() async {
     await Future.delayed(Duration(milliseconds: 400));
-    final lowercaseQuery = query.toLowerCase();
-    return _legalContexts.where((context) {
-      return context.title.toLowerCase().contains(lowercaseQuery) ||
-          context.description.toLowerCase().contains(lowercaseQuery) ||
-          context.keywords
-              .any((keyword) => keyword.toLowerCase().contains(lowercaseQuery));
-    }).toList();
+    // Mock Implementation
+  }
+
+  @override
+  Future<void> restoreLegalData() async {
+    await Future.delayed(Duration(milliseconds: 400));
+    // Mock Implementation
+  }
+
+  // Erweiterte Funktionen
+  @override
+  Future<Map<String, dynamic>> getLegalAiStats() async {
+    await Future.delayed(Duration(milliseconds: 600));
+
+    final chatStats = await _chatService.getMessageStatistics();
+    final contextStats = await _contextService.getContextStatistics();
+
+    return {
+      'chat_statistics': chatStats,
+      'context_statistics': contextStats,
+      'total_interactions': chatStats['total_messages'] ?? 0,
+      'active_contexts': contextStats['total_contexts'] ?? 0,
+      'average_response_time': _random.nextInt(2000) + 500, // Mock
+      'accuracy_rate': _random.nextDouble() * 0.2 + 0.8, // 80-100%
+    };
+  }
+
+  @override
+  Future<List<String>> getLegalRecommendations({
+    required String situation,
+    String? context,
+  }) async {
+    await Future.delayed(Duration(milliseconds: 600));
+
+    final recommendations = [
+      'Sammeln Sie alle relevanten Dokumente',
+      'Führen Sie ein Protokoll aller Vorfälle',
+      'Kontaktieren Sie einen Fachanwalt',
+      'Prüfen Sie Ihre Versicherungsschutz',
+      'Informieren Sie sich über Ihre Rechte',
+    ];
+
+    return recommendations.take(_random.nextInt(3) + 2).toList();
   }
 
   @override
@@ -233,41 +212,6 @@ $template
   }
 
   @override
-  Future<Map<String, dynamic>> analyzeLegalDocument(String document) async {
-    await Future.delayed(Duration(milliseconds: 800));
-
-    return {
-      'word_count': document.split(' ').length,
-      'paragraph_count': document.split('\n\n').length,
-      'legal_terms': ['Vertrag', 'Kündigung', 'Recht', 'Gesetz'],
-      'confidence_score': _random.nextDouble() * 0.3 + 0.7,
-      'recommendations': [
-        'Dokument von Anwalt prüfen lassen',
-        'Rechtliche Begriffe klären',
-        'Fristen beachten',
-      ],
-    };
-  }
-
-  @override
-  Future<List<String>> getLegalRecommendations({
-    required String situation,
-    String? context,
-  }) async {
-    await Future.delayed(Duration(milliseconds: 600));
-
-    final recommendations = [
-      'Sammeln Sie alle relevanten Dokumente',
-      'Führen Sie ein Protokoll aller Vorfälle',
-      'Kontaktieren Sie einen Fachanwalt',
-      'Prüfen Sie Ihre Versicherungsschutz',
-      'Informieren Sie sich über Ihre Rechte',
-    ];
-
-    return recommendations.take(_random.nextInt(3) + 2).toList();
-  }
-
-  @override
   Future<bool> validateLegalInformation(String information) async {
     await Future.delayed(Duration(milliseconds: 400));
 
@@ -289,12 +233,14 @@ $template
     await Future.delayed(Duration(milliseconds: 500));
 
     if (format == 'json') {
+      final chatHistory = await _chatService.getChatHistory();
       return jsonEncode({
-        'messages': _chatHistory.map((m) => m.toMap()).toList(),
+        'messages': chatHistory.map((m) => m.toMap()).toList(),
         'exported_at': DateTime.now().toIso8601String(),
       });
     } else {
-      return _chatHistory.map((m) => '${m.sender}: ${m.content}').join('\n');
+      final chatHistory = await _chatService.getChatHistory();
+      return chatHistory.map((m) => '${m.sender}: ${m.content}').join('\n');
     }
   }
 
@@ -307,17 +253,18 @@ $template
       final messages = (jsonData['messages'] as List)
           .map((m) => AiMessage.fromMap(m))
           .toList();
-      _chatHistory.addAll(messages);
+      await _chatService.importChatHistory(messages);
     } else {
       // Einfache Text-Import
       final lines = data.split('\n');
+      final messages = <AiMessage>[];
       for (final line in lines) {
         if (line.contains(': ')) {
           final parts = line.split(': ');
           if (parts.length >= 2) {
             final sender = parts[0];
             final content = parts.sublist(1).join(': ');
-            _chatHistory.add(AiMessage(
+            messages.add(AiMessage(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
               content: content,
               sender: sender,
@@ -326,6 +273,52 @@ $template
           }
         }
       }
+      await _chatService.importChatHistory(messages);
     }
+  }
+
+  @override
+  Future<Map<String, dynamic>> analyzeLegalDocument(
+      String documentContent) async {
+    await Future.delayed(Duration(milliseconds: 1000));
+
+    return {
+      'document_type': 'Vertrag',
+      'confidence': _random.nextDouble() * 0.2 + 0.8,
+      'key_issues': [
+        'Kündigungsfristen prüfen',
+        'Haftungsklauseln beachten',
+        'Datenschutzbestimmungen',
+      ],
+      'recommendations': [
+        'Anwaltliche Prüfung empfohlen',
+        'Klärende Nachfragen stellen',
+        'Alternative Formulierungen vorschlagen',
+      ],
+      'risk_level': 'medium',
+      'processing_time': _random.nextInt(2000) + 1000,
+    };
+  }
+
+  @override
+  Future<void> trainLegalModel(List<Map<String, dynamic>> trainingData) async {
+    await Future.delayed(Duration(milliseconds: 2000));
+    // Mock Training Implementation
+  }
+
+  @override
+  Future<Map<String, dynamic>> getModelPerformance() async {
+    await Future.delayed(Duration(milliseconds: 300));
+
+    return {
+      'accuracy': _random.nextDouble() * 0.1 + 0.9, // 90-100%
+      'precision': _random.nextDouble() * 0.1 + 0.85, // 85-95%
+      'recall': _random.nextDouble() * 0.1 + 0.88, // 88-98%
+      'f1_score': _random.nextDouble() * 0.05 + 0.92, // 92-97%
+      'training_samples': _random.nextInt(10000) + 5000,
+      'last_updated': DateTime.now()
+          .subtract(Duration(days: _random.nextInt(30)))
+          .toIso8601String(),
+    };
   }
 }

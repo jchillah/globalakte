@@ -2,8 +2,7 @@
 
 import 'dart:math';
 
-/// Zentrales Mock-Data-Repository für alle Mock-Daten im Projekt
-/// Verbessert die Wartbarkeit und Lesbarkeit durch zentrale Organisation
+/// Zentrales Mock-Data Repository für alle Features
 class MockDataRepository {
   static final MockDataRepository _instance = MockDataRepository._internal();
   factory MockDataRepository() => _instance;
@@ -11,483 +10,484 @@ class MockDataRepository {
 
   final Random _random = Random();
 
-  // ===== PDF-GENERATOR MOCK-DATEN =====
-
-  /// PDF-Templates für den PDF-Generator
+  // PDF Templates
   Map<String, Map<String, dynamic>> get pdfTemplates => {
         'legal_letter': {
-          'id': '1',
+          'id': 'legal_letter_001',
           'name': 'Anwaltsschreiben',
-          'description': 'Professionelles Anwaltsschreiben mit Briefkopf',
+          'description': 'Standard-Anwaltsschreiben Template',
           'templateType': 'legal_letter',
-          'htmlTemplate': '''
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>{{title}}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .logo { font-size: 24px; font-weight: bold; color: #1E3A8A; }
-        .date { text-align: right; margin-bottom: 20px; }
-        .recipient { margin-bottom: 20px; }
-        .content { line-height: 1.6; }
-        .signature { margin-top: 40px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="logo">GlobalAkte Rechtsanwälte</div>
-        <div>Musterstraße 123, 12345 Musterstadt</div>
-        <div>Tel: 0123-456789 | E-Mail: info@globalakte.de</div>
-    </div>
-    
-    <div class="date">{{currentDate}}</div>
-    
-    <div class="recipient">
-        <strong>{{recipientName}}</strong><br>
-        {{recipientAddress}}
-    </div>
-    
-    <div class="content">
-        <h2>{{title}}</h2>
-        <p>{{content}}</p>
-    </div>
-    
-    <div class="signature">
-        <p>Mit freundlichen Grüßen</p>
-        <p><strong>{{author}}</strong></p>
-    </div>
-</body>
-</html>
-      ''',
-          'defaultData': {
-            'title': 'Anwaltsschreiben',
-            'recipientName': 'Empfänger Name',
-            'recipientAddress': 'Empfänger Adresse',
-            'content': 'Inhalt des Schreibens',
-            'author': 'Rechtsanwalt',
-          },
-          'requiredFields': [
-            'title',
-            'recipientName',
-            'recipientAddress',
-            'content',
-            'author'
-          ],
-          'optionalFields': ['currentDate'],
           'category': 'Recht',
           'version': '1.0',
-        },
-        'contract': {
-          'id': '2',
-          'name': 'Vertrag',
-          'description': 'Standard-Vertragstemplate',
-          'templateType': 'contract',
           'htmlTemplate': '''
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>{{title}}</title>
+    <title>Anwaltsschreiben</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
         .header { text-align: center; margin-bottom: 30px; }
-        .title { font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 30px; }
-        .parties { margin-bottom: 20px; }
         .content { line-height: 1.6; }
-        .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
+        .footer { margin-top: 30px; text-align: center; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>{{title}}</h1>
-    </div>
-    
-    <div class="parties">
-        <p><strong>Vertragspartei A:</strong> {{partyA}}</p>
-        <p><strong>Vertragspartei B:</strong> {{partyB}}</p>
-    </div>
-    
-    <div class="content">
-        <h3>§ 1 Vertragsgegenstand</h3>
-        <p>{{subject}}</p>
-        
-        <h3>§ 2 Vertragsdauer</h3>
-        <p>{{duration}}</p>
-        
-        <h3>§ 3 Vergütung</h3>
-        <p>{{compensation}}</p>
-        
-        <h3>§ 4 Kündigung</h3>
-        <p>{{termination}}</p>
-    </div>
-    
-    <div class="signatures">
-        <div>
-            <p>_________________</p>
-            <p>{{partyA}}</p>
-        </div>
-        <div>
-            <p>_________________</p>
-            <p>{{partyB}}</p>
-        </div>
-    </div>
-    
-    <div style="margin-top: 20px; text-align: center;">
+        <h1>Anwaltsschreiben</h1>
         <p>Datum: {{currentDate}}</p>
     </div>
+    <div class="content">
+        <p><strong>An: {{empfaenger}}</strong></p>
+        <p><strong>Betreff: {{betreff}}</strong></p>
+        <p>{{inhalt}}</p>
+        <p>Mit freundlichen Grüßen,<br>
+        {{anwaltName}}<br>
+        {{anwaltskanzlei}}</p>
+    </div>
+    <div class="footer">
+        <p>{{anwaltskanzlei}}<br>
+        {{adresse}}<br>
+        Tel: {{telefon}}<br>
+        Email: {{email}}</p>
+    </div>
 </body>
 </html>
       ''',
           'defaultData': {
-            'title': 'Vertrag',
-            'partyA': 'Vertragspartei A',
-            'partyB': 'Vertragspartei B',
-            'subject': 'Vertragsgegenstand',
-            'duration': 'Vertragsdauer',
-            'compensation': 'Vergütung',
-            'termination': 'Kündigungsbedingungen',
+            'empfaenger': 'Max Mustermann',
+            'betreff': 'Rechtliche Angelegenheit',
+            'inhalt':
+                'Sehr geehrte Damen und Herren,\n\nhiermit informieren wir Sie über wichtige rechtliche Aspekte...',
+            'anwaltName': 'Dr. Anna Schmidt',
+            'anwaltskanzlei': 'Rechtsanwaltskanzlei Schmidt & Partner',
+            'adresse': 'Musterstraße 123, 12345 Musterstadt',
+            'telefon': '+49 123 456789',
+            'email': 'info@schmidt-partner.de',
           },
-          'requiredFields': [
-            'title',
-            'partyA',
-            'partyB',
-            'subject',
-            'duration',
-            'compensation',
-            'termination'
-          ],
-          'optionalFields': ['currentDate'],
+          'requiredFields': ['empfaenger', 'betreff', 'inhalt', 'anwaltName'],
+          'optionalFields': ['anwaltskanzlei', 'adresse', 'telefon', 'email'],
+        },
+        'contract': {
+          'id': 'contract_001',
+          'name': 'Vertrag',
+          'description': 'Standard-Vertrag Template',
+          'templateType': 'contract',
           'category': 'Vertrag',
           'version': '1.0',
-        },
-        'application': {
-          'id': '3',
-          'name': 'Antrag',
-          'description': 'Standard-Antragstemplate',
-          'templateType': 'application',
           'htmlTemplate': '''
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>{{title}}</title>
+    <title>Vertrag</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
         .header { text-align: center; margin-bottom: 30px; }
-        .applicant { margin-bottom: 20px; }
         .content { line-height: 1.6; }
-        .signature { margin-top: 40px; }
+        .signature { margin-top: 30px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>{{title}}</h1>
+        <h1>{{vertragstitel}}</h1>
+        <p>Datum: {{currentDate}}</p>
     </div>
-    
-    <div class="applicant">
-        <p><strong>Antragsteller:</strong> {{applicantName}}</p>
-        <p><strong>Adresse:</strong> {{applicantAddress}}</p>
-        <p><strong>Datum:</strong> {{currentDate}}</p>
-    </div>
-    
     <div class="content">
-        <h3>Antrag</h3>
-        <p>{{applicationText}}</p>
-        
-        <h3>Begründung</h3>
-        <p>{{justification}}</p>
-        
-        <h3>Belege</h3>
-        <p>{{documents}}</p>
+        <p><strong>Vertragsparteien:</strong></p>
+        <p>Partei A: {{parteiA}}<br>
+        Partei B: {{parteiB}}</p>
+        <p><strong>Vertragsgegenstand:</strong><br>
+        {{vertragsgegenstand}}</p>
+        <p><strong>Vertragsbedingungen:</strong><br>
+        {{bedingungen}}</p>
+        <p><strong>Laufzeit:</strong> {{laufzeit}}</p>
+        <p><strong>Vergütung:</strong> {{verguetung}}</p>
     </div>
-    
     <div class="signature">
-        <p>_________________</p>
-        <p>{{applicantName}}</p>
+        <p>Unterschriften:</p>
+        <p>Partei A: _________________<br>
+        Partei B: _________________</p>
     </div>
 </body>
 </html>
       ''',
           'defaultData': {
-            'title': 'Antrag',
-            'applicantName': 'Antragsteller Name',
-            'applicantAddress': 'Antragsteller Adresse',
-            'applicationText': 'Antragstext',
-            'justification': 'Begründung',
-            'documents': 'Beigefügte Dokumente',
+            'vertragstitel': 'Dienstleistungsvertrag',
+            'parteiA': 'Firma A GmbH',
+            'parteiB': 'Firma B GmbH',
+            'vertragsgegenstand': 'Erbringung von IT-Dienstleistungen',
+            'bedingungen': 'Standard-Dienstleistungsbedingungen gelten',
+            'laufzeit': '12 Monate',
+            'verguetung': '5.000 EUR monatlich',
           },
           'requiredFields': [
-            'title',
-            'applicantName',
-            'applicantAddress',
-            'applicationText',
-            'justification',
-            'documents'
+            'vertragstitel',
+            'parteiA',
+            'parteiB',
+            'vertragsgegenstand'
           ],
-          'optionalFields': ['currentDate'],
+          'optionalFields': ['bedingungen', 'laufzeit', 'verguetung'],
+        },
+        'application': {
+          'id': 'application_001',
+          'name': 'Antrag',
+          'description': 'Standard-Antrag Template',
+          'templateType': 'application',
           'category': 'Antrag',
           'version': '1.0',
+          'htmlTemplate': '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Antrag</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .content { line-height: 1.6; }
+        .applicant { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{antragstitel}}</h1>
+        <p>Datum: {{currentDate}}</p>
+    </div>
+    <div class="content">
+        <p><strong>Antragsteller:</strong><br>
+        {{antragstellerName}}<br>
+        {{antragstellerAdresse}}<br>
+        Tel: {{antragstellerTelefon}}<br>
+        Email: {{antragstellerEmail}}</p>
+        <p><strong>Antragsgrund:</strong><br>
+        {{antragsgrund}}</p>
+        <p><strong>Gewünschte Maßnahme:</strong><br>
+        {{massnahme}}</p>
+        <p><strong>Begründung:</strong><br>
+        {{begruendung}}</p>
+    </div>
+    <div class="applicant">
+        <p>Unterschrift: _________________<br>
+        {{antragstellerName}}</p>
+    </div>
+</body>
+</html>
+      ''',
+          'defaultData': {
+            'antragstitel': 'Antrag auf Genehmigung',
+            'antragstellerName': 'Max Mustermann',
+            'antragstellerAdresse': 'Musterstraße 123, 12345 Musterstadt',
+            'antragstellerTelefon': '+49 123 456789',
+            'antragstellerEmail': 'max.mustermann@email.de',
+            'antragsgrund': 'Erweiterung der Geschäftstätigkeit',
+            'massnahme': 'Genehmigung für neue Räumlichkeiten',
+            'begruendung':
+                'Die Erweiterung ist notwendig für das Wachstum des Unternehmens...',
+          },
+          'requiredFields': [
+            'antragstitel',
+            'antragstellerName',
+            'antragsgrund'
+          ],
+          'optionalFields': [
+            'antragstellerAdresse',
+            'antragstellerTelefon',
+            'antragstellerEmail',
+            'massnahme',
+            'begruendung'
+          ],
         },
       };
 
-  /// PDF-Dokumente für den PDF-Generator
+  // PDF Documents
   List<Map<String, dynamic>> get pdfDocuments => [
         {
-          'id': '1',
-          'title': 'Anwaltsschreiben - Musterfall',
-          'content': 'HTML-Content für Anwaltsschreiben',
+          'id': 'doc_001',
+          'title': 'Anwaltsschreiben - Fall Müller',
+          'content':
+              'Sehr geehrte Damen und Herren, hiermit informieren wir Sie über wichtige rechtliche Aspekte im Fall Müller. Die Angelegenheit erfordert Ihre umgehende Aufmerksamkeit...',
           'templateType': 'legal_letter',
           'metadata': {
-            'templateId': '1',
-            'author': 'Rechtsanwalt Müller',
+            'templateId': 'legal_letter_001',
+            'author': 'Dr. Anna Schmidt',
             'data': {
-              'title': 'Anwaltsschreiben - Musterfall',
-              'recipientName': 'Max Mustermann',
-              'recipientAddress': 'Musterstraße 1, 12345 Musterstadt',
-              'content':
-                  'Sehr geehrter Herr Mustermann, hiermit bestätigen wir den Erhalt Ihrer Anfrage...',
-              'author': 'Rechtsanwalt Müller',
+              'empfaenger': 'Max Mustermann',
+              'betreff': 'Fall Müller',
+              'inhalt':
+                  'Sehr geehrte Damen und Herren, hiermit informieren wir Sie über wichtige rechtliche Aspekte im Fall Müller...',
             },
           },
-          'createdAt': DateTime.now().subtract(const Duration(days: 5)),
-          'author': 'Rechtsanwalt Müller',
-          'tags': ['Anwaltsschreiben', 'Musterfall'],
+          'createdAt': DateTime.now().subtract(const Duration(days: 2)),
+          'author': 'Dr. Anna Schmidt',
+          'tags': ['Recht', 'Anwalt', 'Fall Müller'],
         },
         {
-          'id': '2',
-          'title': 'Vertrag - Dienstleistung',
-          'content': 'HTML-Content für Vertrag',
+          'id': 'doc_002',
+          'title': 'Dienstleistungsvertrag - IT-Services',
+          'content':
+              'Vertrag zwischen Firma A GmbH und Firma B GmbH über die Erbringung von IT-Dienstleistungen. Laufzeit: 12 Monate, Vergütung: 5.000 EUR monatlich...',
           'templateType': 'contract',
           'metadata': {
-            'templateId': '2',
-            'author': 'Rechtsanwalt Schmidt',
+            'templateId': 'contract_001',
+            'author': 'Rechtsabteilung',
             'data': {
-              'title': 'Dienstleistungsvertrag',
-              'partyA': 'Firma A GmbH',
-              'partyB': 'Firma B GmbH',
-              'subject': 'Dienstleistungen im Bereich IT',
-              'duration': '12 Monate',
-              'compensation': '5.000 EUR monatlich',
-              'termination': '3 Monate Kündigungsfrist',
+              'vertragstitel': 'Dienstleistungsvertrag',
+              'parteiA': 'Firma A GmbH',
+              'parteiB': 'Firma B GmbH',
+              'vertragsgegenstand': 'Erbringung von IT-Dienstleistungen',
             },
           },
-          'createdAt': DateTime.now().subtract(const Duration(days: 3)),
-          'author': 'Rechtsanwalt Schmidt',
-          'tags': ['Vertrag', 'Dienstleistung'],
+          'createdAt': DateTime.now().subtract(const Duration(days: 1)),
+          'author': 'Rechtsabteilung',
+          'tags': ['Vertrag', 'IT', 'Dienstleistung'],
         },
       ];
 
-  // ===== EVIDENCE COLLECTION MOCK-DATEN =====
-
-  /// Beweismittel für die Beweissammlung
-  List<Map<String, dynamic>> get evidenceItems => [
-        {
-          'title': 'Fotos vom Unfallort',
-          'description': 'Fotografische Dokumentation des Verkehrsunfalls',
-          'type': 'photo',
-          'filePath': '/evidence/photos/accident_001.jpg',
-          'collectedBy': 'Polizist Müller',
-          'location': 'Hauptstraße 123, Berlin',
-          'caseId': 'CASE-2024-001',
-          'notes': 'Fotos zeigen Schäden am Fahrzeug',
-          'status': 'collected',
-          'collectedAt': DateTime.now().subtract(const Duration(days: 5)),
-        },
-        {
-          'title': 'Videoaufnahme Überwachungskamera',
-          'description': 'Videoaufnahme vom Tatzeitpunkt',
-          'type': 'video',
-          'filePath': '/evidence/videos/surveillance_001.mp4',
-          'collectedBy': 'Detektiv Schmidt',
-          'location': 'Einkaufszentrum, München',
-          'caseId': 'CASE-2024-002',
-          'notes': 'Zeigt verdächtige Person',
-          'status': 'verified',
-          'collectedAt': DateTime.now().subtract(const Duration(days: 3)),
-        },
-        {
-          'title': 'Zeugenaussage',
-          'description': 'Schriftliche Zeugenaussage von Max Mustermann',
-          'type': 'document',
-          'filePath': '/evidence/documents/witness_statement_001.pdf',
-          'collectedBy': 'Anwalt Weber',
-          'location': 'Kanzlei Weber & Partner',
-          'caseId': 'CASE-2024-003',
-          'notes': 'Wichtige Details zum Tathergang',
-          'status': 'pending',
-          'collectedAt': DateTime.now().subtract(const Duration(days: 2)),
-        },
-        {
-          'title': 'Audioaufnahme Telefonat',
-          'description': 'Aufnahme eines verdächtigen Telefonats',
-          'type': 'audio',
-          'filePath': '/evidence/audio/phone_call_001.wav',
-          'collectedBy': 'Ermittler Klein',
-          'location': 'Polizeipräsidium Hamburg',
-          'caseId': 'CASE-2024-004',
-          'notes': 'Enthält belastende Aussagen',
-          'status': 'collected',
-          'collectedAt': DateTime.now().subtract(const Duration(days: 1)),
-        },
-        {
-          'title': 'Blutprobe',
-          'description': 'Blutprobe vom Tatort',
-          'type': 'physical',
-          'filePath': '/evidence/physical/blood_sample_001',
-          'collectedBy': 'Kriminaltechniker Fischer',
-          'location': 'Labor für Forensik',
-          'caseId': 'CASE-2024-005',
-          'notes': 'DNA-Analyse in Bearbeitung',
-          'status': 'processing',
-          'collectedAt': DateTime.now().subtract(const Duration(hours: 12)),
-        },
-      ];
-
-  /// Beweismittel-Ketten für Evidence Collection
-  Map<String, List<String>> get evidenceChains => {
-        'CHAIN-001': ['evidence_001', 'evidence_002'],
-        'CHAIN-002': ['evidence_003', 'evidence_004'],
-        'CHAIN-003': ['evidence_005'],
-      };
-
-  // ===== LEGAL AI MOCK-DATEN =====
-
-  /// Rechtliche Kontexte für Legal AI
-  List<Map<String, dynamic>> get legalContexts => [
-        {
-          'title': 'Mietrecht - Kündigung',
-          'description': 'Rechtliche Aspekte bei Mietkündigungen',
-          'category': 'Zivilrecht',
-          'keywords': ['Miete', 'Kündigung', 'Vermieter', 'Mieter'],
-          'legalFramework': {
-            'gesetze': ['BGB § 573', 'BGB § 574'],
-            'fristen': '3 Monate Kündigungsfrist',
-          },
-        },
-        {
-          'title': 'Arbeitsrecht - Kündigungsschutz',
-          'description': 'Schutz vor unrechtmäßigen Kündigungen',
-          'category': 'Arbeitsrecht',
-          'keywords': ['Arbeitsvertrag', 'Kündigung', 'Kündigungsschutz'],
-          'legalFramework': {
-            'gesetze': ['KSchG', 'BGB § 626'],
-            'fristen': '4 Wochen Kündigungsfrist',
-          },
-        },
-      ];
-
-  // ===== APPOINTMENT MOCK-DATEN =====
-
-  /// Termine für die Terminverwaltung
-  List<Map<String, dynamic>> get appointments => [
-        {
-          'id': '1',
-          'title': 'Gerichtstermin - Mietstreit',
-          'description': 'Verhandlung vor dem Amtsgericht Berlin-Mitte',
-          'startTime': DateTime.now().add(const Duration(days: 2, hours: 10)),
-          'endTime': DateTime.now().add(const Duration(days: 2, hours: 12)),
-          'location':
-              'Amtsgericht Berlin-Mitte, Littenstraße 12-17, 10179 Berlin',
-          'type': 'court',
-          'status': 'scheduled',
-          'reminderTime': DateTime.now().add(const Duration(days: 1, hours: 9)),
-          'caseId': 'case_001',
-        },
-        {
-          'id': '2',
-          'title': 'Anwaltstermin - Vertragsprüfung',
-          'description': 'Besprechung zur Vertragsprüfung',
-          'startTime': DateTime.now().add(const Duration(days: 1, hours: 14)),
-          'endTime': DateTime.now().add(const Duration(days: 1, hours: 15)),
-          'location':
-              'Kanzlei Müller & Partner, Friedrichstraße 123, 10117 Berlin',
-          'type': 'lawyer',
-          'status': 'scheduled',
-          'reminderTime': DateTime.now().add(const Duration(hours: 1)),
-          'caseId': 'case_002',
-        },
-      ];
-
-  // ===== HELP NETWORK MOCK-DATEN =====
-
-  /// Hilfe-Anfragen für das Hilfe-Netzwerk
+  // Help Network Data
   List<Map<String, dynamic>> get helpRequests => [
         {
-          'id': '1',
-          'title': 'Rechtliche Beratung bei Mietstreit',
-          'description':
-              'Ich habe Probleme mit meinem Vermieter und brauche rechtliche Beratung.',
-          'category': 'Zivilrecht',
+          'id': 'req_001',
+          'title': 'Rechtliche Beratung benötigt',
+          'description': 'Ich benötige Hilfe bei einem Arbeitsrecht-Fall',
+          'category': 'Recht',
           'requesterId': 'user_001',
           'requesterName': 'Max Mustermann',
           'status': 'open',
-          'priority': 'medium',
+          'priority': 'high',
           'location': 'Berlin',
-          'tags': ['Mietrecht', 'Beratung'],
-          'urgency': true,
-          'deadline': DateTime.now().add(const Duration(days: 7)),
-          'maxHelpers': 3,
-          'createdAt': DateTime.now().subtract(const Duration(days: 2)),
+          'tags': ['Arbeitsrecht', 'Beratung'],
+          'urgency': 'urgent',
+          'deadline': DateTime.now().add(const Duration(days: 3)),
+          'maxHelpers': 2,
+          'createdAt': DateTime.now().subtract(const Duration(hours: 2)),
         },
         {
-          'id': '2',
-          'title': 'Unterstützung bei Arbeitsvertrag',
+          'id': 'req_002',
+          'title': 'Dokumente übersetzen',
           'description':
-              'Ich brauche Hilfe bei der Prüfung meines Arbeitsvertrags.',
-          'category': 'Arbeitsrecht',
+              'Suche jemanden, der englische Verträge ins Deutsche übersetzt',
+          'category': 'Übersetzung',
           'requesterId': 'user_002',
           'requesterName': 'Anna Schmidt',
           'status': 'in_progress',
-          'priority': 'high',
-          'location': 'München',
-          'tags': ['Arbeitsrecht', 'Vertrag'],
-          'urgency': false,
-          'deadline': DateTime.now().add(const Duration(days: 14)),
-          'maxHelpers': 2,
-          'createdAt': DateTime.now().subtract(const Duration(days: 5)),
-        },
-      ];
-
-  /// Hilfe-Angebote für das Hilfe-Netzwerk
-  List<Map<String, dynamic>> get helpOffers => [
-        {
-          'id': '1',
-          'helpRequestId': '1',
-          'helperId': 'helper_001',
-          'helperName': 'Rechtsanwalt Weber',
-          'message':
-              'Ich kann Ihnen bei Ihrem Mietstreit helfen. Lassen Sie uns das besprechen.',
-          'status': 'pending',
-          'rating': 4.5,
-          'review': 'Sehr kompetente Beratung',
+          'priority': 'medium',
+          'location': 'Hamburg',
+          'tags': ['Übersetzung', 'Vertrag', 'Englisch'],
+          'urgency': 'normal',
+          'deadline': DateTime.now().add(const Duration(days: 7)),
+          'maxHelpers': 1,
           'createdAt': DateTime.now().subtract(const Duration(days: 1)),
         },
+      ];
+
+  List<Map<String, dynamic>> get helpOffers => [
         {
-          'id': '2',
-          'helpRequestId': '2',
-          'helperId': 'helper_002',
-          'helperName': 'Anwältin Müller',
+          'id': 'offer_001',
+          'helpRequestId': 'req_001',
+          'helperId': 'helper_001',
+          'helperName': 'Dr. Rechtsanwalt',
           'message':
-              'Ich spezialisiere mich auf Arbeitsrecht und kann Ihnen gerne helfen.',
-          'status': 'accepted',
+              'Ich kann Ihnen bei dem Arbeitsrecht-Fall helfen. Bin seit 15 Jahren in diesem Bereich tätig.',
+          'status': 'pending',
           'rating': 4.8,
-          'review': 'Hervorragende Unterstützung',
-          'createdAt': DateTime.now().subtract(const Duration(days: 3)),
+          'review': 'Sehr kompetent und hilfsbereit',
+          'createdAt': DateTime.now().subtract(const Duration(hours: 1)),
+        },
+        {
+          'id': 'offer_002',
+          'helpRequestId': 'req_002',
+          'helperId': 'helper_002',
+          'helperName': 'Übersetzerin Maria',
+          'message':
+              'Ich übersetze gerne Ihre Verträge. Habe 10 Jahre Erfahrung mit juristischen Texten.',
+          'status': 'accepted',
+          'rating': 4.9,
+          'review': 'Exzellente Übersetzung, sehr zuverlässig',
+          'createdAt': DateTime.now().subtract(const Duration(hours: 3)),
         },
       ];
 
-  // ===== UTILITY-METHODEN =====
+  List<Map<String, dynamic>> get helpChats => [
+        {
+          'id': 'chat_001',
+          'helpRequestId': 'req_001',
+          'senderId': 'user_001',
+          'senderName': 'Max Mustermann',
+          'message': 'Hallo, vielen Dank für Ihr Angebot!',
+          'messageType': 'text',
+          'timestamp': DateTime.now().subtract(const Duration(minutes: 30)),
+          'isRead': true,
+        },
+        {
+          'id': 'chat_002',
+          'helpRequestId': 'req_001',
+          'senderId': 'helper_001',
+          'senderName': 'Dr. Rechtsanwalt',
+          'message': 'Gerne! Können Sie mir mehr Details zu Ihrem Fall geben?',
+          'messageType': 'text',
+          'timestamp': DateTime.now().subtract(const Duration(minutes: 25)),
+          'isRead': true,
+        },
+      ];
 
-  /// Generiert eine zufällige Verzögerung für Mock-API-Calls
-  Duration get randomDelay =>
-      Duration(milliseconds: 200 + _random.nextInt(800));
+  // Evidence Collection Data
+  List<Map<String, dynamic>> get evidenceItems => [
+        {
+          'id': 'evid_001',
+          'title': 'Blutprobe - Fall Müller',
+          'description': 'Blutprobe vom 15.03.2024, Labor-ID: LAB-2024-001',
+          'type': 'biological',
+          'status': 'verified',
+          'location': 'Labor Berlin',
+          'collectedBy': 'Dr. Schmidt',
+          'collectedAt': DateTime.now().subtract(const Duration(days: 5)),
+          'notes': 'Probe wurde ordnungsgemäß verpackt und versiegelt',
+          'tags': ['Blutprobe', 'Fall Müller', 'Labor'],
+        },
+        {
+          'id': 'evid_002',
+          'title': 'Fingerabdruck - Tatort',
+          'description':
+              'Fingerabdruck von der Türklinke, Tatort: Musterstraße 123',
+          'type': 'physical',
+          'status': 'pending',
+          'location': 'Tatort',
+          'collectedBy': 'Kriminalbeamter Weber',
+          'collectedAt': DateTime.now().subtract(const Duration(days: 3)),
+          'notes': 'Abdruck wurde mit Spezialfolie gesichert',
+          'tags': ['Fingerabdruck', 'Tatort', 'Spuren'],
+        },
+      ];
 
-  /// Generiert eine zufällige ID
-  String get randomId => DateTime.now().millisecondsSinceEpoch.toString();
+  // Legal AI Data
+  List<Map<String, dynamic>> get legalContexts => [
+        {
+          'id': 'context_001',
+          'name': 'Arbeitsrecht',
+          'description': 'Rechtliche Beratung im Bereich Arbeitsrecht',
+          'keywords': ['Arbeitsvertrag', 'Kündigung', 'Überstunden', 'Urlaub'],
+          'isActive': true,
+        },
+        {
+          'id': 'context_002',
+          'name': 'Vertragsrecht',
+          'description': 'Beratung zu Vertragsangelegenheiten',
+          'keywords': ['Vertrag', 'AGB', 'Schadensersatz', 'Leistungsstörung'],
+          'isActive': true,
+        },
+      ];
 
-  /// Generiert eine zufällige Bewertung zwischen 1.0 und 5.0
-  double get randomRating => 1.0 + _random.nextDouble() * 4.0;
+  List<Map<String, dynamic>> get legalAiMessages => [
+        {
+          'id': 'msg_001',
+          'contextId': 'context_001',
+          'sender': 'user',
+          'message': 'Kann mein Arbeitgeber mich ohne Grund kündigen?',
+          'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
+          'metadata': {
+            'sessionId': 'session_001',
+            'userType': 'citizen',
+          },
+        },
+        {
+          'id': 'msg_002',
+          'contextId': 'context_001',
+          'sender': 'ai',
+          'message':
+              'Nein, eine Kündigung ohne Grund ist in Deutschland nicht zulässig. Es gibt verschiedene Arten der Kündigung: ordentliche Kündigung, außerordentliche Kündigung und betriebsbedingte Kündigung. Jede hat spezifische Voraussetzungen...',
+          'timestamp':
+              DateTime.now().subtract(const Duration(hours: 2, minutes: 1)),
+          'metadata': {
+            'sessionId': 'session_001',
+            'confidence': 0.95,
+            'sources': ['Arbeitsgesetzbuch', 'Bundesarbeitsgericht'],
+          },
+        },
+      ];
+
+  // Notification Data
+  List<Map<String, dynamic>> get notifications => [
+        {
+          'id': 'notif_001',
+          'title': 'Neue Nachricht',
+          'message': 'Sie haben eine neue Nachricht im Hilfe-Netzwerk erhalten',
+          'type': 'message',
+          'category': 'help_network',
+          'isRead': false,
+          'createdAt': DateTime.now().subtract(const Duration(minutes: 30)),
+          'data': {
+            'senderId': 'helper_001',
+            'senderName': 'Dr. Rechtsanwalt',
+            'helpRequestId': 'req_001',
+          },
+        },
+        {
+          'id': 'notif_002',
+          'title': 'Dokument erstellt',
+          'message': 'Ihr PDF-Dokument wurde erfolgreich generiert',
+          'type': 'document',
+          'category': 'pdf_generator',
+          'isRead': true,
+          'createdAt': DateTime.now().subtract(const Duration(hours: 2)),
+          'data': {
+            'documentId': 'doc_001',
+            'documentTitle': 'Anwaltsschreiben - Fall Müller',
+          },
+        },
+      ];
+
+  // EPA Integration Data
+  List<Map<String, dynamic>> get epaCases => [
+        {
+          'id': 'case_001',
+          'patientId': 'patient_001',
+          'patientName': 'Max Mustermann',
+          'caseType': 'Behandlung',
+          'status': 'active',
+          'createdAt': DateTime.now().subtract(const Duration(days: 10)),
+          'updatedAt': DateTime.now().subtract(const Duration(hours: 2)),
+          'metadata': {
+            'doctor': 'Dr. Schmidt',
+            'department': 'Innere Medizin',
+            'priority': 'normal',
+          },
+        },
+      ];
+
+  List<Map<String, dynamic>> get epaDocuments => [
+        {
+          'id': 'epa_doc_001',
+          'caseId': 'case_001',
+          'title': 'Arztbrief',
+          'type': 'medical_report',
+          'content': 'Patient zeigt typische Symptome...',
+          'createdAt': DateTime.now().subtract(const Duration(days: 5)),
+          'author': 'Dr. Schmidt',
+          'status': 'active',
+        },
+      ];
+
+  // Utility Methods
+  String getRandomId() {
+    return 'id_${DateTime.now().millisecondsSinceEpoch}_${_random.nextInt(1000)}';
+  }
+
+  DateTime getRandomDate() {
+    return DateTime.now().subtract(Duration(days: _random.nextInt(30)));
+  }
+
+  String getRandomName() {
+    final names = [
+      'Max Mustermann',
+      'Anna Schmidt',
+      'Peter Weber',
+      'Maria Müller'
+    ];
+    return names[_random.nextInt(names.length)];
+  }
+
+  String getRandomEmail() {
+    final domains = ['gmail.com', 'outlook.com', 'yahoo.com'];
+    final name = getRandomName().toLowerCase().replaceAll(' ', '.');
+    final domain = domains[_random.nextInt(domains.length)];
+    return '$name@$domain';
+  }
 }

@@ -1,253 +1,134 @@
 // features/help_network/data/repositories/help_network_repository_impl.dart
-import 'dart:convert';
 
+import 'dart:math';
+
+import '../../../../core/data/mock_data_repository.dart';
+import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/entities/help_chat.dart';
 import '../../domain/entities/help_offer.dart';
 import '../../domain/entities/help_request.dart';
 import '../../domain/repositories/help_network_repository.dart';
+import 'help_network_mock_data_repository.dart';
 
-/// Implementation des Help Network Repository mit Mock-Daten
+/// Repository-Implementation für Help Network
 class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
+  // Mock-Daten für Demo-Zwecke
   final List<HelpRequest> _helpRequests = [];
   final List<HelpOffer> _helpOffers = [];
-  final List<HelpChat> _chatMessages = [];
-  final List<Map<String, dynamic>> _notifications = [];
+  final List<HelpChat> _helpChats = [];
+  final MockDataRepository _mockData = MockDataRepository();
+  final HelpNetworkMockDataRepository _helpMockData =
+      HelpNetworkMockDataRepository();
+  final Random _random = Random();
 
   HelpNetworkRepositoryImpl() {
     _initializeMockData();
   }
 
   void _initializeMockData() {
-    // Mock Hilfe-Anfragen
-    _helpRequests.addAll([
-      HelpRequest.create(
-        title: 'Hilfe bei Behördengang',
-        description:
-            'Ich brauche Hilfe beim Ausfüllen von Formularen für die Arbeitsagentur.',
-        category: 'Behörden',
-        requesterId: 'user1',
-        requesterName: 'Max Mustermann',
-        priority: 'high',
-        tags: ['Behörden', 'Formulare', 'Arbeitslosigkeit'],
-        location: 'Berlin',
-        isUrgent: true,
-        maxHelpers: 2,
-      ),
-      HelpRequest.create(
-        title: 'Übersetzung von Dokumenten',
-        description:
-            'Suche jemanden, der mir bei der Übersetzung von medizinischen Dokumenten helfen kann.',
-        category: 'Übersetzung',
-        requesterId: 'user2',
-        requesterName: 'Anna Schmidt',
-        priority: 'medium',
-        tags: ['Übersetzung', 'Medizin', 'Dokumente'],
-        location: 'Hamburg',
-        maxHelpers: 1,
-      ),
-      HelpRequest.create(
-        title: 'Begleitung zum Arzt',
-        description: 'Brauche Begleitung zu einem wichtigen Arzttermin.',
-        category: 'Gesundheit',
-        requesterId: 'user3',
-        requesterName: 'Peter Müller',
-        priority: 'urgent',
-        tags: ['Gesundheit', 'Arzt', 'Begleitung'],
-        location: 'München',
-        isUrgent: true,
-        maxHelpers: 1,
-      ),
-    ]);
+    // Help Requests aus Mock-Data Repository laden
+    final requestsData = _helpMockData.helpRequests;
+    _helpRequests.addAll(requestsData.map((data) => HelpRequest.fromMap(data)));
 
-    // Mock Hilfe-Angebote
-    _helpOffers.addAll([
-      HelpOffer.create(
-        helpRequestId: _helpRequests[0].id,
-        helperId: 'helper1',
-        helperName: 'Lisa Weber',
-        message:
-            'Ich kann Ihnen gerne bei den Formularen helfen. Habe Erfahrung mit Behörden.',
-      ),
-      HelpOffer.create(
-        helpRequestId: _helpRequests[1].id,
-        helperId: 'helper2',
-        helperName: 'Dr. Hans Klein',
-        message:
-            'Ich bin Arzt und kann bei der Übersetzung medizinischer Dokumente helfen.',
-      ),
-    ]);
+    // Help Offers aus Mock-Data Repository laden
+    final offersData = _helpMockData.helpOffers;
+    _helpOffers.addAll(offersData.map((data) => HelpOffer.fromMap(data)));
 
-    // Mock Chat-Nachrichten
-    _chatMessages.addAll([
-      HelpChat.create(
-        helpRequestId: _helpRequests[0].id,
-        senderId: 'user1',
-        senderName: 'Max Mustermann',
-        message: 'Hallo, vielen Dank für das Angebot!',
-      ),
-      HelpChat.create(
-        helpRequestId: _helpRequests[0].id,
-        senderId: 'helper1',
-        senderName: 'Lisa Weber',
-        message: 'Gerne! Wann können wir uns treffen?',
-      ),
-    ]);
-
-    // Mock Benachrichtigungen
-    _notifications.addAll([
-      {
-        'id': 'notif1',
-        'userId': 'user1',
-        'title': 'Neues Hilfe-Angebot',
-        'message': 'Lisa Weber hat Ihnen ein Angebot gemacht.',
-        'timestamp': DateTime.now().toIso8601String(),
-        'isRead': false,
-      },
-    ]);
-  }
-
-  // Hilfe-Anfragen Implementation
-  @override
-  Future<List<HelpRequest>> getAllHelpRequests() async {
-    await Future.delayed(Duration(milliseconds: 300));
-    return List.from(_helpRequests);
+    // Help Chats aus Mock-Data Repository laden
+    final chatsData = _helpMockData.helpChats;
+    _helpChats.addAll(chatsData.map((data) => HelpChat.fromMap(data)));
   }
 
   @override
-  Future<List<HelpRequest>> getHelpRequestsByCategory(String category) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return _helpRequests
-        .where((request) => request.category == category)
-        .toList();
+  Future<HelpRequest> createHelpRequest(HelpRequest request) async {
+    await Future.delayed(Duration(milliseconds: 400 + _random.nextInt(600)));
+    _helpRequests.add(request);
+    AppLogger.info('Hilfe-Anfrage erstellt: ${request.title}');
+    return request;
   }
 
   @override
-  Future<List<HelpRequest>> getHelpRequestsByStatus(String status) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return _helpRequests.where((request) => request.status == status).toList();
-  }
-
-  @override
-  Future<List<HelpRequest>> getHelpRequestsByUser(String userId) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return _helpRequests
-        .where((request) => request.requesterId == userId)
-        .toList();
-  }
-
-  @override
-  Future<List<HelpRequest>> searchHelpRequests(String query) async {
-    await Future.delayed(Duration(milliseconds: 400));
-    final lowercaseQuery = query.toLowerCase();
-    return _helpRequests.where((request) {
-      return request.title.toLowerCase().contains(lowercaseQuery) ||
-          request.description.toLowerCase().contains(lowercaseQuery) ||
-          request.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery));
-    }).toList();
-  }
-
-  @override
-  Future<HelpRequest?> getHelpRequestById(String id) async {
-    await Future.delayed(Duration(milliseconds: 100));
+  Future<HelpRequest?> getHelpRequest(String id) async {
+    await Future.delayed(Duration(milliseconds: 200 + _random.nextInt(300)));
     try {
-      return _helpRequests.firstWhere((request) => request.id == id);
+      return _helpRequests.firstWhere((req) => req.id == id);
     } catch (e) {
       return null;
     }
   }
 
   @override
-  Future<void> createHelpRequest(HelpRequest request) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    _helpRequests.add(request);
+  Future<List<HelpRequest>> getAllHelpRequests() async {
+    await Future.delayed(Duration(milliseconds: 500 + _random.nextInt(700)));
+    AppLogger.info('Alle Hilfe-Anfragen geladen: ${_helpRequests.length}');
+    return List.from(_helpRequests);
   }
 
   @override
-  Future<void> updateHelpRequest(HelpRequest request) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    final index = _helpRequests.indexWhere((r) => r.id == request.id);
+  Future<HelpRequest> updateHelpRequest(HelpRequest request) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(500)));
+    final index = _helpRequests.indexWhere((req) => req.id == request.id);
     if (index != -1) {
       _helpRequests[index] = request;
+      AppLogger.info('Hilfe-Anfrage aktualisiert: ${request.title}');
+      return _helpRequests[index];
     }
+    throw Exception('Hilfe-Anfrage nicht gefunden: ${request.id}');
   }
 
   @override
-  Future<void> deleteHelpRequest(String id) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    _helpRequests.removeWhere((request) => request.id == id);
-  }
-
-  @override
-  Future<void> acceptHelpOffer(String requestId, String offerId) async {
-    await Future.delayed(Duration(milliseconds: 300));
-    final requestIndex = _helpRequests.indexWhere((r) => r.id == requestId);
-    final offerIndex = _helpOffers.indexWhere((o) => o.id == offerId);
-
-    if (requestIndex != -1 && offerIndex != -1) {
-      // Update request status
-      final request = _helpRequests[requestIndex];
-      final updatedRequest = request.copyWith(
-        status: 'in_progress',
-        acceptedHelpers: [
-          ...request.acceptedHelpers,
-          _helpOffers[offerIndex].helperId
-        ],
-      );
-      _helpRequests[requestIndex] = updatedRequest;
-
-      // Update offer status
-      final offer = _helpOffers[offerIndex];
-      final updatedOffer = offer.copyWith(status: 'accepted');
-      _helpOffers[offerIndex] = updatedOffer;
+  Future<bool> deleteHelpRequest(String id) async {
+    await Future.delayed(Duration(milliseconds: 200 + _random.nextInt(300)));
+    final initialLength = _helpRequests.length;
+    _helpRequests.removeWhere((req) => req.id == id);
+    final success = _helpRequests.length < initialLength;
+    if (success) {
+      AppLogger.info('Hilfe-Anfrage gelöscht: $id');
     }
+    return success;
   }
 
   @override
-  Future<void> rejectHelpOffer(String requestId, String offerId) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    final offerIndex = _helpOffers.indexWhere((o) => o.id == offerId);
-    if (offerIndex != -1) {
-      final offer = _helpOffers[offerIndex];
-      final updatedOffer = offer.copyWith(status: 'rejected');
-      _helpOffers[offerIndex] = updatedOffer;
-    }
+  Future<List<HelpRequest>> getHelpRequestsByCategory(String category) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
+    return _helpRequests.where((req) => req.category == category).toList();
   }
 
   @override
-  Future<void> completeHelpRequest(String id) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    final index = _helpRequests.indexWhere((r) => r.id == id);
-    if (index != -1) {
-      final request = _helpRequests[index];
-      final updatedRequest = request.copyWith(status: 'completed');
-      _helpRequests[index] = updatedRequest;
-    }
+  Future<List<HelpRequest>> getHelpRequestsByStatus(String status) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
+    return _helpRequests.where((req) => req.status == status).toList();
   }
 
-  // Hilfe-Angebote Implementation
   @override
-  Future<List<HelpOffer>> getHelpOffersByRequest(String requestId) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return _helpOffers
-        .where((offer) => offer.helpRequestId == requestId)
+  Future<List<HelpRequest>> getHelpRequestsByUser(String userId) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
+    return _helpRequests.where((req) => req.requesterId == userId).toList();
+  }
+
+  @override
+  Future<List<HelpRequest>> searchHelpRequests(String query) async {
+    await Future.delayed(Duration(milliseconds: 400 + _random.nextInt(500)));
+    final lowercaseQuery = query.toLowerCase();
+    return _helpRequests
+        .where((req) =>
+            req.title.toLowerCase().contains(lowercaseQuery) ||
+            req.description.toLowerCase().contains(lowercaseQuery) ||
+            req.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery)))
         .toList();
   }
 
   @override
-  Future<List<HelpOffer>> getHelpOffersByUser(String userId) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return _helpOffers.where((offer) => offer.helperId == userId).toList();
+  Future<HelpOffer> createHelpOffer(HelpOffer offer) async {
+    await Future.delayed(Duration(milliseconds: 400 + _random.nextInt(600)));
+    _helpOffers.add(offer);
+    AppLogger.info('Hilfe-Angebot erstellt: ${offer.helperName}');
+    return offer;
   }
 
   @override
-  Future<List<HelpOffer>> getHelpOffersByStatus(String status) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return _helpOffers.where((offer) => offer.status == status).toList();
-  }
-
-  @override
-  Future<HelpOffer?> getHelpOfferById(String id) async {
-    await Future.delayed(Duration(milliseconds: 100));
+  Future<HelpOffer?> getHelpOffer(String id) async {
+    await Future.delayed(Duration(milliseconds: 200 + _random.nextInt(300)));
     try {
       return _helpOffers.firstWhere((offer) => offer.id == id);
     } catch (e) {
@@ -256,253 +137,182 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   }
 
   @override
-  Future<void> createHelpOffer(HelpOffer offer) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    _helpOffers.add(offer);
+  Future<List<HelpOffer>> getAllHelpOffers() async {
+    await Future.delayed(Duration(milliseconds: 400 + _random.nextInt(600)));
+    AppLogger.info('Alle Hilfe-Angebote geladen: ${_helpOffers.length}');
+    return List.from(_helpOffers);
   }
 
   @override
-  Future<void> updateHelpOffer(HelpOffer offer) async {
-    await Future.delayed(Duration(milliseconds: 200));
+  Future<HelpOffer> updateHelpOffer(HelpOffer offer) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(500)));
     final index = _helpOffers.indexWhere((o) => o.id == offer.id);
     if (index != -1) {
       _helpOffers[index] = offer;
+      AppLogger.info('Hilfe-Angebot aktualisiert: ${offer.helperName}');
+      return _helpOffers[index];
     }
+    throw Exception('Hilfe-Angebot nicht gefunden: ${offer.id}');
   }
 
   @override
-  Future<void> deleteHelpOffer(String id) async {
-    await Future.delayed(Duration(milliseconds: 100));
+  Future<bool> deleteHelpOffer(String id) async {
+    await Future.delayed(Duration(milliseconds: 200 + _random.nextInt(300)));
+    final initialLength = _helpOffers.length;
     _helpOffers.removeWhere((offer) => offer.id == id);
+    final success = _helpOffers.length < initialLength;
+    if (success) {
+      AppLogger.info('Hilfe-Angebot gelöscht: $id');
+    }
+    return success;
   }
 
   @override
-  Future<void> rateHelpOffer(
-      String offerId, double rating, String? review) async {
-    await Future.delayed(Duration(milliseconds: 300));
+  Future<List<HelpOffer>> getHelpOffersByRequest(String helpRequestId) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
+    return _helpOffers
+        .where((offer) => offer.helpRequestId == helpRequestId)
+        .toList();
+  }
+
+  @override
+  Future<List<HelpOffer>> getHelpOffersByHelper(String helperId) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
+    return _helpOffers.where((offer) => offer.helperId == helperId).toList();
+  }
+
+  @override
+  Future<List<HelpOffer>> getHelpOffersByStatus(String status) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
+    return _helpOffers.where((offer) => offer.status == status).toList();
+  }
+
+  @override
+  Future<bool> acceptHelpOffer(String offerId) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(500)));
+    final offer = _helpOffers.firstWhere((o) => o.id == offerId);
+    final updatedOffer = offer.copyWith(status: 'accepted');
     final index = _helpOffers.indexWhere((o) => o.id == offerId);
     if (index != -1) {
-      final offer = _helpOffers[index];
-      final updatedOffer = offer.copyWith(
-        rating: rating,
-        review: review,
-      );
       _helpOffers[index] = updatedOffer;
+      AppLogger.info('Hilfe-Angebot akzeptiert: $offerId');
+      return true;
     }
-  }
-
-  // Chat Implementation
-  @override
-  Future<List<HelpChat>> getChatMessages(String requestId) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return _chatMessages
-        .where((message) => message.helpRequestId == requestId)
-        .toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return false;
   }
 
   @override
-  Future<void> sendChatMessage(HelpChat message) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    _chatMessages.add(message);
-  }
-
-  @override
-  Future<void> markMessageAsRead(String messageId) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    final index = _chatMessages.indexWhere((m) => m.id == messageId);
+  Future<bool> rejectHelpOffer(String offerId) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(500)));
+    final offer = _helpOffers.firstWhere((o) => o.id == offerId);
+    final updatedOffer = offer.copyWith(status: 'rejected');
+    final index = _helpOffers.indexWhere((o) => o.id == offerId);
     if (index != -1) {
-      final message = _chatMessages[index];
-      final updatedMessage = message.copyWith(isRead: true);
-      _chatMessages[index] = updatedMessage;
+      _helpOffers[index] = updatedOffer;
+      AppLogger.info('Hilfe-Angebot abgelehnt: $offerId');
+      return true;
     }
+    return false;
   }
 
   @override
-  Future<void> deleteChatMessage(String messageId) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    _chatMessages.removeWhere((message) => message.id == messageId);
-  }
-
-  // Statistiken Implementation
-  @override
-  Future<Map<String, dynamic>> getHelpNetworkStats() async {
-    await Future.delayed(Duration(milliseconds: 400));
-    return {
-      'total_requests': _helpRequests.length,
-      'open_requests': _helpRequests.where((r) => r.isOpen).length,
-      'completed_requests':
-          _helpRequests.where((r) => r.status == 'completed').length,
-      'total_offers': _helpOffers.length,
-      'accepted_offers': _helpOffers.where((o) => o.isAccepted).length,
-      'total_messages': _chatMessages.length,
-      'active_helpers': _helpOffers.map((o) => o.helperId).toSet().length,
-    };
+  Future<HelpChat> sendChatMessage(HelpChat message) async {
+    await Future.delayed(Duration(milliseconds: 200 + _random.nextInt(300)));
+    _helpChats.add(message);
+    AppLogger.info('Chat-Nachricht gesendet: ${message.senderName}');
+    return message;
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getTopHelpers() async {
-    await Future.delayed(Duration(milliseconds: 300));
-    final helperStats = <String, Map<String, dynamic>>{};
+  Future<List<HelpChat>> getChatMessages(String helpRequestId) async {
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
+    return _helpChats
+        .where((chat) => chat.helpRequestId == helpRequestId)
+        .toList();
+  }
 
-    for (final offer in _helpOffers) {
-      if (!helperStats.containsKey(offer.helperId)) {
-        helperStats[offer.helperId] = {
-          'helperId': offer.helperId,
-          'helperName': offer.helperName,
-          'totalOffers': 0,
-          'acceptedOffers': 0,
-          'averageRating': 0.0,
-          'ratings': <double>[],
-        };
-      }
-
-      final stats = helperStats[offer.helperId]!;
-      stats['totalOffers'] = (stats['totalOffers'] as int) + 1;
-
-      if (offer.isAccepted) {
-        stats['acceptedOffers'] = (stats['acceptedOffers'] as int) + 1;
-      }
-
-      if (offer.rating != null) {
-        (stats['ratings'] as List<double>).add(offer.rating!);
-      }
+  @override
+  Future<bool> markChatMessageAsRead(String messageId) async {
+    await Future.delayed(Duration(milliseconds: 100 + _random.nextInt(200)));
+    final index = _helpChats.indexWhere((chat) => chat.id == messageId);
+    if (index != -1) {
+      final message = _helpChats[index];
+      _helpChats[index] = message.copyWith(isRead: true);
+      return true;
     }
-
-    // Calculate average ratings
-    for (final stats in helperStats.values) {
-      final ratings = stats['ratings'] as List<double>;
-      if (ratings.isNotEmpty) {
-        stats['averageRating'] =
-            ratings.reduce((a, b) => a + b) / ratings.length;
-      }
-    }
-
-    return helperStats.values.toList()
-      ..sort((a, b) =>
-          (b['acceptedOffers'] as int).compareTo(a['acceptedOffers'] as int));
+    return false;
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getHelpCategories() async {
-    await Future.delayed(Duration(milliseconds: 200));
-    final categoryStats = <String, Map<String, dynamic>>{};
+  Future<Map<String, dynamic>> generateHelpStatistics() async {
+    await Future.delayed(Duration(milliseconds: 500 + _random.nextInt(800)));
+    AppLogger.info('Help Network Statistiken generiert');
 
-    for (final request in _helpRequests) {
-      if (!categoryStats.containsKey(request.category)) {
-        categoryStats[request.category] = {
-          'category': request.category,
-          'totalRequests': 0,
-          'openRequests': 0,
-          'completedRequests': 0,
-        };
-      }
-
-      final stats = categoryStats[request.category]!;
-      stats['totalRequests'] = (stats['totalRequests'] as int) + 1;
-
-      if (request.isOpen) {
-        stats['openRequests'] = (stats['openRequests'] as int) + 1;
-      } else if (request.status == 'completed') {
-        stats['completedRequests'] = (stats['completedRequests'] as int) + 1;
-      }
-    }
-
-    return categoryStats.values.toList();
-  }
-
-  @override
-  Future<Map<String, dynamic>> getUserHelpStats(String userId) async {
-    await Future.delayed(Duration(milliseconds: 300));
-    final userRequests =
-        _helpRequests.where((r) => r.requesterId == userId).toList();
-    final userOffers = _helpOffers.where((o) => o.helperId == userId).toList();
-
-    return {
-      'totalRequests': userRequests.length,
-      'openRequests': userRequests.where((r) => r.isOpen).length,
-      'completedRequests':
-          userRequests.where((r) => r.status == 'completed').length,
-      'totalOffers': userOffers.length,
-      'acceptedOffers': userOffers.where((o) => o.isAccepted).length,
-      'averageRating': userOffers
-              .where((o) => o.rating != null)
-              .map((o) => o.rating!)
-              .fold(0.0, (sum, rating) => sum + rating) /
-          userOffers.where((o) => o.rating != null).length,
-    };
-  }
-
-  // Benachrichtigungen Implementation
-  @override
-  Future<void> sendHelpRequestNotification(
-      String requestId, String message) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    // Mock implementation
-  }
-
-  @override
-  Future<void> sendHelpOfferNotification(String offerId, String message) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    // Mock implementation
+    // Verwende das Help Network Mock-Data Repository für bessere Statistiken
+    return _helpMockData.generateStatistics();
   }
 
   @override
   Future<List<Map<String, dynamic>>> getUserNotifications(String userId) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return _notifications.where((n) => n['userId'] == userId).toList();
+    await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
+    AppLogger.info('Benutzer-Benachrichtigungen geladen für: $userId');
+
+    // Verwende das Help Network Mock-Data Repository für Benachrichtigungen
+    return _helpMockData.generateUserNotifications(userId);
   }
 
   @override
-  Future<void> markNotificationAsRead(String notificationId) async {
-    await Future.delayed(Duration(milliseconds: 100));
-    final index = _notifications.indexWhere((n) => n['id'] == notificationId);
-    if (index != -1) {
-      _notifications[index]['isRead'] = true;
+  Future<bool> markNotificationAsRead(String notificationId) async {
+    await Future.delayed(Duration(milliseconds: 100 + _random.nextInt(200)));
+    AppLogger.info('Benachrichtigung als gelesen markiert: $notificationId');
+    return true;
+  }
+
+  @override
+  Future<bool> sendPushNotification(
+      String userId, String title, String message) async {
+    await Future.delayed(Duration(milliseconds: 400 + _random.nextInt(600)));
+    AppLogger.info('Push-Benachrichtigung gesendet an $userId: $title');
+    return true;
+  }
+
+  @override
+  Future<Map<String, dynamic>> exportHelpData() async {
+    await Future.delayed(Duration(milliseconds: 800 + _random.nextInt(1200)));
+    AppLogger.info('Help Network Daten exportiert');
+
+    // Verwende das Help Network Mock-Data Repository für Export
+    return _helpMockData.exportData();
+  }
+
+  @override
+  Future<bool> importHelpData(Map<String, dynamic> data) async {
+    await Future.delayed(Duration(milliseconds: 1000 + _random.nextInt(1500)));
+    AppLogger.info('Help Network Daten importiert');
+
+    try {
+      _helpMockData.importData(data);
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 
-  // Backup und Export Implementation
   @override
-  Future<String> exportHelpData(String userId, {String format = 'json'}) async {
-    await Future.delayed(Duration(milliseconds: 500));
+  Future<Map<String, dynamic>> createBackup() async {
+    await Future.delayed(Duration(milliseconds: 1000 + _random.nextInt(2000)));
+    AppLogger.info('Help Network Backup erstellt');
 
-    if (format == 'json') {
-      return jsonEncode({
-        'helpRequests': _helpRequests
-            .where((r) => r.requesterId == userId)
-            .map((r) => r.toMap())
-            .toList(),
-        'helpOffers': _helpOffers
-            .where((o) => o.helperId == userId)
-            .map((o) => o.toMap())
-            .toList(),
-        'chatMessages': _chatMessages
-            .where((m) => m.senderId == userId)
-            .map((m) => m.toMap())
-            .toList(),
-        'exported_at': DateTime.now().toIso8601String(),
-      });
-    } else {
-      return 'Export format not supported';
-    }
+    // Verwende das Help Network Mock-Data Repository für Backup
+    return _helpMockData.createBackup();
   }
 
   @override
-  Future<void> importHelpData(String data, {String format = 'json'}) async {
-    await Future.delayed(Duration(milliseconds: 300));
-    // Mock implementation
-  }
+  Future<bool> restoreBackup(Map<String, dynamic> backup) async {
+    await Future.delayed(Duration(milliseconds: 800 + _random.nextInt(1500)));
+    AppLogger.info('Help Network Backup wiederhergestellt');
 
-  @override
-  Future<void> backupHelpNetwork() async {
-    await Future.delayed(Duration(milliseconds: 1000));
-    // Mock implementation
-  }
-
-  @override
-  Future<void> restoreHelpNetwork(String backupId) async {
-    await Future.delayed(Duration(milliseconds: 800));
-    // Mock implementation
+    // Verwende das Help Network Mock-Data Repository für Restore
+    return _helpMockData.restoreBackup(backup);
   }
 }

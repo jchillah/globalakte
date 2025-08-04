@@ -165,17 +165,26 @@ class PdfGeneratorUseCases {
       throw Exception('Template nicht gefunden: $templateId');
     }
 
+    // HTML-Inhalt aus Template mit eingegebenen Daten generieren
     final htmlContent = _generateHtmlFromTemplate(template, data);
 
+    // PDF-Bytes generieren
+    final pdfBytes =
+        await _repository.generatePdfFromTemplate(templateId, data);
+
+    // Dokument mit den eingegebenen Daten erstellen
     final document = PdfDocument(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
-      content: htmlContent,
+      content: _extractTextFromHtml(htmlContent), // Text-Inhalt extrahieren
       templateType: template.templateType,
       metadata: {
         'templateId': templateId,
         'author': author,
         'data': data,
+        'htmlContent': htmlContent,
+        'pdfBytes': pdfBytes.length,
+        'generatedAt': DateTime.now().toIso8601String(),
       },
       createdAt: DateTime.now(),
       author: author,
@@ -205,6 +214,20 @@ class PdfGeneratorUseCases {
         '${now.hour}:${now.minute.toString().padLeft(2, '0')}');
 
     return html;
+  }
+
+  /// Text aus HTML extrahieren
+  String _extractTextFromHtml(String html) {
+    // Einfache HTML-Tag-Entfernung für bessere Lesbarkeit
+    return html
+        .replaceAll(RegExp(r'<[^>]*>'), '') // HTML-Tags entfernen
+        .replaceAll('&nbsp;', ' ') // HTML-Entities ersetzen
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .trim();
   }
 
   /// PDF-Dokument validieren

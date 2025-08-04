@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_config.dart';
+import '../../../../shared/utils/snackbar_utils.dart';
+import '../../domain/entities/help_request.dart';
 import '../../domain/usecases/help_network_usecases.dart';
 
 /// Widget für das Erstellen neuer Hilfe-Anfragen
@@ -23,6 +25,8 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
   final _tagsController = TextEditingController();
+  final _deadlineController = TextEditingController();
+  final _maxHelpersController = TextEditingController();
 
   String _selectedCategory = 'Behörden';
   String _selectedPriority = 'medium';
@@ -47,6 +51,8 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
     _descriptionController.dispose();
     _locationController.dispose();
     _tagsController.dispose();
+    _deadlineController.dispose();
+    _maxHelpersController.dispose();
     super.dispose();
   }
 
@@ -59,6 +65,7 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
     );
     if (date != null) {
       setState(() => _deadline = date);
+      _deadlineController.text = date.toIso8601String();
     }
   }
 
@@ -68,39 +75,38 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
     setState(() => _isSubmitting = true);
 
     try {
-      final tags = _tagsController.text
-          .split(',')
-          .map((tag) => tag.trim())
-          .where((tag) => tag.isNotEmpty)
-          .toList();
-
-      await widget.useCases.createHelpRequest(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
+      final request = HelpRequest.create(
+        title: _titleController.text,
+        description: _descriptionController.text,
         category: _selectedCategory,
         requesterId: 'demo_user',
         requesterName: 'Demo User',
-        deadline: _deadline,
+        deadline: _deadlineController.text.isNotEmpty
+            ? DateTime.parse(_deadlineController.text)
+            : null,
         priority: _selectedPriority,
-        tags: tags,
-        location: _locationController.text.trim().isEmpty
-            ? null
-            : _locationController.text.trim(),
+        tags: _tagsController.text.isNotEmpty
+            ? _tagsController.text.split(',').map((e) => e.trim()).toList()
+            : [],
+        location: _locationController.text.isNotEmpty
+            ? _locationController.text
+            : null,
         isUrgent: _isUrgent,
-        maxHelpers: _maxHelpers,
+        maxHelpers: _maxHelpersController.text.isNotEmpty
+            ? int.parse(_maxHelpersController.text)
+            : null,
       );
 
+      await widget.useCases.createHelpRequest(request);
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Hilfe-Anfrage erfolgreich erstellt!')),
-        );
+        SnackBarUtils.showSuccess(
+            context, 'Hilfe-Anfrage erfolgreich erstellt!');
         _resetForm();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fehler beim Erstellen der Anfrage: $e')),
-        );
+        SnackBarUtils.showError(context, 'Fehler beim Erstellen: $e');
       }
     } finally {
       setState(() => _isSubmitting = false);
@@ -113,6 +119,8 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
     _descriptionController.clear();
     _locationController.clear();
     _tagsController.clear();
+    _deadlineController.clear();
+    _maxHelpersController.clear();
     setState(() {
       _selectedCategory = 'Behörden';
       _selectedPriority = 'medium';
@@ -257,6 +265,7 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
 
             // Maximale Helfer
             TextFormField(
+              controller: _maxHelpersController,
               decoration: const InputDecoration(
                 labelText: 'Maximale Anzahl Helfer (optional)',
                 hintText: 'z.B. 2',

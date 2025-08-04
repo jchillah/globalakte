@@ -169,9 +169,34 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: _buildEvidenceIcon(evidence.type),
-        title: Text(
-          evidence.title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                evidence.title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            if (evidence.status == 'verified')
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.verified, color: Colors.white, size: 16),
+                    SizedBox(width: 4),
+                    Text(
+                      'Verifiziert',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,6 +216,35 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
                 ),
               ],
             ),
+            if (evidence.notes != null && evidence.notes!.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info,
+                      size: 16,
+                      color: Colors.blue[700],
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        evidence.notes!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -216,16 +270,17 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
                 ],
               ),
             ),
-            const PopupMenuItem(
-              value: 'verify',
-              child: Row(
-                children: [
-                  Icon(Icons.verified),
-                  SizedBox(width: 8),
-                  Text('Verifizieren'),
-                ],
+            if (evidence.status != 'verified')
+              const PopupMenuItem(
+                value: 'verify',
+                child: Row(
+                  children: [
+                    Icon(Icons.verified),
+                    SizedBox(width: 8),
+                    Text('Verifizieren'),
+                  ],
+                ),
               ),
-            ),
             const PopupMenuItem(
               value: 'delete',
               child: Row(
@@ -390,7 +445,16 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
           context,
           'Beweismittel verifiziert',
         );
-        _loadEvidence(); // Liste neu laden
+        // Sofortige UI-Aktualisierung
+        setState(() {
+          final index = _evidenceItems.indexWhere((e) => e.id == evidence.id);
+          if (index != -1) {
+            _evidenceItems[index] = _evidenceItems[index].copyWith(
+              status: 'verified',
+              notes: 'Verifiziert von Demo User am ${DateTime.now()}',
+            );
+          }
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -429,9 +493,13 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
         if (mounted) {
           SnackBarUtils.showSuccess(
             context,
-            'Beweismittel gelöscht',
+            'Beweismittel erfolgreich gelöscht',
           );
-          _loadEvidence(); // Liste neu laden
+          // Sofortige UI-Aktualisierung
+          setState(() {
+            _evidenceItems.removeWhere((e) => e.id == evidence.id);
+            _filteredItems.removeWhere((e) => e.id == evidence.id);
+          });
         }
       } catch (e) {
         if (mounted) {

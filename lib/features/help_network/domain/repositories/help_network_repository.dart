@@ -11,45 +11,39 @@ abstract class HelpNetworkRepository {
   Future<List<HelpRequest>> getHelpRequestsByStatus(String status);
   Future<List<HelpRequest>> getHelpRequestsByUser(String userId);
   Future<List<HelpRequest>> searchHelpRequests(String query);
-  Future<HelpRequest?> getHelpRequestById(String id);
-  Future<void> createHelpRequest(HelpRequest request);
-  Future<void> updateHelpRequest(HelpRequest request);
-  Future<void> deleteHelpRequest(String id);
-  Future<void> acceptHelpOffer(String requestId, String offerId);
-  Future<void> rejectHelpOffer(String requestId, String offerId);
-  Future<void> completeHelpRequest(String id);
+  Future<HelpRequest?> getHelpRequest(String id);
+  Future<HelpRequest> createHelpRequest(HelpRequest request);
+  Future<HelpRequest> updateHelpRequest(HelpRequest request);
+  Future<bool> deleteHelpRequest(String id);
 
   // Hilfe-Angebote
-  Future<List<HelpOffer>> getHelpOffersByRequest(String requestId);
-  Future<List<HelpOffer>> getHelpOffersByUser(String userId);
+  Future<List<HelpOffer>> getAllHelpOffers();
+  Future<List<HelpOffer>> getHelpOffersByRequest(String helpRequestId);
+  Future<List<HelpOffer>> getHelpOffersByHelper(String helperId);
   Future<List<HelpOffer>> getHelpOffersByStatus(String status);
-  Future<HelpOffer?> getHelpOfferById(String id);
-  Future<void> createHelpOffer(HelpOffer offer);
-  Future<void> updateHelpOffer(HelpOffer offer);
-  Future<void> deleteHelpOffer(String id);
-  Future<void> rateHelpOffer(String offerId, double rating, String? review);
+  Future<HelpOffer?> getHelpOffer(String id);
+  Future<HelpOffer> createHelpOffer(HelpOffer offer);
+  Future<HelpOffer> updateHelpOffer(HelpOffer offer);
+  Future<bool> deleteHelpOffer(String id);
+  Future<bool> acceptHelpOffer(String offerId);
+  Future<bool> rejectHelpOffer(String offerId);
 
   // Chat-Funktionalität
-  Future<List<HelpChat>> getChatMessages(String requestId);
-  Future<void> sendChatMessage(HelpChat message);
-  Future<void> markMessageAsRead(String messageId);
-  Future<void> deleteChatMessage(String messageId);
+  Future<List<HelpChat>> getChatMessages(String helpRequestId);
+  Future<HelpChat> sendChatMessage(HelpChat message);
+  Future<bool> markChatMessageAsRead(String messageId);
 
-  // Statistiken und Analytics
-  Future<Map<String, dynamic>> getHelpNetworkStats();
-  Future<List<Map<String, dynamic>>> getTopHelpers();
-  Future<List<Map<String, dynamic>>> getHelpCategories();
-  Future<Map<String, dynamic>> getUserHelpStats(String userId);
+  // Statistiken
+  Future<Map<String, dynamic>> generateHelpStatistics();
 
   // Benachrichtigungen
-  Future<void> sendHelpRequestNotification(String requestId, String message);
-  Future<void> sendHelpOfferNotification(String offerId, String message);
   Future<List<Map<String, dynamic>>> getUserNotifications(String userId);
-  Future<void> markNotificationAsRead(String notificationId);
+  Future<bool> markNotificationAsRead(String notificationId);
+  Future<bool> sendPushNotification(String userId, String title, String message);
 
   // Backup und Export
-  Future<String> exportHelpData(String userId, {String format = 'json'});
-  Future<void> importHelpData(String data, {String format = 'json'});
-  Future<void> backupHelpNetwork();
-  Future<void> restoreHelpNetwork(String backupId);
+  Future<Map<String, dynamic>> exportHelpData();
+  Future<bool> importHelpData(Map<String, dynamic> data);
+  Future<Map<String, dynamic>> createBackup();
+  Future<bool> restoreBackup(Map<String, dynamic> backup);
 }

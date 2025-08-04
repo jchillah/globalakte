@@ -8,6 +8,7 @@ import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/entities/pdf_document.dart';
 import '../../domain/entities/pdf_template.dart';
 import '../../domain/repositories/pdf_generator_repository.dart';
+import 'pdf_mock_data_repository.dart';
 
 /// Repository-Implementation für PDF-Generator
 class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
@@ -15,6 +16,7 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   final List<PdfDocument> _documents = [];
   final List<PdfTemplate> _templates = [];
   final MockDataRepository _mockData = MockDataRepository();
+  final PdfMockDataRepository _pdfMockData = PdfMockDataRepository();
   final Random _random = Random();
 
   PdfGeneratorRepositoryImpl() {
@@ -22,8 +24,8 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   }
 
   void _initializeMockData() {
-    // Templates aus zentralem Mock-Data-Repository laden
-    final templatesData = _mockData.pdfTemplates;
+    // Templates aus PDF Mock-Data Repository laden
+    final templatesData = _pdfMockData.templates;
     _templates.addAll([
       PdfTemplate(
         id: templatesData['legal_letter']!['id'] as String,
@@ -31,9 +33,12 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
         description: templatesData['legal_letter']!['description'] as String,
         templateType: templatesData['legal_letter']!['templateType'] as String,
         htmlTemplate: templatesData['legal_letter']!['htmlTemplate'] as String,
-        defaultData: Map<String, dynamic>.from(templatesData['legal_letter']!['defaultData'] as Map),
-        requiredFields: List<String>.from(templatesData['legal_letter']!['requiredFields'] as List),
-        optionalFields: List<String>.from(templatesData['legal_letter']!['optionalFields'] as List),
+        defaultData: Map<String, dynamic>.from(
+            templatesData['legal_letter']!['defaultData'] as Map),
+        requiredFields: List<String>.from(
+            templatesData['legal_letter']!['requiredFields'] as List),
+        optionalFields: List<String>.from(
+            templatesData['legal_letter']!['optionalFields'] as List),
         createdAt: DateTime.now(),
         category: templatesData['legal_letter']!['category'] as String,
         version: templatesData['legal_letter']!['version'] as String,
@@ -44,9 +49,12 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
         description: templatesData['contract']!['description'] as String,
         templateType: templatesData['contract']!['templateType'] as String,
         htmlTemplate: templatesData['contract']!['htmlTemplate'] as String,
-        defaultData: Map<String, dynamic>.from(templatesData['contract']!['defaultData'] as Map),
-        requiredFields: List<String>.from(templatesData['contract']!['requiredFields'] as List),
-        optionalFields: List<String>.from(templatesData['contract']!['optionalFields'] as List),
+        defaultData: Map<String, dynamic>.from(
+            templatesData['contract']!['defaultData'] as Map),
+        requiredFields: List<String>.from(
+            templatesData['contract']!['requiredFields'] as List),
+        optionalFields: List<String>.from(
+            templatesData['contract']!['optionalFields'] as List),
         createdAt: DateTime.now(),
         category: templatesData['contract']!['category'] as String,
         version: templatesData['contract']!['version'] as String,
@@ -57,24 +65,28 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
         description: templatesData['application']!['description'] as String,
         templateType: templatesData['application']!['templateType'] as String,
         htmlTemplate: templatesData['application']!['htmlTemplate'] as String,
-        defaultData: Map<String, dynamic>.from(templatesData['application']!['defaultData'] as Map),
-        requiredFields: List<String>.from(templatesData['application']!['requiredFields'] as List),
-        optionalFields: List<String>.from(templatesData['application']!['optionalFields'] as List),
+        defaultData: Map<String, dynamic>.from(
+            templatesData['application']!['defaultData'] as Map),
+        requiredFields: List<String>.from(
+            templatesData['application']!['requiredFields'] as List),
+        optionalFields: List<String>.from(
+            templatesData['application']!['optionalFields'] as List),
         createdAt: DateTime.now(),
         category: templatesData['application']!['category'] as String,
         version: templatesData['application']!['version'] as String,
       ),
     ]);
 
-    // Dokumente aus zentralem Mock-Data-Repository laden
-    final documentsData = _mockData.pdfDocuments;
+    // Dokumente aus PDF Mock-Data Repository laden
+    final documentsData = _pdfMockData.documents;
     _documents.addAll([
       PdfDocument(
         id: documentsData[0]['id'] as String,
         title: documentsData[0]['title'] as String,
         content: documentsData[0]['content'] as String,
         templateType: documentsData[0]['templateType'] as String,
-        metadata: Map<String, dynamic>.from(documentsData[0]['metadata'] as Map),
+        metadata:
+            Map<String, dynamic>.from(documentsData[0]['metadata'] as Map),
         createdAt: documentsData[0]['createdAt'] as DateTime,
         author: documentsData[0]['author'] as String,
         tags: List<String>.from(documentsData[0]['tags'] as List),
@@ -84,7 +96,8 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
         title: documentsData[1]['title'] as String,
         content: documentsData[1]['content'] as String,
         templateType: documentsData[1]['templateType'] as String,
-        metadata: Map<String, dynamic>.from(documentsData[1]['metadata'] as Map),
+        metadata:
+            Map<String, dynamic>.from(documentsData[1]['metadata'] as Map),
         createdAt: documentsData[1]['createdAt'] as DateTime,
         author: documentsData[1]['author'] as String,
         tags: List<String>.from(documentsData[1]['tags'] as List),
@@ -103,7 +116,11 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   @override
   Future<PdfDocument?> getPdfDocument(String id) async {
     await Future.delayed(Duration(milliseconds: 200 + _random.nextInt(300)));
-    return _documents.firstWhere((doc) => doc.id == id);
+    try {
+      return _documents.firstWhere((doc) => doc.id == id);
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -138,7 +155,8 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   }
 
   @override
-  Future<List<PdfDocument>> getPdfDocumentsByTemplateType(String templateType) async {
+  Future<List<PdfDocument>> getPdfDocumentsByTemplateType(
+      String templateType) async {
     await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
     return _documents.where((doc) => doc.templateType == templateType).toList();
   }
@@ -152,18 +170,21 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   @override
   Future<List<PdfDocument>> getPdfDocumentsByTags(List<String> tags) async {
     await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
-    return _documents.where((doc) => 
-        doc.tags.any((tag) => tags.contains(tag))).toList();
+    return _documents
+        .where((doc) => doc.tags.any((tag) => tags.contains(tag)))
+        .toList();
   }
 
   @override
   Future<List<PdfDocument>> searchPdfDocuments(String query) async {
     await Future.delayed(Duration(milliseconds: 400 + _random.nextInt(500)));
     final lowercaseQuery = query.toLowerCase();
-    return _documents.where((doc) => 
-        doc.title.toLowerCase().contains(lowercaseQuery) ||
-        doc.content.toLowerCase().contains(lowercaseQuery) ||
-        doc.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery))).toList();
+    return _documents
+        .where((doc) =>
+            doc.title.toLowerCase().contains(lowercaseQuery) ||
+            doc.content.toLowerCase().contains(lowercaseQuery) ||
+            doc.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery)))
+        .toList();
   }
 
   @override
@@ -223,13 +244,17 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   @override
   Future<List<PdfTemplate>> getPdfTemplatesByCategory(String category) async {
     await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
-    return _templates.where((template) => template.category == category).toList();
+    return _templates
+        .where((template) => template.category == category)
+        .toList();
   }
 
   @override
   Future<List<PdfTemplate>> getPdfTemplatesByType(String templateType) async {
     await Future.delayed(Duration(milliseconds: 300 + _random.nextInt(400)));
-    return _templates.where((template) => template.templateType == templateType).toList();
+    return _templates
+        .where((template) => template.templateType == templateType)
+        .toList();
   }
 
   @override
@@ -239,14 +264,14 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   ) async {
     await Future.delayed(Duration(milliseconds: 1000 + _random.nextInt(2000)));
     AppLogger.info('PDF aus Template generiert: $templateId');
-    
-    // Simuliere PDF-Generierung
+
+    // Simuliere PDF-Generierung mit verbesserter Datenübertragung
     final template = await getPdfTemplate(templateId);
     if (template == null) {
       throw Exception('Template nicht gefunden: $templateId');
     }
 
-    // HTML aus Template generieren
+    // HTML aus Template mit eingegebenen Daten generieren
     String html = template.htmlTemplate;
     for (final entry in data.entries) {
       final placeholder = '{{${entry.key}}}';
@@ -254,52 +279,50 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
       html = html.replaceAll(placeholder, value);
     }
 
-    // Simuliere PDF-Bytes (in echtem Fall würde hier PDF-Generierung stattfinden)
-    return Uint8List.fromList(List.generate(1000, (index) => _random.nextInt(256)));
+    // Standard-Variablen ersetzen
+    final now = DateTime.now();
+    html = html.replaceAll(
+        '{{currentDate}}', '${now.day}.${now.month}.${now.year}');
+    html = html.replaceAll('{{currentTime}}',
+        '${now.hour}:${now.minute.toString().padLeft(2, '0')}');
+
+    // PDF-Bytes basierend auf generiertem HTML simulieren
+    final contentLength = html.length;
+    final pdfBytes =
+        List.generate(800 + contentLength, (index) => _random.nextInt(256));
+
+    AppLogger.info(
+        'PDF generiert mit ${data.length} Datenfeldern und $contentLength Zeichen Inhalt');
+    return Uint8List.fromList(pdfBytes);
   }
 
   @override
   Future<Uint8List> generatePdfFromHtml(String html) async {
     await Future.delayed(Duration(milliseconds: 800 + _random.nextInt(1500)));
     AppLogger.info('PDF aus HTML generiert');
-    
+
     // Simuliere PDF-Generierung aus HTML
-    return Uint8List.fromList(List.generate(800, (index) => _random.nextInt(256)));
+    final contentLength = html.length;
+    final pdfBytes =
+        List.generate(600 + contentLength, (index) => _random.nextInt(256));
+    return Uint8List.fromList(pdfBytes);
   }
 
   @override
-  Future<String> generatePdfPreview(String templateId, Map<String, dynamic> data) async {
+  Future<String> generatePdfPreview(
+      String templateId, Map<String, dynamic> data) async {
     await Future.delayed(Duration(milliseconds: 500 + _random.nextInt(1000)));
     AppLogger.info('PDF-Vorschau generiert: $templateId');
-    
-    // Simuliere HTML-Vorschau
-    return '''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>PDF-Vorschau</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .preview { border: 1px solid #ccc; padding: 20px; }
-    </style>
-</head>
-<body>
-    <div class="preview">
-        <h2>PDF-Vorschau</h2>
-        <p>Template: $templateId</p>
-        <p>Daten: ${data.toString()}</p>
-        <p>Dies ist eine Vorschau des generierten PDF-Dokuments.</p>
-    </div>
-</body>
-</html>
-    ''';
+
+    // Verwende das PDF Mock-Data Repository für bessere Vorschau
+    return _pdfMockData.generatePreview(templateId, data);
   }
 
   @override
   Future<String> exportPdfDocument(String documentId, String format) async {
     await Future.delayed(Duration(milliseconds: 600 + _random.nextInt(1000)));
     AppLogger.info('PDF-Dokument exportiert: $documentId ($format)');
-    
+
     // Simuliere Export-Pfad
     return '/exports/document_${documentId}_${DateTime.now().millisecondsSinceEpoch}.$format';
   }
@@ -329,25 +352,26 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   Future<Map<String, dynamic>> generatePdfStatistics() async {
     await Future.delayed(Duration(milliseconds: 500 + _random.nextInt(800)));
     AppLogger.info('PDF-Statistiken generiert');
-    
-    return {
-      'totalDocuments': _documents.length,
-      'totalTemplates': _templates.length,
-      'documentsByType': {
-        'legal_letter': _documents.where((d) => d.templateType == 'legal_letter').length,
-        'contract': _documents.where((d) => d.templateType == 'contract').length,
-        'application': _documents.where((d) => d.templateType == 'application').length,
-      },
-      'templatesByCategory': {
-        'Recht': _templates.where((t) => t.category == 'Recht').length,
-        'Vertrag': _templates.where((t) => t.category == 'Vertrag').length,
-        'Antrag': _templates.where((t) => t.category == 'Antrag').length,
-      },
-      'recentDocuments': _documents
-          .take(5)
-          .map((d) => {'id': d.id, 'title': d.title, 'createdAt': d.formattedCreatedAt})
-          .toList(),
-    };
+
+    // Verwende das PDF Mock-Data Repository für bessere Statistiken
+    final documentsData = _documents
+        .map((doc) => {
+              'id': doc.id,
+              'title': doc.title,
+              'templateType': doc.templateType,
+              'createdAt': doc.createdAt,
+            })
+        .toList();
+
+    final templatesData = _templates
+        .map((template) => {
+              'id': template.id,
+              'name': template.name,
+              'category': template.category,
+            })
+        .toList();
+
+    return _pdfMockData.generateStatistics(documentsData, templatesData);
   }
 
   @override
@@ -363,4 +387,4 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
     AppLogger.info('PDF-Dokumente wiederhergestellt: $backupPath');
     return true;
   }
-} 
+}

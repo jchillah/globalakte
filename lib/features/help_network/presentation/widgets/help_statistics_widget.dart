@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_config.dart';
+import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/usecases/help_network_usecases.dart';
 
 /// Widget für Statistiken im Hilfe-Netzwerk
@@ -18,9 +19,9 @@ class HelpStatisticsWidget extends StatefulWidget {
 }
 
 class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
-  Map<String, dynamic>? _stats;
-  List<Map<String, dynamic>> _topHelpers = [];
-  List<Map<String, dynamic>> _categories = [];
+  Map<String, dynamic>? _statistics;
+  final List<Map<String, dynamic>> _topHelpers = [];
+  final List<Map<String, dynamic>> _categories = [];
   bool _isLoading = true;
 
   @override
@@ -31,23 +32,18 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
 
   Future<void> _loadStatistics() async {
     setState(() => _isLoading = true);
-    try {
-      final stats = await widget.useCases.getHelpNetworkStats();
-      final topHelpers = await widget.useCases.getTopHelpers();
-      final categories = await widget.useCases.getHelpCategories();
 
+    try {
+      final stats = await widget.useCases.generateHelpStatistics();
       setState(() {
-        _stats = stats;
-        _topHelpers = topHelpers;
-        _categories = categories;
+        _statistics = stats;
         _isLoading = false;
       });
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fehler beim Laden der Statistiken: $e')),
-        );
+        SnackBarUtils.showError(
+            context, 'Fehler beim Laden der Statistiken: $e');
       }
     }
   }
@@ -73,12 +69,11 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
             ],
           ),
           const SizedBox(height: 24),
-
           if (_isLoading)
             const Center(child: CircularProgressIndicator())
           else ...[
             // Übersichtskarten
-            if (_stats != null) _buildOverviewCards(),
+            if (_statistics != null) _buildOverviewCards(),
 
             const SizedBox(height: 24),
 
@@ -106,25 +101,25 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
       children: [
         _buildStatCard(
           'Gesamt Anfragen',
-          _stats!['total_requests'].toString(),
+          _statistics!['total_requests'].toString(),
           Icons.list,
           Colors.blue,
         ),
         _buildStatCard(
           'Offene Anfragen',
-          _stats!['open_requests'].toString(),
+          _statistics!['open_requests'].toString(),
           Icons.pending,
           Colors.orange,
         ),
         _buildStatCard(
           'Abgeschlossen',
-          _stats!['completed_requests'].toString(),
+          _statistics!['completed_requests'].toString(),
           Icons.check_circle,
           Colors.green,
         ),
         _buildStatCard(
           'Aktive Helfer',
-          _stats!['active_helpers'].toString(),
+          _statistics!['active_helpers'].toString(),
           Icons.people,
           Colors.purple,
         ),
@@ -132,7 +127,8 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -145,9 +141,9 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
             Text(
               value,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
             ),
             const SizedBox(height: 4),
             Text(
@@ -183,11 +179,13 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
                   backgroundColor: AppConfig.primaryColor,
                   child: Text(
                     helper['helperName'][0].toUpperCase(),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
                 title: Text(helper['helperName']),
-                subtitle: Text('${helper['acceptedOffers']} angenommene Angebote'),
+                subtitle:
+                    Text('${helper['acceptedOffers']} angenommene Angebote'),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -223,7 +221,7 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
             final totalRequests = category['totalRequests'] as int;
             final openRequests = category['openRequests'] as int;
             final completedRequests = category['completedRequests'] as int;
-            
+
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: Padding(
@@ -246,9 +244,12 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
                     ),
                     const SizedBox(height: 8),
                     LinearProgressIndicator(
-                      value: totalRequests > 0 ? completedRequests / totalRequests : 0,
+                      value: totalRequests > 0
+                          ? completedRequests / totalRequests
+                          : 0,
                       backgroundColor: Colors.grey.shade300,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppConfig.primaryColor),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppConfig.primaryColor),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -267,4 +268,4 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
       ],
     );
   }
-} 
+}

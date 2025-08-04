@@ -176,9 +176,9 @@ Mieter: _________________
                       _buildAnalysisSection(
                         'Statistiken',
                         [
-                          'Wörter: ${_analysisResult!['word_count']}',
-                          'Absätze: ${_analysisResult!['paragraph_count']}',
-                          'Vertrauenswert: ${(_analysisResult!['confidence_score'] * 100).toStringAsFixed(1)}%',
+                          'Wörter: ${_analysisResult!['word_count'] ?? 'N/A'}',
+                          'Absätze: ${_analysisResult!['paragraph_count'] ?? 'N/A'}',
+                          'Vertrauenswert: ${_analysisResult!['confidence_score'] != null ? (_analysisResult!['confidence_score'] * 100).toStringAsFixed(1) : 'N/A'}%',
                         ],
                       ),
 
@@ -188,8 +188,9 @@ Mieter: _________________
                       if (_analysisResult!['legal_terms'] != null)
                         _buildAnalysisSection(
                           'Rechtliche Begriffe',
-                          (_analysisResult!['legal_terms'] as List)
-                              .cast<String>(),
+                          (_analysisResult!['legal_terms'] as List?)
+                                  ?.cast<String>() ??
+                              [],
                         ),
 
                       const SizedBox(height: 16),
@@ -198,8 +199,9 @@ Mieter: _________________
                       if (_analysisResult!['recommendations'] != null)
                         _buildAnalysisSection(
                           'Empfehlungen',
-                          (_analysisResult!['recommendations'] as List)
-                              .cast<String>(),
+                          (_analysisResult!['recommendations'] as List?)
+                                  ?.cast<String>() ??
+                              [],
                           icon: Icons.lightbulb,
                           color: Colors.orange,
                         ),
