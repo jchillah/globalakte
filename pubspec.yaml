@@ -57,6 +57,11 @@ dependencies:
   # HTTP-Client für API-Calls
   http: ^1.2.0
 
+  # PDF-Generator & Drucken
+  pdf: ^3.10.7
+  printing: ^5.11.1
+  share_plus: ^7.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

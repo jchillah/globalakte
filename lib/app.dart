@@ -9,6 +9,7 @@ import 'features/appointment/presentation/screens/appointment_demo_screen.dart';
 import 'features/authentication/presentation/screens/register_screen.dart';
 import 'features/case_timeline/presentation/screens/case_files_demo_screen.dart';
 import 'features/communication/presentation/screens/communication_demo_screen.dart';
+import 'features/document_generator/presentation/screens/pdf_generator_demo_screen.dart';
 import 'features/document_management/presentation/screens/document_management_demo_screen.dart';
 import 'features/encryption/presentation/screens/encryption_demo_screen.dart';
 import 'features/epa_integration/presentation/screens/epa_integration_demo_screen.dart';
@@ -76,6 +77,7 @@ class GlobalAkteApp extends StatelessWidget {
         '/appointment-demo': (context) => const AppointmentDemoScreen(),
         '/case-files-demo': (context) => const CaseFilesDemoScreen(),
         '/epa-integration-demo': (context) => const EpaIntegrationDemoScreen(),
+        '/pdf-generator-demo': (context) => const PdfGeneratorDemoScreen(),
       },
       debugShowCheckedModeBanner: false,
       // ScaffoldMessenger für bessere SnackBar-Unterstützung

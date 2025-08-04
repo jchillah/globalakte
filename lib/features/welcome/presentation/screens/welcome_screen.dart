@@ -73,6 +73,8 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: AppConfig.defaultPadding),
                 _buildEpaIntegrationDemoButton(context),
                 const SizedBox(height: AppConfig.defaultPadding),
+                _buildPdfGeneratorDemoButton(context),
+                const SizedBox(height: AppConfig.defaultPadding),
               ],
 
               // Version Info
@@ -534,6 +536,27 @@ class WelcomeScreen extends StatelessWidget {
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.purple,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppConfig.largePadding,
+          vertical: AppConfig.defaultPadding,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPdfGeneratorDemoButton(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: () => Navigator.pushNamed(context, '/pdf-generator-demo'),
+      icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+      label: const Text(
+        'PDF-Generator Demo',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.red,
         padding: const EdgeInsets.symmetric(
           horizontal: AppConfig.largePadding,
           vertical: AppConfig.defaultPadding,
