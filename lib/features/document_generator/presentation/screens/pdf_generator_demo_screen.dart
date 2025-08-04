@@ -126,36 +126,103 @@ class _PdfGeneratorDemoScreenState extends State<PdfGeneratorDemoScreen>
   void _showPdfPreview(Uint8List pdfBytes) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('PDF-Vorschau'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('PDF wurde erfolgreich generiert!'),
-            const SizedBox(height: AppConfig.defaultPadding),
-            Text('Größe: ${pdfBytes.length} Bytes'),
-            const SizedBox(height: AppConfig.defaultPadding),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GlobalButton(
-                  onPressed: () => _sharePdf(pdfBytes),
-                  text: 'Teilen',
+      builder: (context) => Dialog(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.7,
+          padding: const EdgeInsets.all(AppConfig.defaultPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'PDF-Vorschau',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppConfig.defaultPadding),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppConfig.defaultPadding),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'PDF wurde erfolgreich generiert!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                      const SizedBox(height: AppConfig.defaultPadding),
+                      Text('Größe: ${pdfBytes.length} Bytes'),
+                      const SizedBox(height: AppConfig.defaultPadding),
+                      const Text(
+                        'PDF-Vorschau:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: AppConfig.smallPadding),
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(AppConfig.defaultPadding),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: const SingleChildScrollView(
+                            child: Text(
+                              'Dies ist eine Vorschau des generierten PDF-Dokuments.\n\n'
+                              'In einer echten Implementierung würde hier das PDF angezeigt werden.',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                GlobalButton(
-                  onPressed: () => _printPdf(pdfBytes),
-                  text: 'Drucken',
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Schließen'),
+              ),
+              const SizedBox(height: AppConfig.defaultPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: GlobalButton(
+                      onPressed: () => _sharePdf(pdfBytes),
+                      text: 'Teilen',
+                    ),
+                  ),
+                  const SizedBox(width: AppConfig.defaultPadding),
+                  Expanded(
+                    child: GlobalButton(
+                      onPressed: () => _printPdf(pdfBytes),
+                      text: 'Drucken',
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -672,40 +739,64 @@ class _PdfGeneratorDemoScreenState extends State<PdfGeneratorDemoScreen>
   void _showDocumentDetails(PdfDocument document) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(document.title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Typ: ${_getDocumentTypeName(document.templateType)}'),
-            Text('Autor: ${document.author ?? 'Unbekannt'}'),
-            Text('Erstellt: ${document.formattedCreatedAt}'),
-            if (document.updatedAt != null)
-              Text('Aktualisiert: ${document.formattedUpdatedAt}'),
-            if (document.tags.isNotEmpty)
-              Text('Tags: ${document.tags.join(', ')}'),
-            const SizedBox(height: AppConfig.defaultPadding),
-            const Text('Inhalt:'),
-            Container(
-              padding: const EdgeInsets.all(AppConfig.defaultPadding),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+      builder: (context) => Dialog(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.8,
+          padding: const EdgeInsets.all(AppConfig.defaultPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      document.title,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
               ),
-              child: Text(
-                document.content,
-                style: Theme.of(context).textTheme.bodySmall,
+              const SizedBox(height: AppConfig.defaultPadding),
+              Text('Typ: ${_getDocumentTypeName(document.templateType)}'),
+              Text('Autor: ${document.author ?? 'Unbekannt'}'),
+              Text('Erstellt: ${document.formattedCreatedAt}'),
+              if (document.updatedAt != null)
+                Text('Aktualisiert: ${document.formattedUpdatedAt}'),
+              if (document.tags.isNotEmpty)
+                Text('Tags: ${document.tags.join(', ')}'),
+              const SizedBox(height: AppConfig.defaultPadding),
+              const Text('Inhalt:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: AppConfig.smallPadding),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppConfig.defaultPadding),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      document.content,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontFamily: 'monospace',
+                          ),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Schließen'),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -713,31 +804,117 @@ class _PdfGeneratorDemoScreenState extends State<PdfGeneratorDemoScreen>
   void _showTemplatePreview(PdfTemplate template) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Template: ${template.name}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Beschreibung: ${template.description}'),
-            Text('Typ: ${_getTemplateTypeName(template.templateType)}'),
-            Text('Kategorie: ${template.displayCategory}'),
-            Text('Status: ${template.statusText}'),
-            Text('Version: ${template.version ?? '1.0'}'),
-            const SizedBox(height: AppConfig.defaultPadding),
-            const Text('Erforderliche Felder:'),
-            Text(template.requiredFields.join(', ')),
-            if (template.optionalFields.isNotEmpty) ...[
-              const SizedBox(height: AppConfig.smallPadding),
-              const Text('Optionale Felder:'),
-              Text(template.optionalFields.join(', ')),
+      builder: (context) => Dialog(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.8,
+          padding: const EdgeInsets.all(AppConfig.defaultPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Template: ${template.name}',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppConfig.defaultPadding),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildInfoRow('Beschreibung', template.description),
+                      _buildInfoRow('Typ', _getTemplateTypeName(template.templateType)),
+                      _buildInfoRow('Kategorie', template.displayCategory),
+                      _buildInfoRow('Status', template.statusText),
+                      _buildInfoRow('Version', template.version ?? '1.0'),
+                      const SizedBox(height: AppConfig.defaultPadding),
+                      const Text(
+                        'Erforderliche Felder:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: AppConfig.smallPadding),
+                      Wrap(
+                        spacing: 4,
+                        children: template.requiredFields.map((field) => Chip(
+                          label: Text(field),
+                          backgroundColor: Colors.red.withValues(alpha: 0.1),
+                        )).toList(),
+                      ),
+                      if (template.optionalFields.isNotEmpty) ...[
+                        const SizedBox(height: AppConfig.defaultPadding),
+                        const Text(
+                          'Optionale Felder:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: AppConfig.smallPadding),
+                        Wrap(
+                          spacing: 4,
+                          children: template.optionalFields.map((field) => Chip(
+                            label: Text(field),
+                            backgroundColor: Colors.blue.withValues(alpha: 0.1),
+                          )).toList(),
+                        ),
+                      ],
+                      const SizedBox(height: AppConfig.defaultPadding),
+                      const Text(
+                        'HTML-Template:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: AppConfig.smallPadding),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppConfig.defaultPadding),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Text(
+                          template.htmlTemplate,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontFamily: 'monospace',
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
-          ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Schließen'),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppConfig.smallPadding),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: Text(value),
           ),
         ],
       ),
