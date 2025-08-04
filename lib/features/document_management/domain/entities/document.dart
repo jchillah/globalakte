@@ -6,6 +6,7 @@ class Document {
   final String description;
   final String filePath;
   final String fileType;
+  final DocumentType documentType;
   final int fileSize;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -23,6 +24,7 @@ class Document {
     required this.description,
     required this.filePath,
     required this.fileType,
+    required this.documentType,
     required this.fileSize,
     required this.createdAt,
     this.updatedAt,
@@ -42,6 +44,7 @@ class Document {
     String? description,
     String? filePath,
     String? fileType,
+    DocumentType? documentType,
     int? fileSize,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -59,6 +62,7 @@ class Document {
       description: description ?? this.description,
       filePath: filePath ?? this.filePath,
       fileType: fileType ?? this.fileType,
+      documentType: documentType ?? this.documentType,
       fileSize: fileSize ?? this.fileSize,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -80,6 +84,7 @@ class Document {
       'description': description,
       'filePath': filePath,
       'fileType': fileType,
+      'documentType': documentType.name,
       'fileSize': fileSize,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'updatedAt': updatedAt?.millisecondsSinceEpoch,
@@ -101,6 +106,10 @@ class Document {
       description: map['description'] ?? '',
       filePath: map['filePath'] ?? '',
       fileType: map['fileType'] ?? '',
+      documentType: DocumentType.values.firstWhere(
+        (e) => e.name == map['documentType'],
+        orElse: () => DocumentType.other,
+      ),
       fileSize: map['fileSize']?.toInt() ?? 0,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
       updatedAt: map['updatedAt'] != null
@@ -149,6 +158,24 @@ enum DocumentCategory {
   contract, // Verträge
   certificate, // Zertifikate
   other, // Sonstiges
+}
+
+/// Dokumententypen für bessere Kategorisierung
+enum DocumentType {
+  pdf('PDF', 'application/pdf', '.pdf'),
+  image('Bild', 'image/*', '.jpg,.jpeg,.png,.gif'),
+  text('Text', 'text/plain', '.txt'),
+  word('Word', 'application/msword', '.doc,.docx'),
+  excel('Excel', 'application/vnd.ms-excel', '.xls,.xlsx'),
+  audio('Audio', 'audio/*', '.mp3,.wav,.aac'),
+  video('Video', 'video/*', '.mp4,.avi,.mov'),
+  archive('Archiv', 'application/zip', '.zip,.rar,.7z'),
+  other('Sonstiges', 'application/octet-stream', '');
+
+  const DocumentType(this.displayName, this.mimeType, this.extensions);
+  final String displayName;
+  final String mimeType;
+  final String extensions;
 }
 
 /// Status eines Dokuments

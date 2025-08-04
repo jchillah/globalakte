@@ -277,6 +277,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
         description: 'Importiertes Dokument: $fileName',
         filePath: filePath,
         fileType: fileName.split('.').last,
+        documentType: _getDocumentTypeFromFileName(fileName),
         fileSize: fileSize,
         createdAt: DateTime.now(),
         createdBy: userId,
@@ -473,6 +474,39 @@ class DocumentRepositoryImpl implements DocumentRepository {
     } catch (e) {
       debugPrint('Fehler beim Speichern der Dokumente: $e');
       rethrow;
+    }
+  }
+
+  DocumentType _getDocumentTypeFromFileName(String fileName) {
+    final extension = fileName.split('.').last.toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return DocumentType.pdf;
+      case 'doc':
+      case 'docx':
+        return DocumentType.word;
+      case 'xls':
+      case 'xlsx':
+        return DocumentType.excel;
+      case 'ppt':
+      case 'pptx':
+        return DocumentType.other;
+      case 'txt':
+        return DocumentType.text;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return DocumentType.image;
+      case 'mp3':
+      case 'wav':
+        return DocumentType.audio;
+      case 'mp4':
+      case 'avi':
+      case 'mov':
+        return DocumentType.video;
+      default:
+        return DocumentType.other;
     }
   }
 }

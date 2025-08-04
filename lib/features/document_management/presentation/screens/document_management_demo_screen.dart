@@ -106,6 +106,7 @@ class _DocumentManagementDemoScreenState
         description: 'Ein Demo-Dokument für Testzwecke',
         filePath: '/demo/path/document_${_documents.length + 1}.pdf',
         fileType: 'pdf',
+        documentType: DocumentType.pdf,
         fileSize: 1024 * 1024, // 1MB
         createdAt: DateTime.now(),
         createdBy: 'demo_user',
