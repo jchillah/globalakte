@@ -1,7 +1,6 @@
 // features/help_network/presentation/widgets/help_request_list_widget.dart
 import 'package:flutter/material.dart';
 
-import '../../../../core/app_config.dart';
 import '../../domain/entities/help_request.dart';
 import '../../domain/usecases/help_network_usecases.dart';
 
@@ -182,7 +181,8 @@ class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
         setState(() => _selectedFilter = value);
         _filterRequests(value);
       },
-      selectedColor: AppConfig.primaryColor.withValues(alpha: 0.2),
+      selectedColor:
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
     );
   }
 
@@ -205,9 +205,12 @@ class _HelpRequestListWidgetState extends State<HelpRequestListWidget> {
               children: [
                 Chip(
                   label: Text(request.category),
-                  backgroundColor:
-                      AppConfig.primaryColor.withValues(alpha: 0.1),
-                  labelStyle: TextStyle(color: AppConfig.primaryColor),
+                  backgroundColor: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.1),
+                  labelStyle:
+                      TextStyle(color: Theme.of(context).colorScheme.primary),
                 ),
                 const SizedBox(width: 8),
                 Chip(

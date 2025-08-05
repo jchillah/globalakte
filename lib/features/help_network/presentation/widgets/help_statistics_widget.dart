@@ -1,7 +1,6 @@
 // features/help_network/presentation/widgets/help_statistics_widget.dart
 import 'package:flutter/material.dart';
 
-import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/usecases/help_network_usecases.dart';
 
@@ -176,11 +175,12 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: AppConfig.primaryColor,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   child: Text(
                     helper['helperName'][0].toUpperCase(),
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
                 title: Text(helper['helperName']),
@@ -248,8 +248,8 @@ class _HelpStatisticsWidgetState extends State<HelpStatisticsWidget> {
                           ? completedRequests / totalRequests
                           : 0,
                       backgroundColor: Colors.grey.shade300,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(AppConfig.primaryColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).colorScheme.primary),
                     ),
                     const SizedBox(height: 8),
                     Row(

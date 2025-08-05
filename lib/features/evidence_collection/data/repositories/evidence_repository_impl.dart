@@ -18,68 +18,90 @@ class EvidenceRepositoryImpl implements EvidenceRepository {
   }
 
   void _initializeMockData() {
-    // Mock Beweismittel
+    // Mock Beweismittel mit verschiedenen Verifizierungsstatus
+    final now = DateTime.now();
+
     _evidenceItems.addAll([
-      EvidenceItem.create(
+      EvidenceItem(
+        id: 'evidence_001',
         title: 'Fotos vom Unfallort',
         description: 'Fotografische Dokumentation des Verkehrsunfalls',
         type: 'photo',
         filePath: '/evidence/photos/accident_001.jpg',
+        collectedAt: now,
         collectedBy: 'Polizist Müller',
         location: 'Hauptstraße 123, Berlin',
+        metadata: {},
+        status: 'verified',
         caseId: 'CASE-2024-001',
-        notes: 'Fotos zeigen Schäden am Fahrzeug',
+        notes: 'Verifiziert von Demo User am $now',
       ),
-      EvidenceItem.create(
+      EvidenceItem(
+        id: 'evidence_002',
         title: 'Videoaufnahme Überwachungskamera',
         description: 'Videoaufnahme vom Tatzeitpunkt',
         type: 'video',
         filePath: '/evidence/videos/surveillance_001.mp4',
+        collectedAt: now,
         collectedBy: 'Detektiv Schmidt',
         location: 'Einkaufszentrum, München',
+        metadata: {},
+        status: 'verified',
         caseId: 'CASE-2024-002',
-        notes: 'Zeigt verdächtige Person',
+        notes: 'Verifiziert von Demo User am $now',
       ),
-      EvidenceItem.create(
+      EvidenceItem(
+        id: 'evidence_003',
         title: 'Zeugenaussage',
         description: 'Schriftliche Zeugenaussage von Max Mustermann',
         type: 'document',
         filePath: '/evidence/documents/witness_statement_001.pdf',
+        collectedAt: now,
         collectedBy: 'Anwalt Weber',
         location: 'Kanzlei Weber & Partner',
+        metadata: {},
+        status: 'verified',
         caseId: 'CASE-2024-003',
         notes: 'Wichtige Details zum Tathergang',
       ),
-      EvidenceItem.create(
+      EvidenceItem(
+        id: 'evidence_004',
         title: 'Audioaufnahme Telefonat',
         description: 'Aufnahme eines verdächtigen Telefonats',
         type: 'audio',
         filePath: '/evidence/audio/phone_call_001.wav',
+        collectedAt: now,
         collectedBy: 'Ermittler Klein',
         location: 'Polizeipräsidium Hamburg',
+        metadata: {},
+        status: 'verified',
         caseId: 'CASE-2024-004',
-        notes: 'Enthält belastende Aussagen',
+        notes: 'Verifiziert von Demo User am $now',
       ),
-      EvidenceItem.create(
+      EvidenceItem(
+        id: 'evidence_005',
         title: 'Blutprobe',
         description: 'Blutprobe vom Tatort',
         type: 'physical',
         filePath: '/evidence/physical/blood_sample_001',
+        collectedAt: now,
         collectedBy: 'Kriminaltechniker Fischer',
         location: 'Labor für Forensik',
+        metadata: {},
+        status: 'verified',
         caseId: 'CASE-2024-005',
-        notes: 'DNA-Analyse in Bearbeitung',
+        notes: 'DNA-Analyse in Bearbeitung\nVerifiziert von Demo User am $now',
       ),
     ]);
 
     // Mock Beweismittel-Ketten
     _evidenceChains['CHAIN-001'] = [
-      _evidenceItems[0].id,
-      _evidenceItems[1].id,
+      'evidence_001',
+      'evidence_002',
     ];
     _evidenceChains['CHAIN-002'] = [
-      _evidenceItems[2].id,
-      _evidenceItems[3].id,
+      'evidence_003',
+      'evidence_004',
     ];
   }
 
@@ -244,9 +266,15 @@ class EvidenceRepositoryImpl implements EvidenceRepository {
     await Future.delayed(Duration(milliseconds: 200));
     final index = _evidenceItems.indexWhere((e) => e.id == id);
     if (index != -1) {
-      _evidenceItems[index] = _evidenceItems[index].copyWith(
+      final currentEvidence = _evidenceItems[index];
+      final verificationNote = currentEvidence.notes != null &&
+              currentEvidence.notes!.isNotEmpty
+          ? '${currentEvidence.notes}\nVerifiziert von $verifiedBy am ${DateTime.now()}'
+          : 'Verifiziert von $verifiedBy am ${DateTime.now()}';
+
+      _evidenceItems[index] = currentEvidence.copyWith(
         status: 'verified',
-        notes: 'Verifiziert von $verifiedBy am ${DateTime.now()}',
+        notes: verificationNote,
       );
     }
   }
@@ -272,6 +300,25 @@ class EvidenceRepositoryImpl implements EvidenceRepository {
         status: 'archived',
         notes: 'Archiviert am ${DateTime.now()}',
       );
+    }
+  }
+
+  /// Alle Beweismittel verifizieren (für Demo-Zwecke)
+  Future<void> verifyAllEvidence(String verifiedBy) async {
+    await Future.delayed(Duration(milliseconds: 500));
+    for (int i = 0; i < _evidenceItems.length; i++) {
+      final currentEvidence = _evidenceItems[i];
+      if (currentEvidence.status != 'verified') {
+        final verificationNote = currentEvidence.notes != null &&
+                currentEvidence.notes!.isNotEmpty
+            ? '${currentEvidence.notes}\nVerifiziert von $verifiedBy am ${DateTime.now()}'
+            : 'Verifiziert von $verifiedBy am ${DateTime.now()}';
+
+        _evidenceItems[i] = currentEvidence.copyWith(
+          status: 'verified',
+          notes: verificationNote,
+        );
+      }
     }
   }
 

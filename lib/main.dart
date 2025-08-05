@@ -34,5 +34,11 @@ void main() async {
     ),
   );
 
+  // Landscape-Modus deaktivieren - nur Portrait erlauben
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   runApp(const GlobalAkteApp());
 }

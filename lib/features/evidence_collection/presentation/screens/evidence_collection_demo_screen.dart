@@ -1,7 +1,6 @@
 // features/evidence_collection/presentation/screens/evidence_collection_demo_screen.dart
 import 'package:flutter/material.dart';
 
-import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../data/repositories/evidence_repository_impl.dart';
 import '../../domain/usecases/evidence_usecases.dart';
@@ -49,11 +48,11 @@ class _EvidenceCollectionDemoScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConfig.backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text('Beweismittel-Sammlung'),
-        backgroundColor: AppConfig.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         elevation: 0,
         bottom: TabBar(
           controller: _tabController,
@@ -61,7 +60,10 @@ class _EvidenceCollectionDemoScreenState
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
           tabs: const [
-            Tab(icon: Icon(Icons.list), text: 'Übersicht'),
+            Tab(
+              icon: Icon(Icons.list),
+              text: 'Übersicht',
+            ),
             Tab(icon: Icon(Icons.add), text: 'Hinzufügen'),
             Tab(icon: Icon(Icons.analytics), text: 'Statistiken'),
             Tab(icon: Icon(Icons.link), text: 'Ketten'),

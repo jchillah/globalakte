@@ -1,7 +1,6 @@
 // features/help_network/presentation/screens/help_network_demo_screen.dart
 import 'package:flutter/material.dart';
 
-import '../../../../core/app_config.dart';
 import '../../data/repositories/help_network_repository_impl.dart';
 import '../../domain/usecases/help_network_usecases.dart';
 import '../widgets/help_chat_widget.dart';
@@ -48,8 +47,8 @@ class _HelpNetworkDemoScreenState extends State<HelpNetworkDemoScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Hilfe-Netzwerk'),
-        backgroundColor: AppConfig.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,

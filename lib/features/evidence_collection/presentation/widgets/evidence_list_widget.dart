@@ -1,7 +1,6 @@
 // features/evidence_collection/presentation/widgets/evidence_list_widget.dart
 import 'package:flutter/material.dart';
 
-import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../data/repositories/evidence_repository_impl.dart';
 import '../../domain/entities/evidence_item.dart';
@@ -90,9 +89,25 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Filter',
-              style: Theme.of(context).textTheme.titleMedium,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Filter',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                // Button zum Verifizieren aller Beweismittel
+                ElevatedButton.icon(
+                  onPressed: _verifyAllEvidence,
+                  icon: const Icon(Icons.verified, size: 16),
+                  label: const Text('Alle verifizieren'),
+                  style: ElevatedButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    textStyle: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -120,8 +135,9 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
       onSelected: (selected) {
         setState(() => _selectedFilter = value);
       },
-      selectedColor: AppConfig.primaryColor.withValues(alpha: 0.2),
-      checkmarkColor: AppConfig.primaryColor,
+      selectedColor:
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+      checkmarkColor: Theme.of(context).colorScheme.primary,
     );
   }
 
@@ -445,14 +461,30 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
           context,
           'Beweismittel verifiziert',
         );
-        // Sofortige UI-Aktualisierung
+        // Sofortige UI-Aktualisierung für beide Listen
         setState(() {
           final index = _evidenceItems.indexWhere((e) => e.id == evidence.id);
           if (index != -1) {
-            _evidenceItems[index] = _evidenceItems[index].copyWith(
+            final currentEvidence = _evidenceItems[index];
+            final verificationNote = currentEvidence.notes != null &&
+                    currentEvidence.notes!.isNotEmpty
+                ? '${currentEvidence.notes}\nVerifiziert von Demo User am ${DateTime.now()}'
+                : 'Verifiziert von Demo User am ${DateTime.now()}';
+
+            final updatedEvidence = currentEvidence.copyWith(
               status: 'verified',
-              notes: 'Verifiziert von Demo User am ${DateTime.now()}',
+              notes: verificationNote,
             );
+
+            // Aktualisiere beide Listen
+            _evidenceItems[index] = updatedEvidence;
+
+            // Aktualisiere auch die gefilterte Liste
+            final filteredIndex =
+                _filteredItems.indexWhere((e) => e.id == evidence.id);
+            if (filteredIndex != -1) {
+              _filteredItems[filteredIndex] = updatedEvidence;
+            }
           }
         });
       }
@@ -461,6 +493,47 @@ class _EvidenceListWidgetState extends State<EvidenceListWidget> {
         SnackBarUtils.showError(
           context,
           'Fehler beim Verifizieren: $e',
+        );
+      }
+    }
+  }
+
+  Future<void> _verifyAllEvidence() async {
+    try {
+      // Verwende die neue Methode aus dem Repository
+      await widget.repository.verifyAllEvidence('Demo User');
+      if (mounted) {
+        SnackBarUtils.showSuccess(
+          context,
+          'Alle Beweismittel verifiziert',
+        );
+        // Sofortige UI-Aktualisierung ohne Liste neu zu laden
+        setState(() {
+          for (int i = 0; i < _evidenceItems.length; i++) {
+            final currentEvidence = _evidenceItems[i];
+            if (currentEvidence.status != 'verified') {
+              final verificationNote = currentEvidence.notes != null &&
+                      currentEvidence.notes!.isNotEmpty
+                  ? '${currentEvidence.notes}\nVerifiziert von Demo User am ${DateTime.now()}'
+                  : 'Verifiziert von Demo User am ${DateTime.now()}';
+
+              final updatedEvidence = currentEvidence.copyWith(
+                status: 'verified',
+                notes: verificationNote,
+              );
+
+              _evidenceItems[i] = updatedEvidence;
+            }
+          }
+
+          // Die gefilterte Liste wird automatisch durch den Getter aktualisiert
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBarUtils.showError(
+          context,
+          'Fehler beim Verifizieren aller Beweismittel: $e',
         );
       }
     }

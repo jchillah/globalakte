@@ -2,7 +2,6 @@
 
 import 'dart:math';
 
-import '../../../../core/data/mock_data_repository.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/entities/help_chat.dart';
 import '../../domain/entities/help_offer.dart';
@@ -16,7 +15,6 @@ class HelpNetworkRepositoryImpl implements HelpNetworkRepository {
   final List<HelpRequest> _helpRequests = [];
   final List<HelpOffer> _helpOffers = [];
   final List<HelpChat> _helpChats = [];
-  final MockDataRepository _mockData = MockDataRepository();
   final HelpNetworkMockDataRepository _helpMockData =
       HelpNetworkMockDataRepository();
   final Random _random = Random();

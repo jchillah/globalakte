@@ -199,10 +199,10 @@ class PdfGeneratorUseCases {
       PdfTemplate template, Map<String, dynamic> data) {
     String html = template.htmlTemplate;
 
-    // Template-Variablen ersetzen
+    // Template-Variablen ersetzen mit Userflow-Behandlung
     for (final entry in data.entries) {
       final placeholder = '{{${entry.key}}}';
-      final value = entry.value?.toString() ?? '';
+      final value = _processTextForPdf(entry.value?.toString() ?? '');
       html = html.replaceAll(placeholder, value);
     }
 
@@ -214,6 +214,94 @@ class PdfGeneratorUseCases {
         '${now.hour}:${now.minute.toString().padLeft(2, '0')}');
 
     return html;
+  }
+
+  /// Text für PDF-Verarbeitung optimieren (Userflow-Behandlung)
+  String _processTextForPdf(String text) {
+    if (text.isEmpty) return text;
+
+    // Lange Wörter umbrechen
+    text = _wrapLongWords(text);
+
+    // Zeilenumbrüche für bessere Lesbarkeit
+    text = _addLineBreaks(text);
+
+    // HTML-Entities korrekt behandeln
+    text = _escapeHtmlEntities(text);
+
+    return text;
+  }
+
+  /// Lange Wörter umbrechen
+  String _wrapLongWords(String text) {
+    const maxWordLength = 20; // Maximale Wortlänge vor Umbruch
+    final words = text.split(' ');
+    final processedWords = words.map((word) {
+      if (word.length > maxWordLength) {
+        // Wort in der Mitte umbrechen
+        final mid = (word.length / 2).round();
+        return '${word.substring(0, mid)}&shy;${word.substring(mid)}';
+      }
+      return word;
+    });
+    return processedWords.join(' ');
+  }
+
+  /// Zeilenumbrüche für bessere Lesbarkeit hinzufügen
+  String _addLineBreaks(String text) {
+    // Nach Satzzeichen Zeilenumbrüche hinzufügen
+    text = text.replaceAllMapped(
+      RegExp(r'([.!?])\s+'),
+      (match) => '${match.group(1)}<br><br>${match.group(2) ?? ''}',
+    );
+
+    // Lange Absätze in kleinere Teile aufteilen
+    const maxLineLength = 80;
+    if (text.length > maxLineLength) {
+      final sentences = text.split(RegExp(r'[.!?]'));
+      final processedSentences = sentences.map((sentence) {
+        if (sentence.trim().length > maxLineLength) {
+          // Satz in kleinere Teile aufteilen
+          final words = sentence.trim().split(' ');
+          final lines = <String>[];
+          String currentLine = '';
+
+          for (final word in words) {
+            if ((currentLine + word).length > maxLineLength) {
+              if (currentLine.isNotEmpty) {
+                lines.add(currentLine.trim());
+                currentLine = word;
+              } else {
+                currentLine = word;
+              }
+            } else {
+              currentLine += (currentLine.isEmpty ? '' : ' ') + word;
+            }
+          }
+
+          if (currentLine.isNotEmpty) {
+            lines.add(currentLine.trim());
+          }
+
+          return lines.join('<br>');
+        }
+        return sentence.trim();
+      });
+
+      text = processedSentences.where((s) => s.isNotEmpty).join('. ');
+    }
+
+    return text;
+  }
+
+  /// HTML-Entities korrekt behandeln
+  String _escapeHtmlEntities(String text) {
+    return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
   }
 
   /// Text aus HTML extrahieren

@@ -3,7 +3,6 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import '../../../../core/data/mock_data_repository.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/entities/pdf_document.dart';
 import '../../domain/entities/pdf_template.dart';
@@ -15,7 +14,6 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
   // Mock-Daten für Demo-Zwecke
   final List<PdfDocument> _documents = [];
   final List<PdfTemplate> _templates = [];
-  final MockDataRepository _mockData = MockDataRepository();
   final PdfMockDataRepository _pdfMockData = PdfMockDataRepository();
   final Random _random = Random();
 
@@ -265,7 +263,7 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
     await Future.delayed(Duration(milliseconds: 1000 + _random.nextInt(2000)));
     AppLogger.info('PDF aus Template generiert: $templateId');
 
-    // Simuliere PDF-Generierung mit verbesserter Datenübertragung
+    // Simuliere PDF-Generierung mit verbesserter Datenübertragung und Userflow-Behandlung
     final template = await getPdfTemplate(templateId);
     if (template == null) {
       throw Exception('Template nicht gefunden: $templateId');
@@ -273,9 +271,11 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
 
     // HTML aus Template mit eingegebenen Daten generieren
     String html = template.htmlTemplate;
+
+    // Template-Variablen ersetzen mit Userflow-Behandlung
     for (final entry in data.entries) {
       final placeholder = '{{${entry.key}}}';
-      final value = entry.value?.toString() ?? '';
+      final value = _processTextForPdf(entry.value?.toString() ?? '');
       html = html.replaceAll(placeholder, value);
     }
 
@@ -292,8 +292,96 @@ class PdfGeneratorRepositoryImpl implements PdfGeneratorRepository {
         List.generate(800 + contentLength, (index) => _random.nextInt(256));
 
     AppLogger.info(
-        'PDF generiert mit ${data.length} Datenfeldern und $contentLength Zeichen Inhalt');
+        'PDF generiert mit ${data.length} Datenfeldern und $contentLength Zeichen Inhalt (mit Userflow-Behandlung)');
     return Uint8List.fromList(pdfBytes);
+  }
+
+  /// Text für PDF-Verarbeitung optimieren (Userflow-Behandlung)
+  String _processTextForPdf(String text) {
+    if (text.isEmpty) return text;
+
+    // Lange Wörter umbrechen
+    text = _wrapLongWords(text);
+
+    // Zeilenumbrüche für bessere Lesbarkeit
+    text = _addLineBreaks(text);
+
+    // HTML-Entities korrekt behandeln
+    text = _escapeHtmlEntities(text);
+
+    return text;
+  }
+
+  /// Lange Wörter umbrechen
+  String _wrapLongWords(String text) {
+    const maxWordLength = 20; // Maximale Wortlänge vor Umbruch
+    final words = text.split(' ');
+    final processedWords = words.map((word) {
+      if (word.length > maxWordLength) {
+        // Wort in der Mitte umbrechen
+        final mid = (word.length / 2).round();
+        return '${word.substring(0, mid)}&shy;${word.substring(mid)}';
+      }
+      return word;
+    });
+    return processedWords.join(' ');
+  }
+
+  /// Zeilenumbrüche für bessere Lesbarkeit hinzufügen
+  String _addLineBreaks(String text) {
+    // Nach Satzzeichen Zeilenumbrüche hinzufügen
+    text = text.replaceAllMapped(
+      RegExp(r'([.!?])\s+'),
+      (match) => '${match.group(1)}<br><br>${match.group(2) ?? ''}',
+    );
+
+    // Lange Absätze in kleinere Teile aufteilen
+    const maxLineLength = 80;
+    if (text.length > maxLineLength) {
+      final sentences = text.split(RegExp(r'[.!?]'));
+      final processedSentences = sentences.map((sentence) {
+        if (sentence.trim().length > maxLineLength) {
+          // Satz in kleinere Teile aufteilen
+          final words = sentence.trim().split(' ');
+          final lines = <String>[];
+          String currentLine = '';
+
+          for (final word in words) {
+            if ((currentLine + word).length > maxLineLength) {
+              if (currentLine.isNotEmpty) {
+                lines.add(currentLine.trim());
+                currentLine = word;
+              } else {
+                currentLine = word;
+              }
+            } else {
+              currentLine += (currentLine.isEmpty ? '' : ' ') + word;
+            }
+          }
+
+          if (currentLine.isNotEmpty) {
+            lines.add(currentLine.trim());
+          }
+
+          return lines.join('<br>');
+        }
+        return sentence.trim();
+      });
+
+      text = processedSentences.where((s) => s.isNotEmpty).join('. ');
+    }
+
+    return text;
+  }
+
+  /// HTML-Entities korrekt behandeln
+  String _escapeHtmlEntities(String text) {
+    return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
   }
 
   @override

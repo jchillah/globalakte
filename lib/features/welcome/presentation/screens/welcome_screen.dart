@@ -15,7 +15,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConfig.backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppConfig.largePadding),
@@ -34,6 +34,11 @@ class WelcomeScreen extends StatelessWidget {
 
               // App Description
               _buildAppDescription(),
+
+              const SizedBox(height: AppConfig.largePadding),
+
+              // Theme Toggle Button
+              _buildThemeToggleButton(context),
 
               const SizedBox(height: AppConfig.largePadding * 2),
 
@@ -87,17 +92,19 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   Widget _buildAppLogo() {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        color: AppConfig.primaryColor,
-        borderRadius: BorderRadius.circular(AppConfig.largeRadius),
-      ),
-      child: const Icon(
-        Icons.gavel,
-        size: 60,
-        color: Colors.white,
+    return Builder(
+      builder: (context) => Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primary,
+          borderRadius: BorderRadius.circular(AppConfig.largeRadius),
+        ),
+        child: Icon(
+          Icons.gavel,
+          size: 60,
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
       ),
     );
   }
@@ -564,6 +571,24 @@ class WelcomeScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
         ),
+      ),
+    );
+  }
+
+  Widget _buildThemeToggleButton(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: () {
+        SnackBarUtils.showSuccess(
+          context,
+          'Theme-Toggle wird implementiert',
+        );
+      },
+      icon: const Icon(Icons.brightness_6),
+      label: const Text('Theme wechseln'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppConfig.primaryColor,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
     );
   }

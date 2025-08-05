@@ -70,7 +70,9 @@ class _PushTestWidgetState extends State<PushTestWidget> {
         // Zeige Erfolgsmeldung
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Test-Benachrichtigung erfolgreich gesendet!' : 'Fehler beim Senden'),
+            content: Text(success
+                ? 'Test-Benachrichtigung erfolgreich gesendet!'
+                : 'Fehler beim Senden'),
             backgroundColor: success ? Colors.green : Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -154,7 +156,9 @@ class _PushTestWidgetState extends State<PushTestWidget> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Test-Benachrichtigung gesendet!' : 'Fehler beim Senden'),
+            content: Text(success
+                ? 'Test-Benachrichtigung gesendet!'
+                : 'Fehler beim Senden'),
             backgroundColor: success ? Colors.green : Colors.red,
           ),
         );
@@ -201,11 +205,12 @@ class _PushTestWidgetState extends State<PushTestWidget> {
           children: [
             Row(
               children: [
-                Icon(Icons.send, color: AppConfig.primaryColor),
+                Icon(Icons.send, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Push-Benachrichtigungen testen',
+                  'Push-Benachrichtigungen\ntesten',
                   style: Theme.of(context).textTheme.headlineSmall,
+                  overflow: TextOverflow.clip,
                 ),
               ],
             ),
@@ -233,9 +238,14 @@ class _PushTestWidgetState extends State<PushTestWidget> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'Vordefinierte Test-Benachrichtigungen für verschiedene Szenarien',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6)),
             ),
             const SizedBox(height: 16),
             Wrap(
@@ -282,7 +292,7 @@ class _PushTestWidgetState extends State<PushTestWidget> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
-            
+
             // Titel
             TextField(
               controller: _titleController,
@@ -293,7 +303,7 @@ class _PushTestWidgetState extends State<PushTestWidget> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Nachricht
             TextField(
               controller: _messageController,
@@ -305,7 +315,7 @@ class _PushTestWidgetState extends State<PushTestWidget> {
               maxLines: 3,
             ),
             const SizedBox(height: 16),
-            
+
             // Kategorie
             DropdownButtonFormField<String>(
               value: _selectedCategory,
@@ -326,7 +336,7 @@ class _PushTestWidgetState extends State<PushTestWidget> {
               },
             ),
             const SizedBox(height: 16),
-            
+
             // Typ
             DropdownButtonFormField<String>(
               value: _selectedType,
@@ -347,23 +357,25 @@ class _PushTestWidgetState extends State<PushTestWidget> {
               },
             ),
             const SizedBox(height: 24),
-            
+
             // Senden-Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _isSending ? null : _sendTestNotification,
-                icon: _isSending 
+                icon: _isSending
                     ? const SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.send),
-                label: Text(_isSending ? 'Wird gesendet...' : 'Push-Benachrichtigung senden'),
+                label: Text(_isSending
+                    ? 'Wird gesendet...'
+                    : 'Push-Benachrichtigung senden'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConfig.primaryColor,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
@@ -373,4 +385,4 @@ class _PushTestWidgetState extends State<PushTestWidget> {
       ),
     );
   }
-} 
+}

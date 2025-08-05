@@ -1,7 +1,5 @@
 // features/help_network/data/repositories/help_network_mock_data_repository.dart
 
-import 'dart:math';
-
 import '../../../../core/data/mock_data_repository.dart';
 
 /// Mock-Data Repository speziell für Help Network
@@ -12,7 +10,6 @@ class HelpNetworkMockDataRepository {
   HelpNetworkMockDataRepository._internal();
 
   final MockDataRepository _mockData = MockDataRepository();
-  final Random _random = Random();
 
   /// Help Requests laden
   List<Map<String, dynamic>> get helpRequests => _mockData.helpRequests;

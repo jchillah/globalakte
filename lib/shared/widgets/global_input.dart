@@ -48,7 +48,10 @@ class GlobalTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppConfig.titleStyle.copyWith(fontSize: 16),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
         ),
         const SizedBox(height: AppConfig.smallPadding),
         TextFormField(
@@ -63,25 +66,49 @@ class GlobalTextField extends StatelessWidget {
           onTap: onTap,
           onChanged: onChanged,
           onEditingComplete: onEditingComplete,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.6),
+            ),
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-              borderSide:
-                  const BorderSide(color: AppConfig.primaryColor, width: 2),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-              borderSide:
-                  const BorderSide(color: AppConfig.accentColor, width: 2),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.error,
+                width: 2,
+              ),
             ),
             filled: true,
-            fillColor: enabled ? Colors.grey[50] : Colors.grey[200],
+            fillColor: enabled
+                ? Theme.of(context).colorScheme.surface
+                : Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
             contentPadding: const EdgeInsets.all(AppConfig.defaultPadding),
           ),
         ),

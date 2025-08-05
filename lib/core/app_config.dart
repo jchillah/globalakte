@@ -17,19 +17,19 @@ class AppConfig {
 
   // Text Styles
   static const TextStyle headlineStyle = TextStyle(
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: FontWeight.bold,
     color: primaryColor,
   );
 
   static const TextStyle titleStyle = TextStyle(
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: FontWeight.w600,
     color: primaryColor,
   );
 
   static const TextStyle bodyStyle = TextStyle(
-    fontSize: 12,
+    fontSize: 8,
     color: Color(0xFF374151),
   );
 

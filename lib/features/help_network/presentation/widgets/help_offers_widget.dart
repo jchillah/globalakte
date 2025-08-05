@@ -197,7 +197,8 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
         setState(() => _selectedFilter = value);
         _filterOffers(value);
       },
-      selectedColor: AppConfig.primaryColor.withValues(alpha: 0.2),
+      selectedColor:
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
     );
   }
 
@@ -206,11 +207,12 @@ class _HelpOffersWidgetState extends State<HelpOffersWidget> {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppConfig.primaryColor,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           child: Text(
             offer.helperName[0].toUpperCase(),
-            style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.bold),
           ),
         ),
         title: Text(

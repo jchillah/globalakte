@@ -1,216 +1,271 @@
 // core/performance_monitor.dart
+
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'package:flutter/foundation.dart';
 
-/// Performance Monitor für GlobalAkte
-/// Überwacht App-Performance und sammelt Metriken
+/// Erweiterte Performance Monitoring Klasse
 class PerformanceMonitor {
   static final PerformanceMonitor _instance = PerformanceMonitor._internal();
   factory PerformanceMonitor() => _instance;
   PerformanceMonitor._internal();
 
   final Map<String, Stopwatch> _timers = {};
-  final Map<String, List<double>> _metrics = {};
+  final Map<String, List<Duration>> _measurements = {};
+  final Map<String, int> _errorCounts = {};
+  final Map<String, int> _successCounts = {};
   final List<PerformanceEvent> _events = [];
-  bool _isEnabled = true;
 
-  /// Performance-Monitoring aktivieren/deaktivieren
-  void setEnabled(bool enabled) {
-    _isEnabled = enabled;
-    if (kDebugMode) {
-      developer.log('Performance Monitor ${enabled ? 'aktiviert' : 'deaktiviert'}');
+  /// Timer starten
+  void startTimer(String name) {
+    _timers[name] = Stopwatch()..start();
+    _logEvent('TIMER_START', name);
+  }
+
+  /// Timer stoppen und Messung speichern
+  Duration stopTimer(String name) {
+    final timer = _timers[name];
+    if (timer == null) return Duration.zero;
+
+    timer.stop();
+    final duration = timer.elapsed;
+    
+    _measurements.putIfAbsent(name, () => []).add(duration);
+    _logEvent('TIMER_STOP', name, {'duration': duration.inMilliseconds});
+    
+    _timers.remove(name);
+    return duration;
+  }
+
+  /// Performance-Messung durchführen
+  Future<T> measureAsync<T>(String name, Future<T> Function() operation) async {
+    startTimer(name);
+    try {
+      final result = await operation();
+      _successCounts[name] = (_successCounts[name] ?? 0) + 1;
+      return result;
+    } catch (e) {
+      _errorCounts[name] = (_errorCounts[name] ?? 0) + 1;
+      _logEvent('ERROR', name, {'error': e.toString()});
+      rethrow;
+    } finally {
+      stopTimer(name);
     }
   }
 
-  /// Timer für Operation starten
-  void startTimer(String operation) {
-    if (!_isEnabled) return;
-    
-    _timers[operation] = Stopwatch()..start();
-    if (kDebugMode) {
-      developer.log('Timer gestartet: $operation');
+  /// Synchronous Performance-Messung
+  T measureSync<T>(String name, T Function() operation) {
+    startTimer(name);
+    try {
+      final result = operation();
+      _successCounts[name] = (_successCounts[name] ?? 0) + 1;
+      return result;
+    } catch (e) {
+      _errorCounts[name] = (_errorCounts[name] ?? 0) + 1;
+      _logEvent('ERROR', name, {'error': e.toString()});
+      rethrow;
+    } finally {
+      stopTimer(name);
     }
   }
 
-  /// Timer stoppen und Metrik speichern
-  void stopTimer(String operation) {
-    if (!_isEnabled) return;
+  /// Memory Usage überwachen
+  void trackMemoryUsage(String context) {
+    final memoryInfo = _getMemoryInfo();
+    _logEvent('MEMORY_USAGE', context, memoryInfo);
+  }
+
+  /// Network Performance überwachen
+  void trackNetworkCall(String endpoint, Duration duration, {bool success = true}) {
+    _logEvent('NETWORK_CALL', endpoint, {
+      'duration': duration.inMilliseconds,
+      'success': success,
+    });
+  }
+
+  /// UI Performance überwachen
+  void trackUIRender(String widgetName, Duration renderTime) {
+    _logEvent('UI_RENDER', widgetName, {
+      'renderTime': renderTime.inMilliseconds,
+    });
+  }
+
+  /// Error Tracking
+  void trackError(String context, dynamic error, [StackTrace? stackTrace]) {
+    _errorCounts[context] = (_errorCounts[context] ?? 0) + 1;
+    _logEvent('ERROR', context, {
+      'error': error.toString(),
+      'stackTrace': stackTrace?.toString(),
+    });
+  }
+
+  /// Success Tracking
+  void trackSuccess(String context) {
+    _successCounts[context] = (_successCounts[context] ?? 0) + 1;
+    _logEvent('SUCCESS', context);
+  }
+
+  /// Performance-Statistiken abrufen
+  Map<String, dynamic> getStatistics() {
+    final stats = <String, dynamic>{};
     
-    final timer = _timers[operation];
-    if (timer != null) {
-      timer.stop();
-      final duration = timer.elapsedMicroseconds / 1000.0; // in Millisekunden
-      
-      _metrics.putIfAbsent(operation, () => []).add(duration);
-      _events.add(PerformanceEvent(
-        operation: operation,
-        duration: duration,
-        timestamp: DateTime.now(),
-      ));
-      
-      _timers.remove(operation);
-      
-      if (kDebugMode) {
-        developer.log('Timer gestoppt: $operation (${duration.toStringAsFixed(2)}ms)');
+    // Timer-Statistiken
+    for (final entry in _measurements.entries) {
+      final measurements = entry.value;
+      if (measurements.isNotEmpty) {
+        final avg = measurements.map((d) => d.inMilliseconds).reduce((a, b) => a + b) / measurements.length;
+        final min = measurements.map((d) => d.inMilliseconds).reduce((a, b) => a < b ? a : b);
+        final max = measurements.map((d) => d.inMilliseconds).reduce((a, b) => a > b ? a : b);
+        
+        stats[entry.key] = {
+          'count': measurements.length,
+          'average_ms': avg,
+          'min_ms': min,
+          'max_ms': max,
+          'total_ms': measurements.map((d) => d.inMilliseconds).reduce((a, b) => a + b),
+        };
       }
     }
-  }
 
-  /// Memory-Usage messen
-  void recordMemoryUsage(String context) {
-    if (!_isEnabled) return;
-    
-    // In einer echten App würden wir hier echte Memory-Metriken sammeln
-    final memoryUsage = _simulateMemoryUsage();
-    
-    _events.add(PerformanceEvent(
-      operation: 'memory_usage',
-      duration: memoryUsage,
-      timestamp: DateTime.now(),
-      metadata: {'context': context},
-    ));
-    
-    if (kDebugMode) {
-      developer.log('Memory Usage ($context): ${memoryUsage.toStringAsFixed(2)}MB');
-    }
-  }
+    // Error/Success Statistiken
+    stats['errors'] = _errorCounts;
+    stats['successes'] = _successCounts;
 
-  /// Frame-Rate messen
-  void recordFrameRate(double fps) {
-    if (!_isEnabled) return;
-    
-    _events.add(PerformanceEvent(
-      operation: 'frame_rate',
-      duration: fps,
-      timestamp: DateTime.now(),
-    ));
-    
-    if (kDebugMode && fps < 30) {
-      developer.log('WARNUNG: Niedrige Frame-Rate: ${fps.toStringAsFixed(1)} FPS');
-    }
+    // Event Statistiken
+    stats['total_events'] = _events.length;
+    stats['recent_events'] = _events.take(10).map((e) => e.toMap()).toList();
+
+    return stats;
   }
 
   /// Performance-Report generieren
-  Map<String, dynamic> generateReport() {
-    final report = <String, dynamic>{
-      'timestamp': DateTime.now().toIso8601String(),
-      'total_events': _events.length,
-      'metrics': <String, dynamic>{},
-      'warnings': <String>[],
-    };
+  String generateReport() {
+    final stats = getStatistics();
+    final report = StringBuffer();
+    
+    report.writeln('=== Performance Report ===');
+    report.writeln('Generated: ${DateTime.now()}');
+    report.writeln();
 
-    // Durchschnittliche Dauer für jede Operation berechnen
-    for (final entry in _metrics.entries) {
-      final operation = entry.key;
-      final durations = entry.value;
-      
-      if (durations.isNotEmpty) {
-        final avgDuration = durations.reduce((a, b) => a + b) / durations.length;
-        final maxDuration = durations.reduce((a, b) => a > b ? a : b);
-        final minDuration = durations.reduce((a, b) => a < b ? a : b);
-        
-        report['metrics'][operation] = {
-          'count': durations.length,
-          'avg_duration_ms': avgDuration,
-          'max_duration_ms': maxDuration,
-          'min_duration_ms': minDuration,
-        };
-
-        // Warnungen für langsame Operationen
-        if (avgDuration > 1000) { // > 1 Sekunde
-          report['warnings'].add('Langsame Operation: $operation (${avgDuration.toStringAsFixed(2)}ms)');
-        }
+    // Timer-Statistiken
+    report.writeln('Timer Statistics:');
+    for (final entry in stats.entries) {
+      if (entry.key != 'errors' && entry.key != 'successes' && entry.key != 'total_events' && entry.key != 'recent_events') {
+        final data = entry.value as Map<String, dynamic>;
+        report.writeln('  ${entry.key}:');
+        report.writeln('    Count: ${data['count']}');
+        report.writeln('    Average: ${data['average_ms'].toStringAsFixed(2)}ms');
+        report.writeln('    Min: ${data['min_ms']}ms');
+        report.writeln('    Max: ${data['max_ms']}ms');
+        report.writeln('    Total: ${data['total_ms']}ms');
+        report.writeln();
       }
     }
 
-    // Frame-Rate Analyse
-    final frameRateEvents = _events.where((e) => e.operation == 'frame_rate').toList();
-    if (frameRateEvents.isNotEmpty) {
-      final avgFps = frameRateEvents.map((e) => e.duration).reduce((a, b) => a + b) / frameRateEvents.length;
-      report['metrics']['frame_rate'] = {
-        'avg_fps': avgFps,
-        'count': frameRateEvents.length,
-      };
-      
-      if (avgFps < 30) {
-        report['warnings'].add('Niedrige durchschnittliche Frame-Rate: ${avgFps.toStringAsFixed(1)} FPS');
-      }
+    // Error/Success Statistiken
+    report.writeln('Error Counts:');
+    for (final entry in _errorCounts.entries) {
+      report.writeln('  ${entry.key}: ${entry.value}');
     }
+    report.writeln();
 
-    return report;
+    report.writeln('Success Counts:');
+    for (final entry in _successCounts.entries) {
+      report.writeln('  ${entry.key}: ${entry.value}');
+    }
+    report.writeln();
+
+    return report.toString();
   }
 
   /// Performance-Daten zurücksetzen
   void reset() {
     _timers.clear();
-    _metrics.clear();
+    _measurements.clear();
+    _errorCounts.clear();
+    _successCounts.clear();
     _events.clear();
+  }
+
+  /// Event loggen
+  void _logEvent(String type, String name, [Map<String, dynamic>? data]) {
+    final event = PerformanceEvent(
+      type: type,
+      name: name,
+      timestamp: DateTime.now(),
+      data: data ?? {},
+    );
+    _events.add(event);
     
-    if (kDebugMode) {
-      developer.log('Performance Monitor zurückgesetzt');
-    }
+    // Log für Debugging
+    developer.log('Performance: $type - $name', name: 'PerformanceMonitor');
   }
 
-  /// Aktive Timer anzeigen
-  List<String> get activeTimers => _timers.keys.toList();
-
-  /// Letzte Events abrufen
-  List<PerformanceEvent> get recentEvents => _events.take(100).toList();
-
-  /// Simulierte Memory-Usage (für Demo-Zwecke)
-  double _simulateMemoryUsage() {
-    // Simuliere Memory-Usage zwischen 50-200 MB
-    return 50 + (DateTime.now().millisecondsSinceEpoch % 150);
-  }
-}
-
-/// Performance-Event für detaillierte Analyse
-class PerformanceEvent {
-  final String operation;
-  final double duration;
-  final DateTime timestamp;
-  final Map<String, dynamic>? metadata;
-
-  PerformanceEvent({
-    required this.operation,
-    required this.duration,
-    required this.timestamp,
-    this.metadata,
-  });
-
-  Map<String, dynamic> toJson() {
+  /// Memory Info simulieren
+  Map<String, dynamic> _getMemoryInfo() {
+    // In einer echten Implementierung würde hier echte Memory-Info abgerufen
     return {
-      'operation': operation,
-      'duration': duration,
-      'timestamp': timestamp.toIso8601String(),
-      'metadata': metadata,
+      'heap_size': '~50MB',
+      'external_size': '~10MB',
+      'rss': '~100MB',
     };
   }
 }
 
-/// Performance-Utilities für einfache Verwendung
-class PerformanceUtils {
-  /// Operation mit Timer ausführen
-  static Future<T> measureOperation<T>(
-    String operation,
-    Future<T> Function() callback,
-  ) async {
-    PerformanceMonitor().startTimer(operation);
-    try {
-      final result = await callback();
-      return result;
-    } finally {
-      PerformanceMonitor().stopTimer(operation);
-    }
+/// Performance Event
+class PerformanceEvent {
+  final String type;
+  final String name;
+  final DateTime timestamp;
+  final Map<String, dynamic> data;
+
+  const PerformanceEvent({
+    required this.type,
+    required this.name,
+    required this.timestamp,
+    required this.data,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'type': type,
+      'name': name,
+      'timestamp': timestamp.toIso8601String(),
+      'data': data,
+    };
   }
 
-  /// Widget-Performance messen
-  static void measureWidgetBuild(String widgetName) {
-    PerformanceMonitor().startTimer('widget_build_$widgetName');
+  @override
+  String toString() {
+    return 'PerformanceEvent(type: $type, name: $name, timestamp: $timestamp)';
+  }
+}
+
+/// Performance Monitoring Mixin
+mixin PerformanceMonitoring {
+  PerformanceMonitor get _monitor => PerformanceMonitor();
+
+  /// Async Operation mit Performance-Tracking
+  Future<T> trackAsync<T>(String name, Future<T> Function() operation) {
+    return _monitor.measureAsync(name, operation);
   }
 
-  static void endWidgetBuild(String widgetName) {
-    PerformanceMonitor().stopTimer('widget_build_$widgetName');
+  /// Sync Operation mit Performance-Tracking
+  T trackSync<T>(String name, T Function() operation) {
+    return _monitor.measureSync(name, operation);
+  }
+
+  /// Error Tracking
+  void trackError(String context, dynamic error, [StackTrace? stackTrace]) {
+    _monitor.trackError(context, error, stackTrace);
+  }
+
+  /// Success Tracking
+  void trackSuccess(String context) {
+    _monitor.trackSuccess(context);
+  }
+
+  /// UI Render Tracking
+  void trackUIRender(String widgetName, Duration renderTime) {
+    _monitor.trackUIRender(widgetName, renderTime);
   }
 } 

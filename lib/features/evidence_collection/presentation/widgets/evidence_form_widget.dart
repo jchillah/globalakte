@@ -1,7 +1,6 @@
 // features/evidence_collection/presentation/widgets/evidence_form_widget.dart
 import 'package:flutter/material.dart';
 
-import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../../../shared/widgets/global_button.dart';
 import '../../../../shared/widgets/global_input.dart';
@@ -63,7 +62,9 @@ class _EvidenceFormWidgetState extends State<EvidenceFormWidget> {
           children: [
             Text(
               'Neues Beweismittel hinzufügen',
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
             ),
             const SizedBox(height: 24),
 
@@ -119,8 +120,10 @@ class _EvidenceFormWidgetState extends State<EvidenceFormWidget> {
                           onSelected: (selected) {
                             setState(() => _selectedType = type['value']!);
                           },
-                          selectedColor:
-                              AppConfig.primaryColor.withValues(alpha: 0.2),
+                          selectedColor: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.2),
                         );
                       }).toList(),
                     ),
@@ -179,7 +182,8 @@ class _EvidenceFormWidgetState extends State<EvidenceFormWidget> {
 
             // Info-Box
             Card(
-              color: AppConfig.primaryColor.withValues(alpha: 0.1),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -189,16 +193,18 @@ class _EvidenceFormWidgetState extends State<EvidenceFormWidget> {
                       children: [
                         Icon(
                           Icons.info_outline,
-                          color: AppConfig.primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'Hinweise',
-                          style:
-                              Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppConfig.primaryColor,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                       ],
                     ),

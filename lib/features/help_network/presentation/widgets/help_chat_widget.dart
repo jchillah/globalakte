@@ -109,7 +109,7 @@ class _HelpChatWidgetState extends State<HelpChatWidget> {
           child: Padding(
             padding: const EdgeInsets.all(AppConfig.defaultPadding),
             child: DropdownButtonFormField<String>(
-              value: _selectedRequestId.isEmpty ? null : _selectedRequestId,
+              value: _selectedRequestId.isNotEmpty ? _selectedRequestId : null,
               decoration: const InputDecoration(
                 labelText: 'Hilfe-Anfrage auswählen',
                 border: OutlineInputBorder(),
@@ -144,7 +144,12 @@ class _HelpChatWidgetState extends State<HelpChatWidget> {
                     return Card(
                       margin: const EdgeInsets.only(
                           bottom: AppConfig.defaultPadding),
-                      color: isOwnMessage ? Colors.blue[50] : Colors.grey[50],
+                      color: isOwnMessage
+                          ? Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.1)
+                          : Theme.of(context).colorScheme.surface,
                       child: ListTile(
                         leading: CircleAvatar(
                           child: Text(message.senderName[0]),

@@ -1,7 +1,6 @@
 // features/help_network/presentation/widgets/help_request_form_widget.dart
 import 'package:flutter/material.dart';
 
-import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../domain/entities/help_request.dart';
 import '../../domain/usecases/help_network_usecases.dart';
@@ -32,7 +31,6 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
   String _selectedPriority = 'medium';
   bool _isUrgent = false;
   DateTime? _deadline;
-  int? _maxHelpers;
   bool _isSubmitting = false;
 
   final List<String> _categories = [
@@ -126,7 +124,6 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
       _selectedPriority = 'medium';
       _isUrgent = false;
       _deadline = null;
-      _maxHelpers = null;
     });
   }
 
@@ -272,11 +269,6 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  _maxHelpers = value.isEmpty ? null : int.tryParse(value);
-                });
-              },
             ),
             const SizedBox(height: 24),
 
@@ -286,8 +278,8 @@ class _HelpRequestFormWidgetState extends State<HelpRequestFormWidget> {
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitForm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConfig.primaryColor,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: _isSubmitting

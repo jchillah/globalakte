@@ -465,6 +465,63 @@ class MockDataRepository {
         },
       ];
 
+  List<Map<String, dynamic>> get epaUsers => [
+        {
+          'id': 'epa_user_001',
+          'username': 'dr.schmidt',
+          'email': 'dr.schmidt@krankenhaus.de',
+          'fullName': 'Dr. Hans Schmidt',
+          'role': 'doctor',
+          'status': 'active',
+          'permissions': ['read_cases', 'write_cases', 'read_documents'],
+          'department': 'Innere Medizin',
+          'phone': '+49 123 456789',
+          'createdAt': DateTime.now().subtract(const Duration(days: 30)),
+          'lastLogin': DateTime.now().subtract(const Duration(hours: 1)),
+          'metadata': {
+            'source': 'epa_system',
+            'syncStatus': 'synced',
+            'lastSync': DateTime.now().toIso8601String(),
+          },
+        },
+        {
+          'id': 'epa_user_002',
+          'username': 'nurse.mueller',
+          'email': 'nurse.mueller@krankenhaus.de',
+          'fullName': 'Maria Müller',
+          'role': 'nurse',
+          'status': 'active',
+          'permissions': ['read_cases', 'read_documents'],
+          'department': 'Innere Medizin',
+          'phone': '+49 123 456790',
+          'createdAt': DateTime.now().subtract(const Duration(days: 25)),
+          'lastLogin': DateTime.now().subtract(const Duration(hours: 3)),
+          'metadata': {
+            'source': 'epa_system',
+            'syncStatus': 'synced',
+            'lastSync': DateTime.now().toIso8601String(),
+          },
+        },
+        {
+          'id': 'epa_user_003',
+          'username': 'admin.weber',
+          'email': 'admin.weber@krankenhaus.de',
+          'fullName': 'Peter Weber',
+          'role': 'admin',
+          'status': 'active',
+          'permissions': ['read_cases', 'write_cases', 'read_documents', 'write_documents', 'manage_users'],
+          'department': 'IT-Administration',
+          'phone': '+49 123 456791',
+          'createdAt': DateTime.now().subtract(const Duration(days: 60)),
+          'lastLogin': DateTime.now().subtract(const Duration(minutes: 30)),
+          'metadata': {
+            'source': 'epa_system',
+            'syncStatus': 'synced',
+            'lastSync': DateTime.now().toIso8601String(),
+          },
+        },
+      ];
+
   // Utility Methods
   String getRandomId() {
     return 'id_${DateTime.now().millisecondsSinceEpoch}_${_random.nextInt(1000)}';

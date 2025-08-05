@@ -107,7 +107,7 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
           // Übersichtskarten
           _buildOverviewCards(totalCount, recentAdditions),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 0),
 
           // Typ-Statistiken
           _buildTypeStatistics(typeStats),
@@ -139,9 +139,9 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 1.5,
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
+      childAspectRatio: 1.4, // Erhöht für mehr Platz
       children: [
         _buildStatCard(
           'Gesamt',
@@ -164,26 +164,30 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
     return Card(
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
+            Icon(icon, size: 24, color: color),
+            const SizedBox(height: 4),
             Text(
               value,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
             ),
             const SizedBox(height: 4),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
-              textAlign: TextAlign.center,
+            Flexible(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.grey.shade600,
+                    ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
             ),
           ],
         ),
@@ -193,6 +197,7 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
 
   Widget _buildTypeStatistics(Map<String, dynamic> typeStats) {
     return Card(
+      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -222,6 +227,7 @@ class _EvidenceStatisticsWidgetState extends State<EvidenceStatisticsWidget> {
 
   Widget _buildStatusStatistics(Map<String, dynamic> statusStats) {
     return Card(
+      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

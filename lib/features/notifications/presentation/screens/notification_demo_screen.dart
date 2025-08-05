@@ -1,7 +1,6 @@
 // features/notifications/presentation/screens/notification_demo_screen.dart
 import 'package:flutter/material.dart';
 
-import '../../../../core/app_config.dart';
 import '../../data/repositories/notification_repository_impl.dart';
 import '../../domain/usecases/notification_usecases.dart';
 import '../widgets/notification_list_widget.dart';
@@ -43,8 +42,8 @@ class _NotificationDemoScreenState extends State<NotificationDemoScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('🔔 Benachrichtigungen & Push-System'),
-        backgroundColor: AppConfig.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,

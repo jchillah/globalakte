@@ -1,7 +1,6 @@
 // features/evidence_collection/presentation/widgets/evidence_chain_widget.dart
 import 'package:flutter/material.dart';
 
-import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
 import '../../../../shared/widgets/global_button.dart';
 import '../../../../shared/widgets/global_input.dart';
@@ -91,7 +90,7 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
               onPressed: _showInfoDialog,
               icon: Icon(
                 Icons.info_outline,
-                color: AppConfig.primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
               tooltip: 'Informationen zu Beweismittel-Ketten',
             ),
@@ -153,7 +152,10 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
               subtitle: Text(
                 evidence.type,
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
                   fontSize: 12,
                 ),
               ),
@@ -173,21 +175,12 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
       itemCount: _allEvidence.length,
       itemBuilder: (context, index) {
         final evidence = _allEvidence[index];
-        final isSelected = _selectedEvidence.contains(evidence);
+        final isSelected = _selectedEvidence.any((e) => e.id == evidence.id);
 
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
-          child: CheckboxListTile(
-            value: isSelected,
-            onChanged: (selected) {
-              setState(() {
-                if (selected == true) {
-                  _addEvidenceToSelection(evidence);
-                } else {
-                  _removeEvidenceFromSelection(evidence);
-                }
-              });
-            },
+          child: ListTile(
+            leading: _buildEvidenceIcon(evidence.type),
             title: Text(
               evidence.title,
               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -204,7 +197,10 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
                     Text(
                       evidence.type,
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6),
                         fontSize: 12,
                       ),
                     ),
@@ -212,7 +208,31 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
                 ),
               ],
             ),
-            secondary: _buildEvidenceIcon(evidence.type),
+            trailing: Checkbox(
+              value: isSelected,
+              onChanged: (selected) {
+                setState(() {
+                  if (selected == true) {
+                    // Nur hinzufügen wenn nicht bereits vorhanden
+                    if (!_selectedEvidence.any((e) => e.id == evidence.id)) {
+                      _selectedEvidence.add(evidence);
+                    }
+                  } else {
+                    // Entfernen basierend auf ID
+                    _selectedEvidence.removeWhere((e) => e.id == evidence.id);
+                  }
+                });
+              },
+            ),
+            onTap: () {
+              setState(() {
+                if (_selectedEvidence.any((e) => e.id == evidence.id)) {
+                  _selectedEvidence.removeWhere((e) => e.id == evidence.id);
+                } else {
+                  _selectedEvidence.add(evidence);
+                }
+              });
+            },
           ),
         );
       },
@@ -324,17 +344,9 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
     );
   }
 
-  void _addEvidenceToSelection(EvidenceItem evidence) {
-    if (!_selectedEvidence.contains(evidence)) {
-      setState(() {
-        _selectedEvidence.add(evidence);
-      });
-    }
-  }
-
   void _removeEvidenceFromSelection(EvidenceItem evidence) {
     setState(() {
-      _selectedEvidence.remove(evidence);
+      _selectedEvidence.removeWhere((e) => e.id == evidence.id);
     });
   }
 
@@ -350,7 +362,8 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.info_outline, color: AppConfig.primaryColor),
+            Icon(Icons.info_outline,
+                color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 8),
             const Text('Beweismittel-Ketten'),
           ],
