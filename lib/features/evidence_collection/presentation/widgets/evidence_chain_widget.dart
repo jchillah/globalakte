@@ -173,7 +173,7 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
       itemCount: _allEvidence.length,
       itemBuilder: (context, index) {
         final evidence = _allEvidence[index];
-        final isSelected = _selectedEvidence.contains(evidence);
+        final isSelected = _selectedEvidence.any((e) => e.id == evidence.id);
 
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
@@ -182,9 +182,13 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
             onChanged: (selected) {
               setState(() {
                 if (selected == true) {
-                  _addEvidenceToSelection(evidence);
+                  // Nur hinzufügen wenn nicht bereits vorhanden
+                  if (!_selectedEvidence.any((e) => e.id == evidence.id)) {
+                    _selectedEvidence.add(evidence);
+                  }
                 } else {
-                  _removeEvidenceFromSelection(evidence);
+                  // Entfernen basierend auf ID
+                  _selectedEvidence.removeWhere((e) => e.id == evidence.id);
                 }
               });
             },
@@ -334,7 +338,7 @@ class _EvidenceChainWidgetState extends State<EvidenceChainWidget> {
 
   void _removeEvidenceFromSelection(EvidenceItem evidence) {
     setState(() {
-      _selectedEvidence.remove(evidence);
+      _selectedEvidence.removeWhere((e) => e.id == evidence.id);
     });
   }
 
