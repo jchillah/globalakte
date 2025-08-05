@@ -20,6 +20,11 @@ class SignInWithEmailAndPasswordUseCase {
 
     return await _authRepository.signInWithEmailAndPassword(email, password);
   }
+
+  /// Alternative execute-Methode für konsistente API
+  Future<AuthUser> execute(String email, String password) async {
+    return call(email, password);
+  }
 }
 
 /// Use Case: Neuen Benutzer registrieren
@@ -51,6 +56,11 @@ class SignUpWithEmailAndPasswordUseCase {
 
     return await _authRepository.signUpWithEmailAndPassword(email, password, name, role);
   }
+
+  /// Alternative execute-Methode für konsistente API
+  Future<AuthUser> execute(String email, String password, String name, String role) async {
+    return call(email, password, name, role);
+  }
 }
 
 /// Use Case: Benutzer abmelden
@@ -61,6 +71,11 @@ class SignOutUseCase {
 
   Future<void> call() async {
     await _authRepository.signOut();
+  }
+
+  /// Alternative execute-Methode für konsistente API
+  Future<void> execute() async {
+    return call();
   }
 }
 
@@ -77,6 +92,11 @@ class SignInWithPinUseCase {
 
     return await _authRepository.signInWithPin(pin);
   }
+
+  /// Alternative execute-Methode für konsistente API
+  Future<AuthUser> execute(String pin) async {
+    return call(pin);
+  }
 }
 
 /// Use Case: PIN setzen
@@ -92,6 +112,11 @@ class SetPinUseCase {
 
     await _authRepository.setPin(pin);
   }
+
+  /// Alternative execute-Methode für konsistente API
+  Future<void> execute(String pin) async {
+    return call(pin);
+  }
 }
 
 /// Use Case: Mit Biometrie anmelden
@@ -101,72 +126,16 @@ class SignInWithBiometricsUseCase {
   const SignInWithBiometricsUseCase(this._authRepository);
 
   Future<AuthUser> call() async {
-    final isAvailable = await _authRepository.isBiometricsAvailable();
-    if (!isAvailable) {
-      throw ArgumentError('Biometrie ist nicht verfügbar');
-    }
-
-    final isEnabled = await _authRepository.isBiometricsEnabled();
-    if (!isEnabled) {
-      throw ArgumentError('Biometrie ist nicht aktiviert');
-    }
-
     return await _authRepository.signInWithBiometrics();
   }
-}
 
-/// Use Case: Biometrie aktivieren/deaktivieren
-class SetBiometricsEnabledUseCase {
-  final AuthRepository _authRepository;
-
-  const SetBiometricsEnabledUseCase(this._authRepository);
-
-  Future<void> call(bool enabled) async {
-    if (enabled) {
-      final isAvailable = await _authRepository.isBiometricsAvailable();
-      if (!isAvailable) {
-        throw ArgumentError('Biometrie ist auf diesem Gerät nicht verfügbar');
-      }
-    }
-
-    await _authRepository.setBiometricsEnabled(enabled);
+  /// Alternative execute-Methode für konsistente API
+  Future<AuthUser> execute() async {
+    return call();
   }
 }
 
-/// Use Case: Authentifizierungsstatus prüfen
-class IsAuthenticatedUseCase {
-  final AuthRepository _authRepository;
-
-  const IsAuthenticatedUseCase(this._authRepository);
-
-  Future<bool> call() async {
-    return await _authRepository.isAuthenticated();
-  }
-}
-
-/// Use Case: Aktuellen Benutzer abrufen
-class GetCurrentUserUseCase {
-  final AuthRepository _authRepository;
-
-  const GetCurrentUserUseCase(this._authRepository);
-
-  Future<AuthUser?> call() async {
-    return await _authRepository.getCurrentUser();
-  }
-}
-
-/// Use Case: Benutzerdaten aktualisieren
-class UpdateUserUseCase {
-  final AuthRepository _authRepository;
-
-  const UpdateUserUseCase(this._authRepository);
-
-  Future<AuthUser> call(AuthUser user) async {
-    return await _authRepository.updateUser(user);
-  }
-}
-
-/// Use Case: Passwort-Reset Email senden
+/// Use Case: Passwort zurücksetzen
 class SendPasswordResetEmailUseCase {
   final AuthRepository _authRepository;
 
@@ -179,37 +148,25 @@ class SendPasswordResetEmailUseCase {
 
     await _authRepository.sendPasswordResetEmail(email);
   }
-}
 
-/// Use Case: PIN-Status prüfen
-class IsPinEnabledUseCase {
-  final AuthRepository _authRepository;
-
-  const IsPinEnabledUseCase(this._authRepository);
-
-  Future<bool> call() async {
-    return await _authRepository.isPinEnabled();
+  /// Alternative execute-Methode für konsistente API
+  Future<void> execute(String email) async {
+    return call(email);
   }
 }
 
-/// Use Case: Biometrie-Status prüfen
-class IsBiometricsEnabledUseCase {
+/// Use Case: Aktuellen Benutzer abrufen
+class GetCurrentUserUseCase {
   final AuthRepository _authRepository;
 
-  const IsBiometricsEnabledUseCase(this._authRepository);
+  const GetCurrentUserUseCase(this._authRepository);
 
-  Future<bool> call() async {
-    return await _authRepository.isBiometricsEnabled();
+  Future<AuthUser?> call() async {
+    return await _authRepository.getCurrentUser();
   }
-}
 
-/// Use Case: Biometrie-Verfügbarkeit prüfen
-class IsBiometricsAvailableUseCase {
-  final AuthRepository _authRepository;
-
-  const IsBiometricsAvailableUseCase(this._authRepository);
-
-  Future<bool> call() async {
-    return await _authRepository.isBiometricsAvailable();
+  /// Alternative execute-Methode für konsistente API
+  Future<AuthUser?> execute() async {
+    return call();
   }
 } 

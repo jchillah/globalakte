@@ -21,6 +21,7 @@ class GlobalTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final ValueChanged<String>? onChanged;
   final VoidCallback? onEditingComplete;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const GlobalTextField({
     super.key,
@@ -39,6 +40,7 @@ class GlobalTextField extends StatelessWidget {
     this.onTap,
     this.onChanged,
     this.onEditingComplete,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -66,6 +68,7 @@ class GlobalTextField extends StatelessWidget {
           onTap: onTap,
           onChanged: onChanged,
           onEditingComplete: onEditingComplete,
+          onFieldSubmitted: onFieldSubmitted,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
           ),
@@ -102,17 +105,86 @@ class GlobalTextField extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
               borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.error,
                 width: 2,
               ),
             ),
             filled: true,
-            fillColor: enabled
-                ? Theme.of(context).colorScheme.surface
-                : Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
-            contentPadding: const EdgeInsets.all(AppConfig.defaultPadding),
+            fillColor: Theme.of(context).colorScheme.surface,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppConfig.defaultPadding,
+              vertical: AppConfig.smallPadding,
+            ),
           ),
         ),
       ],
+    );
+  }
+}
+
+/// GlobalInput - Wrapper für GlobalTextField mit vereinfachter API
+class GlobalInput extends StatelessWidget {
+  final TextEditingController? controller;
+  final String labelText;
+  final String? hintText;
+  final TextInputType? keyboardType;
+  final bool obscureText;
+  final bool enabled;
+  final String? Function(String?)? validator;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final int? maxLines;
+  final int? maxLength;
+  final List<TextInputFormatter>? inputFormatters;
+  final VoidCallback? onTap;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onEditingComplete;
+  final ValueChanged<String>? onFieldSubmitted;
+
+  const GlobalInput({
+    super.key,
+    this.controller,
+    required this.labelText,
+    this.hintText,
+    this.keyboardType,
+    this.obscureText = false,
+    this.enabled = true,
+    this.validator,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.maxLines = 1,
+    this.maxLength,
+    this.inputFormatters,
+    this.onTap,
+    this.onChanged,
+    this.onEditingComplete,
+    this.onFieldSubmitted,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlobalTextField(
+      controller: controller,
+      label: labelText,
+      hint: hintText,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      enabled: enabled,
+      validator: validator,
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      maxLines: maxLines,
+      maxLength: maxLength,
+      inputFormatters: inputFormatters,
+      onTap: onTap,
+      onChanged: onChanged,
+      onEditingComplete: onEditingComplete,
+      onFieldSubmitted: onFieldSubmitted,
     );
   }
 }

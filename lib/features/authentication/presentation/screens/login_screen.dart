@@ -1,5 +1,6 @@
 // features/authentication/presentation/screens/login_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
@@ -10,6 +11,7 @@ import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/auth_usecases.dart';
 
 /// Login Screen für GlobalAkte
+/// Verbesserte Version mit Barrierefreiheit und moderner UI
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -30,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _isPinMode = false;
   bool _showPassword = false;
+  bool _rememberMe = false;
 
   @override
   void initState() {
@@ -55,6 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
         title: const Text('Anmelden'),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -69,6 +74,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 _buildAuthModeToggle(),
                 const SizedBox(height: AppConfig.largePadding),
                 _buildAuthForm(),
+                const SizedBox(height: AppConfig.largePadding),
+                _buildRememberMeCheckbox(),
                 const SizedBox(height: AppConfig.largePadding),
                 _buildActionButtons(),
                 const SizedBox(height: AppConfig.largePadding),
@@ -91,6 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: BoxDecoration(
             color: AppConfig.primaryColor,
             borderRadius: BorderRadius.circular(AppConfig.largeRadius),
+            boxShadow: [
+              BoxShadow(
+                color: AppConfig.primaryColor.withValues(alpha: 0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: const Icon(
             Icons.gavel,
@@ -99,25 +113,20 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         const SizedBox(height: AppConfig.defaultPadding),
-
-        // Titel
         Text(
           'Willkommen zurück',
-          style: AppConfig.headlineStyle.copyWith(fontSize: 28),
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
           textAlign: TextAlign.center,
         ),
-
         const SizedBox(height: AppConfig.smallPadding),
-
-        // Untertitel
         Text(
-          _isPinMode
-              ? 'Geben Sie Ihre PIN ein'
-              : 'Melden Sie sich mit Ihren Zugangsdaten an',
-          style: AppConfig.bodyStyle.copyWith(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
+          'Melden Sie sich an, um auf Ihre Akten zuzugreifen',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
           textAlign: TextAlign.center,
         ),
       ],
@@ -128,69 +137,68 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       padding: const EdgeInsets.all(AppConfig.smallPadding),
       decoration: BoxDecoration(
-        color: AppConfig.surfaceColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+        ),
       ),
       child: Row(
         children: [
           Expanded(
-            child: _buildToggleButton(
-              title: 'Email',
-              icon: Icons.email,
-              isSelected: !_isPinMode,
+            child: GestureDetector(
               onTap: () => setState(() => _isPinMode = false),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppConfig.smallPadding,
+                ),
+                decoration: BoxDecoration(
+                  color: !_isPinMode
+                      ? AppConfig.primaryColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(AppConfig.smallRadius),
+                ),
+                child: Text(
+                  'E-Mail',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: !_isPinMode
+                        ? Colors.white
+                        : Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
           ),
+          const SizedBox(width: AppConfig.smallPadding),
           Expanded(
-            child: _buildToggleButton(
-              title: 'PIN',
-              icon: Icons.lock,
-              isSelected: _isPinMode,
+            child: GestureDetector(
               onTap: () => setState(() => _isPinMode = true),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppConfig.smallPadding,
+                ),
+                decoration: BoxDecoration(
+                  color: _isPinMode
+                      ? AppConfig.primaryColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(AppConfig.smallRadius),
+                ),
+                child: Text(
+                  'PIN',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _isPinMode
+                        ? Colors.white
+                        : Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildToggleButton({
-    required String title,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppConfig.defaultPadding,
-          horizontal: AppConfig.smallPadding,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? AppConfig.primaryColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isSelected ? Colors.white : AppConfig.primaryColor,
-            ),
-            const SizedBox(width: AppConfig.smallPadding),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : AppConfig.primaryColor,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -199,59 +207,53 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_isPinMode) {
       return _buildPinForm();
     } else {
-      return _buildEmailPasswordForm();
+      return _buildEmailForm();
     }
   }
 
-  Widget _buildEmailPasswordForm() {
+  Widget _buildEmailForm() {
     return Column(
       children: [
-        // Email Field
-        GlobalTextField(
+        GlobalInput(
           controller: _emailController,
-          label: 'Email',
-          hint: 'ihre.email@beispiel.de',
+          labelText: 'E-Mail-Adresse',
+          hintText: 'ihre.email@beispiel.de',
           keyboardType: TextInputType.emailAddress,
+          prefixIcon: const Icon(Icons.email_outlined),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Email ist erforderlich';
+              return 'Bitte geben Sie Ihre E-Mail-Adresse ein';
             }
-            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
-              return 'Ungültige Email-Adresse';
+            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              return 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
             }
             return null;
           },
-          prefixIcon: const Icon(Icons.email),
+          onFieldSubmitted: (_) => _handleLogin(),
         ),
-
         const SizedBox(height: AppConfig.defaultPadding),
-
-        // Password Field
-        GlobalTextField(
+        GlobalInput(
           controller: _passwordController,
-          label: 'Passwort',
-          hint: 'Ihr Passwort',
+          labelText: 'Passwort',
+          hintText: 'Ihr Passwort',
           obscureText: !_showPassword,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Passwort ist erforderlich';
-            }
-            if (value.length < 8) {
-              return 'Passwort muss mindestens 8 Zeichen haben';
-            }
-            return null;
-          },
-          prefixIcon: const Icon(Icons.lock),
+          prefixIcon: const Icon(Icons.lock_outlined),
           suffixIcon: IconButton(
             icon: Icon(
               _showPassword ? Icons.visibility : Icons.visibility_off,
             ),
-            onPressed: () {
-              setState(() {
-                _showPassword = !_showPassword;
-              });
-            },
+            onPressed: () => setState(() => _showPassword = !_showPassword),
           ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Bitte geben Sie Ihr Passwort ein';
+            }
+            if (value.length < 6) {
+              return 'Das Passwort muss mindestens 6 Zeichen lang sein';
+            }
+            return null;
+          },
+          onFieldSubmitted: (_) => _handleLogin(),
         ),
       ],
     );
@@ -260,58 +262,46 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildPinForm() {
     return Column(
       children: [
-        // PIN Field
-        GlobalTextField(
+        GlobalInput(
           controller: _pinController,
-          label: 'PIN',
-          hint: 'Ihre 6-stellige PIN',
+          labelText: 'PIN',
+          hintText: 'Ihre 4-stellige PIN',
           keyboardType: TextInputType.number,
-          obscureText: true,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(4),
+          ],
+          prefixIcon: const Icon(Icons.pin_outlined),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'PIN ist erforderlich';
+              return 'Bitte geben Sie Ihre PIN ein';
             }
-            if (value.length < 6) {
-              return 'PIN muss mindestens 6 Ziffern haben';
-            }
-            if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-              return 'PIN darf nur Ziffern enthalten';
+            if (value.length != 4) {
+              return 'Die PIN muss 4-stellig sein';
             }
             return null;
           },
-          prefixIcon: const Icon(Icons.pin),
+          onFieldSubmitted: (_) => _handleLogin(),
         ),
+      ],
+    );
+  }
 
-        const SizedBox(height: AppConfig.smallPadding),
-
-        // PIN Info
-        Container(
-          padding: const EdgeInsets.all(AppConfig.defaultPadding),
-          decoration: BoxDecoration(
-            color: AppConfig.primaryColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
-            border: Border.all(
-              color: AppConfig.primaryColor.withValues(alpha: 0.3),
+  Widget _buildRememberMeCheckbox() {
+    return Row(
+      children: [
+        Checkbox(
+          value: _rememberMe,
+          onChanged: (value) => setState(() => _rememberMe = value ?? false),
+          activeColor: AppConfig.primaryColor,
+        ),
+        Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _rememberMe = !_rememberMe),
+            child: Text(
+              'Angemeldet bleiben',
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.info_outline,
-                color: AppConfig.primaryColor,
-                size: 20,
-              ),
-              const SizedBox(width: AppConfig.smallPadding),
-              Expanded(
-                child: Text(
-                  'PIN ist sicherer als Passwort und schneller einzugeben',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppConfig.primaryColor,
-                  ),
-                ),
-              ),
-            ],
           ),
         ),
       ],
@@ -321,21 +311,23 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildActionButtons() {
     return Column(
       children: [
-        // Login Button
         GlobalButton(
           text: _isLoading ? 'Anmelden...' : 'Anmelden',
           onPressed: _isLoading ? null : _handleLogin,
           isLoading: _isLoading,
-          icon: Icons.login,
         ),
-
         const SizedBox(height: AppConfig.defaultPadding),
-
-        // Register Link
-        GlobalTextButton(
-          text: 'Noch kein Konto? Registrieren',
-          onPressed: _handleRegister,
-          icon: Icons.person_add,
+        TextButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/register');
+          },
+          child: Text(
+            'Noch kein Konto? Registrieren',
+            style: TextStyle(
+              color: AppConfig.primaryColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ],
     );
@@ -344,47 +336,18 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildAdditionalOptions() {
     return Column(
       children: [
-        // Biometric Login
-        if (!_isPinMode) ...[
-          GlobalSecondaryButton(
-            text: 'Mit Biometrie anmelden',
-            onPressed: _handleBiometricLogin,
-            icon: Icons.fingerprint,
-          ),
-          const SizedBox(height: AppConfig.defaultPadding),
-        ],
-
-        // Forgot Password
-        if (!_isPinMode) ...[
-          GlobalTextButton(
-            text: 'Passwort vergessen?',
-            onPressed: _handleForgotPassword,
-            icon: Icons.help_outline,
-          ),
-          const SizedBox(height: AppConfig.defaultPadding),
-        ],
-
-        // Demo Info Button
-        GlobalTextButton(
-          text: 'Demo Login-Daten anzeigen',
-          onPressed: () {
-            SnackBarUtils.showInfo(
-              context,
-              'Demo Accounts:\n'
-              'demo@globalakte.de / Demo123!\n'
-              'test@globalakte.de / Test123!\n'
-              'admin@globalakte.de / Admin123!',
-            );
-          },
-          icon: Icons.info_outline,
-        ),
+        const Divider(),
         const SizedBox(height: AppConfig.defaultPadding),
-
-        // Back to Welcome
-        GlobalTextButton(
-          text: 'Zurück zum Start',
-          onPressed: () => Navigator.of(context).pop(),
-          icon: Icons.arrow_back,
+        TextButton.icon(
+          onPressed: _handleForgotPassword,
+          icon: const Icon(Icons.help_outline),
+          label: const Text('Passwort vergessen?'),
+        ),
+        const SizedBox(height: AppConfig.smallPadding),
+        TextButton.icon(
+          onPressed: _handleBiometricLogin,
+          icon: const Icon(Icons.fingerprint),
+          label: const Text('Biometrische Anmeldung'),
         ),
       ],
     );
@@ -395,197 +358,52 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       if (_isPinMode) {
-        try {
-          final user = await _signInWithPinUseCase.call(_pinController.text);
-          if (mounted) {
-            SnackBarUtils.showSuccess(
-              context,
-              'Erfolgreich mit PIN angemeldet: ${user.name}',
-            );
-            // Navigation zur Haupt-App - ohne Zurück-Button
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              '/home',
-              (route) => false, // Entfernt alle vorherigen Routes
-            );
-          }
-        } catch (e) {
-          if (mounted) {
-            SnackBarUtils.showError(
-              context,
-              'Falsche PIN: $e',
-            );
-          }
-        }
+        await _signInWithPinUseCase.execute(_pinController.text);
       } else {
-        try {
-          final user = await _signInWithEmailUseCase.call(
-            _emailController.text,
-            _passwordController.text,
-          );
-          if (mounted) {
-            SnackBarUtils.showSuccess(
-              context,
-              'Erfolgreich angemeldet: ${user.name}',
-            );
-            // Navigation zur Haupt-App - ohne Zurück-Button
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              '/home',
-              (route) => false, // Entfernt alle vorherigen Routes
-            );
-          }
-        } catch (e) {
-          if (mounted) {
-            SnackBarUtils.showError(
-              context,
-              'Anmeldung fehlgeschlagen: $e',
-            );
-          }
-        }
+        await _signInWithEmailUseCase.execute(
+          _emailController.text,
+          _passwordController.text,
+        );
+      }
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+        SnackBarUtils.showSuccess(
+          context,
+          'Erfolgreich angemeldet!',
+        );
       }
     } catch (e) {
-      if (!mounted) return;
-      SnackBarUtils.showError(
-        context,
-        'Anmeldung fehlgeschlagen: ${e.toString()}',
-      );
+      if (mounted) {
+        SnackBarUtils.showError(
+          context,
+          'Anmeldung fehlgeschlagen: ${e.toString()}',
+        );
+      }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
-    }
-  }
-
-  void _handleRegister() {
-    Navigator.of(context).pushNamed('/register');
-  }
-
-  Future<void> _handleBiometricLogin() async {
-    try {
-      final authRepository = AuthRepositoryImpl();
-      final biometrics = await authRepository.getAvailableBiometrics();
-
-      if (biometrics.isEmpty) {
-        if (mounted) {
-          SnackBarUtils.showError(
-            context,
-            'Biometrie ist auf diesem Gerät nicht verfügbar',
-          );
-        }
-        return;
-      }
-
-      final isAuthenticated = await authRepository.authenticateWithBiometrics();
-
-      if (!mounted) return;
-
-      if (isAuthenticated) {
-        if (mounted) {
-          SnackBarUtils.showSuccess(
-            context,
-            'Biometrie-Authentifizierung erfolgreich',
-          );
-          // Navigation zur Haupt-App - ohne Zurück-Button
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            '/home',
-            (route) => false, // Entfernt alle vorherigen Routes
-          );
-        }
-      } else {
-        if (mounted) {
-          SnackBarUtils.showError(
-            context,
-            'Biometrie-Authentifizierung fehlgeschlagen',
-          );
-        }
-      }
-    } catch (e) {
-      if (!mounted) return;
-      SnackBarUtils.showError(
-        context,
-        'Biometrie-Fehler: ${e.toString()}',
-      );
     }
   }
 
   void _handleForgotPassword() {
-    _showPasswordResetDialog();
-  }
-
-  void _showPasswordResetDialog() {
-    final emailController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Passwort zurücksetzen'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Geben Sie Ihre Email-Adresse ein, um Ihr Passwort zurückzusetzen.',
-            ),
-            const SizedBox(height: AppConfig.defaultPadding),
-            GlobalTextField(
-              controller: emailController,
-              label: 'Email',
-              hint: 'ihre.email@beispiel.de',
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Email ist erforderlich';
-                }
-                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
-                  return 'Ungültige Email-Adresse';
-                }
-                return null;
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Abbrechen'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (emailController.text.isNotEmpty) {
-                Navigator.of(context).pop();
-                await _handlePasswordReset(emailController.text);
-              }
-            },
-            child: const Text('Senden'),
-          ),
-        ],
-      ),
+    // TODO: Implementiere Passwort-Reset-Funktionalität
+    SnackBarUtils.showInfo(
+      context,
+      'Passwort-Reset-Funktion wird implementiert',
     );
   }
 
-  Future<void> _handlePasswordReset(String email) async {
-    try {
-      final authRepository = AuthRepositoryImpl();
-      await authRepository.sendPasswordResetEmail(email);
-
-      if (!mounted) return;
-
-      SnackBarUtils.showSuccess(
-        context,
-        'Passwort-Reset Email wurde an $email gesendet',
-      );
-    } catch (e) {
-      if (!mounted) return;
-      SnackBarUtils.showError(
-        context,
-        'Passwort-Reset fehlgeschlagen: ${e.toString()}',
-      );
-    }
+  void _handleBiometricLogin() {
+    // TODO: Implementiere biometrische Anmeldung
+    SnackBarUtils.showInfo(
+      context,
+      'Biometrische Anmeldung wird implementiert',
+    );
   }
 }

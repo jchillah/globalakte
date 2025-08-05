@@ -40,6 +40,7 @@ class AppConfig {
 
   // Border Radius
   static const double defaultRadius = 8.0;
+  static const double smallRadius = 4.0;
   static const double largeRadius = 16.0;
 
   // Animation Duration

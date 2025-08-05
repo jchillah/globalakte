@@ -1,15 +1,19 @@
 // features/document_management/presentation/screens/document_management_demo_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/app_config.dart';
 import '../../../../shared/utils/snackbar_utils.dart';
+import '../../../../shared/widgets/global_button.dart';
+import '../../../../shared/widgets/global_input.dart';
 import '../../../encryption/data/repositories/encryption_repository_impl.dart';
 import '../../data/repositories/document_repository_impl.dart';
 import '../../domain/entities/document.dart';
 import '../../domain/repositories/document_repository.dart';
 import '../../domain/usecases/document_usecases.dart';
 
-/// Demo-Screen für die Dokumentenverwaltung
+/// Verbesserte Dokumentenverwaltung mit moderner UI und Barrierefreiheit
 class DocumentManagementDemoScreen extends StatefulWidget {
   const DocumentManagementDemoScreen({super.key});
 
@@ -32,9 +36,30 @@ class _DocumentManagementDemoScreenState
   late SyncWithCloudUseCase _syncWithCloudUseCase;
 
   List<Document> _documents = [];
+  List<Document> _filteredDocuments = [];
   Map<String, dynamic> _statistics = {};
   bool _isLoading = false;
+  bool _isSearching = false;
   String _searchQuery = '';
+  String _selectedCategory = 'Alle';
+  String _selectedSortBy = 'Datum';
+  bool _showOnlyEncrypted = false;
+
+  final List<String> _categories = [
+    'Alle',
+    'Verträge',
+    'Urteile',
+    'Korrespondenz',
+    'Beweise',
+    'Sonstiges',
+  ];
+
+  final List<String> _sortOptions = [
+    'Datum',
+    'Name',
+    'Größe',
+    'Kategorie',
+  ];
 
   @override
   void initState() {
@@ -65,7 +90,7 @@ class _DocumentManagementDemoScreenState
       await _loadDocuments();
     } catch (e) {
       if (mounted) {
-        SnackBarUtils.showErrorSnackBar(
+        SnackBarUtils.showError(
             context, 'Fehler bei der Initialisierung: $e');
       }
     }
@@ -83,6 +108,7 @@ class _DocumentManagementDemoScreenState
 
       setState(() {
         _documents = documents;
+        _filteredDocuments = documents;
         _statistics = statistics;
         _isLoading = false;
       });
@@ -91,274 +117,238 @@ class _DocumentManagementDemoScreenState
         _isLoading = false;
       });
       if (mounted) {
-        SnackBarUtils.showErrorSnackBar(
+        SnackBarUtils.showError(
             context, 'Fehler beim Laden der Dokumente: $e');
       }
     }
   }
 
-  /// Erstellt ein Demo-Dokument
-  Future<void> _createDemoDocument() async {
-    try {
-      final demoDocument = Document(
-        id: '',
-        title: 'Demo-Dokument ${_documents.length + 1}',
-        description: 'Ein Demo-Dokument für Testzwecke',
-        filePath: '/demo/path/document_${_documents.length + 1}.pdf',
-        fileType: 'pdf',
-        documentType: DocumentType.pdf,
-        fileSize: 1024 * 1024, // 1MB
-        createdAt: DateTime.now(),
-        createdBy: 'demo_user',
-        category: DocumentCategory.legal,
-        status: DocumentStatus.draft,
-        isEncrypted: false,
-      );
+  /// Filtert und sortiert die Dokumente
+  void _filterAndSortDocuments() {
+    List<Document> filtered = _documents;
 
-      final createdDocument = await _createDocumentUseCase(demoDocument);
-
-      setState(() {
-        _documents.add(createdDocument);
-      });
-
-      if (mounted) {
-        SnackBarUtils.showSuccessSnackBar(
-            context, 'Demo-Dokument erstellt: ${createdDocument.title}');
-      }
-      await _loadDocuments(); // Aktualisiere Statistiken
-    } catch (e) {
-      if (mounted) {
-        SnackBarUtils.showErrorSnackBar(
-            context, 'Fehler beim Erstellen des Demo-Dokuments: $e');
-      }
+    // Kategorie-Filter
+    if (_selectedCategory != 'Alle') {
+      filtered = filtered.where((doc) => doc.category.name == _selectedCategory).toList();
     }
-  }
 
-  /// Verschlüsselt ein Dokument
-  Future<void> _encryptDocument(String documentId) async {
-    try {
-      await _encryptDocumentUseCase(documentId, 'demo_key_1');
-      await _loadDocuments();
-      if (mounted) {
-        SnackBarUtils.showSuccessSnackBar(context, 'Dokument verschlüsselt');
-      }
-    } catch (e) {
-      if (mounted) {
-        SnackBarUtils.showErrorSnackBar(
-            context, 'Fehler beim Verschlüsseln: $e');
-      }
+    // Verschlüsselungs-Filter
+    if (_showOnlyEncrypted) {
+      filtered = filtered.where((doc) => doc.isEncrypted).toList();
     }
-  }
 
-  /// Entschlüsselt ein Dokument
-  Future<void> _decryptDocument(String documentId) async {
-    try {
-      await _decryptDocumentUseCase(documentId);
-      await _loadDocuments();
-      if (mounted) {
-        SnackBarUtils.showSuccessSnackBar(context, 'Dokument entschlüsselt');
-      }
-    } catch (e) {
-      if (mounted) {
-        SnackBarUtils.showErrorSnackBar(
-            context, 'Fehler beim Entschlüsseln: $e');
-      }
+    // Such-Filter
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered.where((doc) =>
+          doc.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          doc.description.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          doc.category.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
     }
-  }
 
-  /// Exportiert ein Dokument
-  Future<void> _exportDocument(String documentId) async {
-    try {
-      final exportPath = await _exportDocumentUseCase(documentId, 'pdf');
-      if (mounted) {
-        SnackBarUtils.showSuccessSnackBar(
-            context, 'Dokument exportiert: $exportPath');
-      }
-    } catch (e) {
-      if (mounted) {
-        SnackBarUtils.showErrorSnackBar(context, 'Fehler beim Exportieren: $e');
-      }
+    // Sortierung
+    switch (_selectedSortBy) {
+      case 'Datum':
+        filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      case 'Name':
+        filtered.sort((a, b) => a.title.compareTo(b.title));
+        break;
+      case 'Größe':
+        filtered.sort((a, b) => b.fileSize.compareTo(a.fileSize));
+        break;
+      case 'Kategorie':
+        filtered.sort((a, b) => a.category.name.compareTo(b.category.name));
+        break;
     }
-  }
 
-  /// Erstellt ein Backup
-  Future<void> _createBackup() async {
-    try {
-      final backupPath = await _createBackupUseCase();
-      if (mounted) {
-        SnackBarUtils.showSuccessSnackBar(
-            context, 'Backup erstellt: $backupPath');
-      }
-    } catch (e) {
-      if (mounted) {
-        SnackBarUtils.showErrorSnackBar(
-            context, 'Fehler beim Erstellen des Backups: $e');
-      }
-    }
-  }
-
-  /// Synchronisiert mit der Cloud
-  Future<void> _syncWithCloud() async {
-    try {
-      final success = await _syncWithCloudUseCase();
-      if (mounted) {
-        if (success) {
-          SnackBarUtils.showSuccessSnackBar(
-              context, 'Cloud-Synchronisation erfolgreich');
-        } else {
-          SnackBarUtils.showErrorSnackBar(
-              context, 'Cloud-Synchronisation fehlgeschlagen');
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        SnackBarUtils.showErrorSnackBar(
-            context, 'Fehler bei der Cloud-Synchronisation: $e');
-      }
-    }
-  }
-
-  /// Sucht Dokumente
-  Future<void> _searchDocuments(String query) async {
-    try {
-      final results = await _searchDocumentsUseCase(query);
-      setState(() {
-        _documents = results;
-        _searchQuery = query;
-      });
-    } catch (e) {
-      if (mounted) {
-        SnackBarUtils.showErrorSnackBar(context, 'Fehler bei der Suche: $e');
-      }
-    }
+    setState(() {
+      _filteredDocuments = filtered;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppConfig.backgroundColor,
       appBar: AppBar(
-        title: const Text('Dokumentenverwaltung Demo'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
+        title: const Text('Dokumentenverwaltung'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadDocuments,
-            tooltip: 'Aktualisieren',
+            icon: const Icon(Icons.add),
+            onPressed: _showAddDocumentDialog,
+            tooltip: 'Neues Dokument hinzufügen',
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: _showSettingsDialog,
+            tooltip: 'Einstellungen',
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                _buildStatisticsCard(),
-                _buildSearchBar(),
-                Expanded(
-                  child: _documents.isEmpty
-                      ? _buildEmptyState()
-                      : _buildDocumentsList(),
-                ),
-              ],
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _createDemoDocument,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+      body: Column(
+        children: [
+          _buildSearchAndFilters(),
+          _buildStatistics(),
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _buildDocumentsList(),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddDocumentDialog,
+        icon: const Icon(Icons.add),
+        label: const Text('Neues Dokument'),
+        backgroundColor: AppConfig.primaryColor,
         foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
       ),
     );
   }
 
-  /// Erstellt die Statistik-Karte
-  Widget _buildStatisticsCard() {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildSearchAndFilters() {
+    return Container(
+      padding: const EdgeInsets.all(AppConfig.defaultPadding),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Suchleiste
+          GlobalInput(
+            labelText: 'Dokumente durchsuchen',
+            hintText: 'Name, Beschreibung oder Kategorie eingeben...',
+            prefixIcon: const Icon(Icons.search),
+            onChanged: (value) {
+              setState(() {
+                _searchQuery = value;
+              });
+              _filterAndSortDocuments();
+            },
+          ),
+          const SizedBox(height: AppConfig.defaultPadding),
+          
+          // Filter und Sortierung
+          Row(
+            children: [
+              Expanded(
+                child: _buildFilterChip(
+                  label: 'Kategorie: $_selectedCategory',
+                  onTap: _showCategoryFilter,
+                ),
+              ),
+              const SizedBox(width: AppConfig.smallPadding),
+              Expanded(
+                child: _buildFilterChip(
+                  label: 'Sortierung: $_selectedSortBy',
+                  onTap: _showSortOptions,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppConfig.smallPadding),
+          
+          // Verschlüsselungs-Filter
+          Row(
+            children: [
+              Checkbox(
+                value: _showOnlyEncrypted,
+                onChanged: (value) {
+                  setState(() {
+                    _showOnlyEncrypted = value ?? false;
+                  });
+                  _filterAndSortDocuments();
+                },
+                activeColor: AppConfig.primaryColor,
+              ),
+              const Text('Nur verschlüsselte Dokumente'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip({
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppConfig.defaultPadding,
+          vertical: AppConfig.smallPadding,
+        ),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Dokumenten-Statistiken',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            Expanded(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _buildStatItem(
-                  'Gesamt',
-                  _statistics['totalDocuments']?.toString() ?? '0',
-                  Icons.description,
-                ),
-                _buildStatItem(
-                  'Verschlüsselt',
-                  _statistics['encryptedDocuments']?.toString() ?? '0',
-                  Icons.lock,
-                ),
-                _buildStatItem(
-                  'Größe',
-                  '${(_statistics['totalSize'] ?? 0) ~/ 1024} KB',
-                  Icons.storage,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _createBackup,
-                    icon: const Icon(Icons.backup),
-                    label: const Text('Backup'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _syncWithCloud,
-                    icon: const Icon(Icons.cloud_sync),
-                    label: const Text('Cloud Sync'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            const Icon(Icons.arrow_drop_down, size: 20),
           ],
         ),
       ),
     );
   }
 
-  /// Erstellt ein Statistik-Element
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Expanded(
-      child: Column(
+  Widget _buildStatistics() {
+    if (_statistics.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.all(AppConfig.defaultPadding),
+      padding: const EdgeInsets.all(AppConfig.defaultPadding),
+      decoration: BoxDecoration(
+        color: AppConfig.primaryColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+        border: Border.all(
+          color: AppConfig.primaryColor.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
         children: [
-          Icon(icon, color: Colors.grey[600]),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.description,
+              label: 'Gesamt',
+              value: '${_statistics['totalDocuments'] ?? 0}',
             ),
           ),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.lock,
+              label: 'Verschlüsselt',
+              value: '${_statistics['encryptedDocuments'] ?? 0}',
+            ),
+          ),
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.storage,
+              label: 'Größe',
+              value: '${_statistics['totalSize'] ?? '0'} MB',
             ),
           ),
         ],
@@ -366,41 +356,51 @@ class _DocumentManagementDemoScreenState
     );
   }
 
-  /// Erstellt die Suchleiste
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Dokumente suchen...',
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon: _searchQuery.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
-                      _searchQuery = '';
-                    });
-                    _loadDocuments();
-                  },
-                )
-              : null,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+  Widget _buildStatItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          color: AppConfig.primaryColor,
+          size: 24,
         ),
-        onChanged: (value) {
-          if (value.isEmpty) {
-            _loadDocuments();
-          } else {
-            _searchDocuments(value);
-          }
-        },
-      ),
+        const SizedBox(height: AppConfig.smallPadding),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppConfig.primaryColor,
+              ),
+        ),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppConfig.primaryColor.withValues(alpha: 0.7),
+              ),
+        ),
+      ],
     );
   }
 
-  /// Erstellt den leeren Zustand
+  Widget _buildDocumentsList() {
+    if (_filteredDocuments.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(AppConfig.defaultPadding),
+      itemCount: _filteredDocuments.length,
+      itemBuilder: (context, index) {
+        final document = _filteredDocuments[index];
+        return _buildDocumentCard(document);
+      },
+    );
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -409,120 +409,125 @@ class _DocumentManagementDemoScreenState
           Icon(
             Icons.folder_open,
             size: 64,
-            color: Colors.grey[400],
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConfig.defaultPadding),
           Text(
             'Keine Dokumente gefunden',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[600],
-            ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppConfig.smallPadding),
           Text(
-            'Erstellen Sie Ihr erstes Dokument mit dem + Button',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            'Fügen Sie Ihr erstes Dokument hinzu oder ändern Sie die Filtereinstellungen',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  /// Erstellt die Dokumentenliste
-  Widget _buildDocumentsList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _documents.length,
-      itemBuilder: (context, index) {
-        final document = _documents[index];
-        return _buildDocumentCard(document);
-      },
-    );
-  }
-
-  /// Erstellt eine Dokumenten-Karte
   Widget _buildDocumentCard(Document document) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppConfig.defaultPadding),
+      elevation: 2,
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: _getCategoryColor(document.category),
+        leading: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: _getCategoryColor(document.category.name).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppConfig.defaultRadius),
+          ),
           child: Icon(
-            _getCategoryIcon(document.category),
-            color: Colors.white,
+            _getCategoryIcon(document.category.name),
+            color: _getCategoryColor(document.category.name),
           ),
         ),
         title: Text(
           document.title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(document.description),
+            Text(
+              document.description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
             const SizedBox(height: 4),
             Row(
               children: [
-                _buildStatusChip(document.status),
-                const SizedBox(width: 8),
+                Icon(
+                  Icons.category,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  document.category.name,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                ),
+                const Spacer(),
                 if (document.isEncrypted)
-                  const Chip(
-                    label: Text('Verschlüsselt'),
-                    backgroundColor: Colors.green,
-                    labelStyle: TextStyle(color: Colors.white, fontSize: 10),
+                  Icon(
+                    Icons.lock,
+                    size: 16,
+                    color: AppConfig.secondaryColor,
                   ),
+                const SizedBox(width: 4),
+                Text(
+                  '${document.fileSize} KB',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                ),
               ],
-            ),
-            Text(
-              '${document.fileSize ~/ 1024} KB • ${document.fileType.toUpperCase()}',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
             ),
           ],
         ),
         trailing: PopupMenuButton<String>(
-          onSelected: (value) {
-            switch (value) {
-              case 'encrypt':
-                _encryptDocument(document.id);
-                break;
-              case 'decrypt':
-                _decryptDocument(document.id);
-                break;
-              case 'export':
-                _exportDocument(document.id);
-                break;
-            }
-          },
+          onSelected: (value) => _handleDocumentAction(value, document),
           itemBuilder: (context) => [
-            if (!document.isEncrypted)
-              const PopupMenuItem(
-                value: 'encrypt',
-                child: Row(
-                  children: [
-                    Icon(Icons.lock),
-                    SizedBox(width: 8),
-                    Text('Verschlüsseln'),
-                  ],
-                ),
+            const PopupMenuItem(
+              value: 'view',
+              child: Row(
+                children: [
+                  Icon(Icons.visibility),
+                  SizedBox(width: 8),
+                  Text('Anzeigen'),
+                ],
               ),
-            if (document.isEncrypted)
-              const PopupMenuItem(
-                value: 'decrypt',
-                child: Row(
-                  children: [
-                    Icon(Icons.lock_open),
-                    SizedBox(width: 8),
-                    Text('Entschlüsseln'),
-                  ],
-                ),
+            ),
+            const PopupMenuItem(
+              value: 'edit',
+              child: Row(
+                children: [
+                  Icon(Icons.edit),
+                  SizedBox(width: 8),
+                  Text('Bearbeiten'),
+                ],
               ),
+            ),
+            const PopupMenuItem(
+              value: 'encrypt',
+              child: Row(
+                children: [
+                  Icon(Icons.lock),
+                  SizedBox(width: 8),
+                  Text('Verschlüsseln'),
+                ],
+              ),
+            ),
             const PopupMenuItem(
               value: 'export',
               child: Row(
@@ -533,102 +538,220 @@ class _DocumentManagementDemoScreenState
                 ],
               ),
             ),
+            const PopupMenuItem(
+              value: 'delete',
+              child: Row(
+                children: [
+                  Icon(Icons.delete, color: Colors.red),
+                  SizedBox(width: 8),
+                  Text('Löschen', style: TextStyle(color: Colors.red)),
+                ],
+              ),
+            ),
           ],
+        ),
+        onTap: () => _viewDocument(document),
+      ),
+    );
+  }
+
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'Verträge':
+        return Colors.blue;
+      case 'Urteile':
+        return Colors.red;
+      case 'Korrespondenz':
+        return Colors.green;
+      case 'Beweise':
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Verträge':
+        return Icons.description;
+      case 'Urteile':
+        return Icons.gavel;
+      case 'Korrespondenz':
+        return Icons.mail;
+      case 'Beweise':
+        return Icons.photo_camera;
+      default:
+        return Icons.insert_drive_file;
+    }
+  }
+
+  void _showCategoryFilter() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Kategorie auswählen'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: _categories.map((category) => ListTile(
+            title: Text(category),
+            leading: Radio<String>(
+              value: category,
+              groupValue: _selectedCategory,
+              onChanged: (value) {
+                setState(() {
+                  _selectedCategory = value!;
+                });
+                _filterAndSortDocuments();
+                Navigator.pop(context);
+              },
+            ),
+          )).toList(),
         ),
       ),
     );
   }
 
-  /// Erstellt einen Status-Chip
-  Widget _buildStatusChip(DocumentStatus status) {
-    Color backgroundColor;
-    String label;
-
-    switch (status) {
-      case DocumentStatus.draft:
-        backgroundColor = Colors.grey;
-        label = 'Entwurf';
-        break;
-      case DocumentStatus.pending:
-        backgroundColor = Colors.orange;
-        label = 'Ausstehend';
-        break;
-      case DocumentStatus.approved:
-        backgroundColor = Colors.green;
-        label = 'Genehmigt';
-        break;
-      case DocumentStatus.rejected:
-        backgroundColor = Colors.red;
-        label = 'Abgelehnt';
-        break;
-      case DocumentStatus.archived:
-        backgroundColor = Colors.blue;
-        label = 'Archiviert';
-        break;
-      case DocumentStatus.expired:
-        backgroundColor = Colors.purple;
-        label = 'Abgelaufen';
-        break;
-    }
-
-    return Chip(
-      label: Text(
-        label,
-        style: const TextStyle(color: Colors.white, fontSize: 10),
+  void _showSortOptions() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sortierung auswählen'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: _sortOptions.map((option) => ListTile(
+            title: Text(option),
+            leading: Radio<String>(
+              value: option,
+              groupValue: _selectedSortBy,
+              onChanged: (value) {
+                setState(() {
+                  _selectedSortBy = value!;
+                });
+                _filterAndSortDocuments();
+                Navigator.pop(context);
+              },
+            ),
+          )).toList(),
+        ),
       ),
-      backgroundColor: backgroundColor,
     );
   }
 
-  /// Holt die Farbe für eine Kategorie
-  Color _getCategoryColor(DocumentCategory category) {
-    switch (category) {
-      case DocumentCategory.legal:
-        return Colors.red;
-      case DocumentCategory.medical:
-        return Colors.green;
-      case DocumentCategory.financial:
-        return Colors.blue;
-      case DocumentCategory.personal:
-        return Colors.purple;
-      case DocumentCategory.official:
-        return Colors.orange;
-      case DocumentCategory.correspondence:
-        return Colors.teal;
-      case DocumentCategory.evidence:
-        return Colors.indigo;
-      case DocumentCategory.contract:
-        return Colors.brown;
-      case DocumentCategory.certificate:
-        return Colors.cyan;
-      case DocumentCategory.other:
-        return Colors.grey;
+  void _showAddDocumentDialog() {
+    // TODO: Implementiere Dialog zum Hinzufügen von Dokumenten
+    SnackBarUtils.showInfo(
+      context,
+      'Dokument hinzufügen wird implementiert',
+    );
+  }
+
+  void _showSettingsDialog() {
+    // TODO: Implementiere Einstellungen-Dialog
+    SnackBarUtils.showInfo(
+      context,
+      'Einstellungen werden implementiert',
+    );
+  }
+
+  void _viewDocument(Document document) {
+    // TODO: Implementiere Dokument-Anzeige
+    SnackBarUtils.showInfo(
+      context,
+      'Dokument wird angezeigt: ${document.title}',
+    );
+  }
+
+  void _handleDocumentAction(String action, Document document) {
+    switch (action) {
+      case 'view':
+        _viewDocument(document);
+        break;
+      case 'edit':
+        // TODO: Implementiere Dokument-Bearbeitung
+        SnackBarUtils.showInfo(
+          context,
+          'Dokument bearbeiten wird implementiert',
+        );
+        break;
+      case 'encrypt':
+        _encryptDocument(document);
+        break;
+      case 'export':
+        _exportDocument(document);
+        break;
+      case 'delete':
+        _deleteDocument(document);
+        break;
     }
   }
 
-  /// Holt das Icon für eine Kategorie
-  IconData _getCategoryIcon(DocumentCategory category) {
-    switch (category) {
-      case DocumentCategory.legal:
-        return Icons.gavel;
-      case DocumentCategory.medical:
-        return Icons.medical_services;
-      case DocumentCategory.financial:
-        return Icons.account_balance;
-      case DocumentCategory.personal:
-        return Icons.person;
-      case DocumentCategory.official:
-        return Icons.admin_panel_settings;
-      case DocumentCategory.correspondence:
-        return Icons.mail;
-      case DocumentCategory.evidence:
-        return Icons.fingerprint;
-      case DocumentCategory.contract:
-        return Icons.description;
-      case DocumentCategory.certificate:
-        return Icons.verified;
-      case DocumentCategory.other:
-        return Icons.folder;
+  Future<void> _encryptDocument(Document document) async {
+    try {
+      await _encryptDocumentUseCase(document.id, 'demo_key_1');
+      await _loadDocuments();
+      SnackBarUtils.showSuccess(
+        context,
+        'Dokument erfolgreich verschlüsselt',
+      );
+    } catch (e) {
+      SnackBarUtils.showError(
+        context,
+        'Fehler beim Verschlüsseln: $e',
+      );
+    }
+  }
+
+  Future<void> _exportDocument(Document document) async {
+    try {
+      await _exportDocumentUseCase(document.id, 'pdf');
+      SnackBarUtils.showSuccess(
+        context,
+        'Dokument erfolgreich exportiert',
+      );
+    } catch (e) {
+      SnackBarUtils.showError(
+        context,
+        'Fehler beim Exportieren: $e',
+      );
+    }
+  }
+
+  Future<void> _deleteDocument(Document document) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Dokument löschen'),
+        content: Text(
+          'Möchten Sie das Dokument "${document.title}" wirklich löschen?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Abbrechen'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        // TODO: Implementiere Dokument-Löschung
+        SnackBarUtils.showSuccess(
+          context,
+          'Dokument erfolgreich gelöscht',
+        );
+        await _loadDocuments();
+      } catch (e) {
+        SnackBarUtils.showError(
+          context,
+          'Fehler beim Löschen: $e',
+        );
+      }
     }
   }
 }
